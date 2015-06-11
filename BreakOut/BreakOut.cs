@@ -18,7 +18,7 @@ namespace Game {
         int paddleSpeed = 0;
         int numRow = 0;
         int numCol = 0;
-        int lives = 3;
+        int lives = 5;
         List<int> difficultyLevel = null;
         //float debugDTime = 0;
         List<Rect> obstacles = null;
