@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pong", "Pong\Pong.csproj", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BreakOut", "BreakOut\BreakOut.csproj", "{5CED4C80-4A32-4877-83D7-B2C1BFDAC633}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Snake", "Snake\Snake.csproj", "{AB464B2D-06F6-4D76-8397-C09B616E52CC}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,10 @@ Global
 		{5CED4C80-4A32-4877-83D7-B2C1BFDAC633}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5CED4C80-4A32-4877-83D7-B2C1BFDAC633}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5CED4C80-4A32-4877-83D7-B2C1BFDAC633}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AB464B2D-06F6-4D76-8397-C09B616E52CC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AB464B2D-06F6-4D76-8397-C09B616E52CC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AB464B2D-06F6-4D76-8397-C09B616E52CC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AB464B2D-06F6-4D76-8397-C09B616E52CC}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
