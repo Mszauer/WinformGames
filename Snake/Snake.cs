@@ -17,6 +17,8 @@ namespace Game {
         float deltaTime = 0;
         int size = 30;
         float moveAccum = 0;
+        enum Direction {Up,Down,Left,Right};
+        Direction currentDirection = Direction.Right;
 
         public Snake() {
             this.title = "Snake";
@@ -82,35 +84,43 @@ namespace Game {
         }
         public Rect SnakeMove() {
             Rect r = snake[0];
-            
-            if (KeyDown(Keys.Up)) {
-                moveAccum += deltaTime;
-                if (moveAccum > 1.0f / (float)speed) {
+            moveAccum += deltaTime;
 
-                    r.Y -= size;
-                    moveAccum -= 1.0f / (float)speed;
+            if (KeyDown(Keys.Up)) {
+                if (currentDirection != Direction.Down) {
+                    currentDirection = Direction.Up;
                 }
             }
             else if (KeyDown(Keys.Down)) {
-                moveAccum += deltaTime;
-                if (moveAccum > 1.0f / (float)speed) {
-                    r.Y += size;
-                    moveAccum -= 1.0f / (float)speed;
+                if (currentDirection != Direction.Up) {
+                    currentDirection = Direction.Down;
                 }
             }
             else if (KeyDown(Keys.Left)) {
-                moveAccum += deltaTime;
-                if (moveAccum > 1.0f / (float)speed) {
-                    r.X -= size;
-                    moveAccum -= 1.0f / (float)speed;
+                if (currentDirection != Direction.Right) {
+                    currentDirection = Direction.Left;
                 }
             }
             else if (KeyDown(Keys.Right)) {
-                moveAccum += deltaTime;
-                if (moveAccum > 1.0f / (float)speed) {
-                    r.X += size;
-                    moveAccum -= 1.0f / (float)speed;
+                if (currentDirection != Direction.Left) {
+                    currentDirection = Direction.Right;
                 }
+            }
+
+            if (moveAccum > 1.0f / (float)speed) {
+                if (currentDirection == Direction.Up) {
+                    r.Y -= size;
+                }
+                if (currentDirection == Direction.Down) {
+                    r.Y += size;
+                }
+                if (currentDirection == Direction.Left) {
+                    r.X -= size;
+                }
+                if (currentDirection == Direction.Right) {
+                    r.X += size;
+                }
+                moveAccum -= 1.0f / (float)speed;
             }
 
             return new Rect(r) ;
