@@ -14,6 +14,7 @@ namespace Game {
         Random r = null;
         List<Rect> snake = null;
         int speed = 1;
+        int foodEaten = 0;
         float deltaTime = 0;
         int size = 30;
         float moveAccum = 0;
@@ -70,20 +71,25 @@ namespace Game {
             if (KeyPressed(Keys.R)) {
                 GenerateFood();
             }
-            if (snake[0].X + snake[0].W > width/size*size || snake[0].X + snake[0].W < 0 || snake[0].Y < 0 || snake[0].Y + snake[0].H > height) {
-
-            }
-            else {
+            if (CheckBoundry()) {
                 Rect tail = SnakeMove();
                 GenerateBody(tail);
+            }
+            else {
+                ShutDown();
             }
         }
         public override void ShutDown() {
 
         }
         public bool CheckBoundry (){
-            if (snake[0].X <= 0 || snake[0].X + snake[0].W >= width || snake[0].Y <= 0 || snake[0].Y + snake[0].H > height) {
+            if (snake[0].X + snake[0].W > width / size * size || snake[0].X + snake[0].W < 0 || snake[0].Y < 0 || snake[0].Y + snake[0].H > height) {
                 return false;
+            }
+            for (int i = snake.Count-1; i >= 1; i--) {
+                if (snake[0].X == snake[i].X && snake[0].Y == snake[i].Y) {
+                    return false;
+                }
             }
             return true;
         }
@@ -92,6 +98,11 @@ namespace Game {
             if (snake[0].X == food.X && snake[0].Y == food.Y) {
                 snake.Add(new Rect(r));
                 GenerateFood();
+                foodEaten++;
+                if (foodEaten >= 3) {
+                    speed += 1;
+                    foodEaten = 0;
+                }
             }
         }
         public Rect SnakeMove() {
@@ -147,6 +158,11 @@ namespace Game {
         public Rect GenerateFood() {
             Point foodLocation = new Point(r.Next(0, width / size)*size, r.Next(0, height / size)*size);
             food = new Rect(foodLocation, new Size(size, size));
+            for (int i = 0; i < snake.Count; i++) {
+                if (food.X == snake[i].X && food.Y == snake[i].Y) {
+                    continue;
+                }
+            }
             return food;
         }
     }
