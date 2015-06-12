@@ -13,9 +13,10 @@ namespace Game {
         Rect food = null;
         Random r = null;
         List<Rect> snake = null;
-        int speed = 0;
+        int speed = 1;
         float deltaTime = 0;
         int size = 30;
+        float moveAccum = 0;
 
         public Snake() {
             this.title = "Snake";
@@ -61,6 +62,10 @@ namespace Game {
             if (KeyPressed(Keys.R)) {
                 GenerateFood();
             }
+            if (snake[0].X + snake[0].W > width || snake[0].X + snake[0].W < 0 || snake[0].Y < 0 || snake[0].Y + snake[0].H > height) {
+
+            }
+            SnakeMove();
         }
         public override void ShutDown() {
 
@@ -76,7 +81,39 @@ namespace Game {
 
         }
         public Rect SnakeMove() {
-            return null;
+            Rect r = snake[0];
+            
+            if (KeyDown(Keys.Up)) {
+                moveAccum += deltaTime;
+                if (moveAccum > 1.0f / (float)speed) {
+
+                    r.Y -= size;
+                    moveAccum -= 1.0f / (float)speed;
+                }
+            }
+            else if (KeyDown(Keys.Down)) {
+                moveAccum += deltaTime;
+                if (moveAccum > 1.0f / (float)speed) {
+                    r.Y += size;
+                    moveAccum -= 1.0f / (float)speed;
+                }
+            }
+            else if (KeyDown(Keys.Left)) {
+                moveAccum += deltaTime;
+                if (moveAccum > 1.0f / (float)speed) {
+                    r.X -= size;
+                    moveAccum -= 1.0f / (float)speed;
+                }
+            }
+            else if (KeyDown(Keys.Right)) {
+                moveAccum += deltaTime;
+                if (moveAccum > 1.0f / (float)speed) {
+                    r.X += size;
+                    moveAccum -= 1.0f / (float)speed;
+                }
+            }
+
+            return new Rect(r) ;
         }
 
         public Rect GenerateFood() {
