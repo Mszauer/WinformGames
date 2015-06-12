@@ -28,6 +28,8 @@ namespace Game {
         }
 
         public override void Initialize() {
+            this.width = width / size * size;
+            this.height = height / size * size;
             Rect head = new Rect(new Point(width/2/size * size, height/2/size * size), new Size(size, size));
             snake.Add(head);
             GenerateFood();
@@ -64,10 +66,13 @@ namespace Game {
             if (KeyPressed(Keys.R)) {
                 GenerateFood();
             }
-            if (snake[0].X + snake[0].W > width || snake[0].X + snake[0].W < 0 || snake[0].Y < 0 || snake[0].Y + snake[0].H > height) {
+            if (snake[0].X + snake[0].W > width/size*size || snake[0].X + snake[0].W < 0 || snake[0].Y < 0 || snake[0].Y + snake[0].H > height) {
 
             }
-            SnakeMove();
+            else {
+                Rect tail = SnakeMove();
+                GenerateBody(tail);
+            }
         }
         public override void ShutDown() {
 
@@ -80,7 +85,10 @@ namespace Game {
         }
 
         public void GenerateBody(Rect r) {
-
+            if (snake[0].X == food.X && snake[0].Y == food.Y) {
+                snake.Add(new Rect(r));
+                GenerateFood();
+            }
         }
         public Rect SnakeMove() {
             Rect r = snake[0];
