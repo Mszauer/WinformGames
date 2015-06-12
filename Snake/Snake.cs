@@ -31,7 +31,11 @@ namespace Game {
             this.width = width / size * size;
             this.height = height / size * size;
             Rect head = new Rect(new Point(width/2/size * size, height/2/size * size), new Size(size, size));
+            Rect body1 = new Rect(new Point(width / 2 / size * size-size, height / 2 / size * size), new Size(size, size));
+            Rect body2 = new Rect(new Point(width / 2 / size * size-size-size, height / 2 / size * size), new Size(size, size));
             snake.Add(head);
+            snake.Add(body1);
+            snake.Add(body2);
             GenerateFood();
         }
 
@@ -91,7 +95,7 @@ namespace Game {
             }
         }
         public Rect SnakeMove() {
-            Rect r = snake[0];
+            Rect r = new Rect(snake[0]);
             moveAccum += deltaTime;
 
             if (KeyDown(Keys.Up)) {
@@ -114,7 +118,7 @@ namespace Game {
                     currentDirection = Direction.Right;
                 }
             }
-
+            Rect tail = new Rect(snake[snake.Count - 1]);
             if (moveAccum > 1.0f / (float)speed) {
                 if (currentDirection == Direction.Up) {
                     r.Y -= size;
@@ -129,10 +133,16 @@ namespace Game {
                     r.X += size;
                 }
                 moveAccum -= 1.0f / (float)speed;
-            }
+                
+                for (int i = snake.Count - 1; i >= 1; i--) {
+                    snake[i] = new Rect(snake[i - 1]);
+                }
+                snake[0] = r;
+            }     
 
-            return new Rect(r) ;
+            return new Rect(tail);
         }
+            
 
         public Rect GenerateFood() {
             Point foodLocation = new Point(r.Next(0, width / size)*size, r.Next(0, height / size)*size);
