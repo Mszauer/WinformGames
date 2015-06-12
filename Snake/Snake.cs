@@ -13,15 +13,18 @@ namespace Game {
         Rect food = null;
         Random r = null;
         List<Rect> snake = null;
-        int speed = 1;
+        int speed = 3;
         int foodEaten = 0;
         float deltaTime = 0;
         int size = 30;
         float moveAccum = 0;
         enum Direction {Up,Down,Left,Right};
         Direction currentDirection = Direction.Right;
+        bool gameOver = false;
 
         public Snake() {
+            width = 800 / size * size;
+            height = 600 / size * size;
             this.title = "Snake";
             this.clearColor = Brushes.Black;
             r = new Random();
@@ -41,12 +44,15 @@ namespace Game {
         }
 
         public override void Render(Graphics g) {
-            DebugRender(g);
+            //DebugRender(g);
             for (int i = 0; i < snake.Count; i++) {
                 g.FillRectangle(Brushes.White,snake[i].Rectangle);
             }
             if (food != null) {
                 g.FillRectangle(Brushes.Green, food.Rectangle);
+            }
+            if (gameOver) {
+                g.DrawString("Game Over!", new Font("Purisa", 40), Brushes.White, new Point(width / 2 - 120, height / 2 - 30));
             }
         }
 
@@ -67,6 +73,9 @@ namespace Game {
         }
 
         public override void Update(float dTime) {
+            if (gameOver) {
+                return;
+            }
             deltaTime = dTime;
             if (KeyPressed(Keys.R)) {
                 GenerateFood();
@@ -76,14 +85,15 @@ namespace Game {
                 GenerateBody(tail);
             }
             else {
-                ShutDown();
+                gameOver = true;
             }
         }
         public override void ShutDown() {
 
         }
+
         public bool CheckBoundry (){
-            if (snake[0].X + snake[0].W > width / size * size || snake[0].X + snake[0].W < 0 || snake[0].Y < 0 || snake[0].Y + snake[0].H > height) {
+            if (snake[0].X + snake[0].W > width / size * size || snake[0].X < 0 || snake[0].Y < 0 || snake[0].Y + snake[0].H > height) {
                 return false;
             }
             for (int i = snake.Count-1; i >= 1; i--) {
@@ -157,12 +167,20 @@ namespace Game {
 
         public Rect GenerateFood() {
             Point foodLocation = new Point(r.Next(0, width / size)*size, r.Next(0, height / size)*size);
-            food = new Rect(foodLocation, new Size(size, size));
-            for (int i = 0; i < snake.Count; i++) {
-                if (food.X == snake[i].X && food.Y == snake[i].Y) {
-                    continue;
+           
+            while (true) {
+                bool unique = true;
+                food = new Rect(foodLocation, new Size(size, size));
+                for (int i = 0; i < snake.Count; i++) {
+                    if (food.X == snake[i].X && food.Y == snake[i].Y) {
+                        unique = false;
+                    }
+                }
+                if (unique) {
+                    break;
                 }
             }
+
             return food;
         }
     }
