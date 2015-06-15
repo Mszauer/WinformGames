@@ -7,7 +7,7 @@ using Game;
 using System.Drawing;
 using System.Windows.Forms;
 
-namespace Tetris {
+namespace Game {
     class Tetromino {
         List<List<Rect>> states = null;
         int size = 30;
@@ -52,13 +52,14 @@ namespace Tetris {
         public void CreateShape(int[][] rowcol) {
             List<Rect> shape = new List<Rect>();
             for (int row = 0; row < rowcol.Length; row++) {
-                for (int col = 0; col < rowcol[0].Length; col++) {
+                for (int col = 0; col < rowcol[row].Length; col++) {
                     if (rowcol[row][col] == 1) {
-                        Rect r = new Rect(row * size, col * size, size, size);
+                        Rect r = new Rect(col * size, row * size, size, size);
                         shape.Add(r);
                     }
                 }
             }
+            states.Add(shape);
         }
 
         public void Rotate(Direction direction) {
