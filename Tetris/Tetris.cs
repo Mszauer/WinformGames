@@ -20,6 +20,7 @@ namespace Game {
         bool gameOver = false;
         Random r = null;
         List<Tetromino> shapes = null;
+        int[][] board = null;
 
         public Tetris() {
             width = 800 / size * size;
@@ -27,6 +28,14 @@ namespace Game {
             this.clearColor = Brushes.Black;
             this.title = "Tetris";
             r = new Random();
+
+            board = new int[height / size][];
+            for (int i = 0; i < board.Length; i++) {
+                board[i] = new int[width / size];
+            }
+            board[0][0] = 1;
+            board[2][2] = 1;
+            board[5][7] = 1;
 
         }
 
@@ -152,7 +161,7 @@ namespace Game {
                         new int[]{0,0,0,0}});
             iShape.position = new Point(width / 2 / size * size, 0);
 
-            currentShape = shapes[r.Next(0,shapes.Count)];
+            currentShape = shapes[r.Next(0, shapes.Count)];
         }
 
         public override void Update(float dTime) {
@@ -196,6 +205,17 @@ namespace Game {
             CheckBoundry();
         }
 
+
+        public bool CheckStack() {
+
+            return true;
+        }
+
+        public void SetStack() {
+
+        }
+
+
         public void CheckBoundry() {
             if (currentShape.position.X < 0) {
                 currentShape.position.X = 0;
@@ -205,12 +225,22 @@ namespace Game {
             }
             if (currentShape.position.Y + currentShape.AABB.H > height) {
                 currentShape.position.Y = height - (Int32)currentShape.AABB.H;
+
+                currentShape = shapes[r.Next(0, shapes.Count)];
             }
         }
 
         public override void Render(Graphics g) {
             DebugRender(g);
             currentShape.Draw(g);
+            for (int i = 0; i < board.Length; i++) { // i = row; row = y
+                for (int j = 0; j < board[i].Length; j++) { // j = col; col = x
+                    if (board[i][j] == 1) {
+                        Rect block = new Rect(j * size, i * size, size, size);
+                        g.FillRectangle(Brushes.Red, block.Rectangle);
+                    }
+                }
+            }
         }
 
         void DebugRender(Graphics g) {
@@ -223,7 +253,7 @@ namespace Game {
                     tileCount++;
                 }
             }
-            
+
         }
     }
 }
