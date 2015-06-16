@@ -29,14 +29,14 @@ namespace Game {
             this.title = "Tetris";
             r = new Random();
 
-            board = new int[height / size][];
+            board = new int[width / size][];
             for (int i = 0; i < board.Length; i++) {
-                board[i] = new int[width / size];
+                board[i] = new int[height / size];
             }
-            board[0][0] = 1;
-            board[2][2] = 1;
-            board[5][7] = 1;
 
+            board[0][0] = 1;
+            board[1][1] = 1;
+            board[2][2] = 1;
         }
 
         public override void Initialize() {
@@ -85,7 +85,6 @@ namespace Game {
                         new int[]{1,0,0,0},
                         new int[]{0,0,0,0}});
             jShape.CreateShape(new int[][]{
-                        new int[]{0,0,0,0},
                         new int[]{1,1,1,0},
                         new int[]{0,0,1,0},
                         new int[]{0,0,0,0}});
@@ -211,8 +210,12 @@ namespace Game {
             return true;
         }
 
-        public void SetStack() {
-
+        public void StampStack() {
+            foreach (Rect r in currentShape.ReturnRects()) {
+                Console.WriteLine("X: " + r.X + ", stamped at: " + ((Int32)r.X / size));
+                Console.WriteLine("Y: " + r.Y + ", stamped at: " + ((Int32)r.Y / size) + "\n");
+                board[(Int32)r.X / size][(Int32)r.Y / size] = 1; // the y index is out of range
+            }
         }
 
 
@@ -225,7 +228,7 @@ namespace Game {
             }
             if (currentShape.position.Y + currentShape.AABB.H > height) {
                 currentShape.position.Y = height - (Int32)currentShape.AABB.H;
-
+                StampStack();
                 currentShape = shapes[r.Next(0, shapes.Count)];
             }
         }
@@ -236,7 +239,7 @@ namespace Game {
             for (int i = 0; i < board.Length; i++) { // i = row; row = y
                 for (int j = 0; j < board[i].Length; j++) { // j = col; col = x
                     if (board[i][j] == 1) {
-                        Rect block = new Rect(j * size, i * size, size, size);
+                        Rect block = new Rect(i * size, j * size, size, size);
                         g.FillRectangle(Brushes.Red, block.Rectangle);
                     }
                 }

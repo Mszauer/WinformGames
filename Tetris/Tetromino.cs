@@ -13,7 +13,7 @@ namespace Game {
         int size = 30;
         int currentState = 0;
         public Point position = default(Point);
-        public enum Direction { Left, Right};
+        public enum Direction { Left, Right };
         public Rect debugAABB = null;
 
         public Rect AABB {//axis aligned boundry blocks
@@ -36,17 +36,17 @@ namespace Game {
                         maxY = r.Y + r.H;
                     }
                 }
-                
 
-                return new Rect(new Point((Int32)minX,(Int32)minY), new Point((Int32)maxX,(Int32)maxY));          
+
+                return new Rect(new Point((Int32)minX, (Int32)minY), new Point((Int32)maxX, (Int32)maxY));
             }
         }
-        public Tetromino(){
+        public Tetromino() {
             states = new List<List<Rect>>();
 
         }
 
-        public List<Rect> ReturnRects (Tetromino tRects){
+        public List<Rect> ReturnRects() {
             List<Rect> returnShape = new List<Rect>();
 
             for (int i = 0; i < states[currentState].Count; i++) {
@@ -65,8 +65,7 @@ namespace Game {
                 g.FillRectangle(Brushes.White, states[currentState][i].X + position.X, states[currentState][i].Y + position.Y, states[currentState][i].W, states[currentState][i].H);
             }
             using (Pen p = new Pen(Brushes.LimeGreen)) {
-                debugAABB = AABB;               
-                g.DrawRectangle(p, debugAABB.Rectangle);
+                g.DrawRectangle(p, AABB.X + position.X, AABB.Y + position.Y, AABB.W, AABB.H);
 
             }
         }
