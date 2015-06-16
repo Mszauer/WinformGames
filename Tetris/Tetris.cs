@@ -33,10 +33,6 @@ namespace Game {
             for (int i = 0; i < board.Length; i++) {
                 board[i] = new int[height / size];
             }
-
-            board[0][0] = 1;
-            board[1][1] = 1;
-            board[2][2] = 1;
         }
 
         public override void Initialize() {
@@ -137,6 +133,7 @@ namespace Game {
 
             Tetromino sShape = new Tetromino();
             shapes.Add(sShape);
+            sShape.position = new Point(width / 2 / size * size, 0);
             sShape.CreateShape(new int[][]{
                         new int[]{0,1,1,0},
                         new int[]{1,1,0,0},
@@ -145,7 +142,6 @@ namespace Game {
                         new int[]{0,1,0,0},
                         new int[]{0,1,1,0},
                         new int[]{0,0,1,0}});
-            sShape.position = new Point(width / 2 / size * size, 0);
 
             Tetromino iShape = new Tetromino();
             shapes.Add(iShape);
@@ -170,6 +166,10 @@ namespace Game {
             deltaTime = dTime;
             if (KeyPressed(Keys.Up)) {
                 currentShape.Rotate(Tetromino.Direction.Left);
+                CheckBoundry();
+                if (CheckCollision()) {
+                    currentShape.Rotate(Tetromino.Direction.Right);
+                }
             }
             /*if (KeyPressed(Keys.R)) {
                 //currentShape = shapes[r.Next(0, shapes.Count)];
@@ -188,9 +188,19 @@ namespace Game {
             moveAccum += deltaTime;
             if (KeyDown(Keys.Left)) {
                 currentShape.position.X -= size;
+                CheckBoundry();
+                if (CheckCollision()) {
+                    currentShape.position.X += size;
+                    StampStack();
+                }
             }
             if (KeyDown(Keys.Right)) {
                 currentShape.position.X += size;
+                CheckBoundry();
+                if (CheckCollision()) {
+                    currentShape.position.X -= size;
+                    StampStack();
+                }
             }
             if (KeyDown(Keys.Down)) {
                 currentSpeed = fastSpeed;
@@ -200,25 +210,34 @@ namespace Game {
             }
             if (moveAccum > 1.0f / (float)currentSpeed) {
                 currentShape.position.Y += size;
+                CheckBoundry();
+                if (CheckCollision()) {
+                    currentShape.position.Y -= size;
+                    StampStack();
+                }
                 moveAccum -= 1.0f / (float)currentSpeed;
+
             }
-            CheckBoundry();
         }
 
 
-        public bool CheckStack() {
-
-            return true;
+        public bool CheckCollision() {
+            foreach (Rect r in currentShape.ReturnRects()) {
+                if (board[(Int32)r.X / size][(Int32)r.Y / size] == 1) {
+                    return true;
+                }
+            }
+            return false;
         }
 
         public void StampStack() {
             foreach (Rect r in currentShape.ReturnRects()) {
                 Console.WriteLine("X: " + r.X + ", stamped at: " + ((Int32)r.X / size));
                 Console.WriteLine("Y: " + r.Y + ", stamped at: " + ((Int32)r.Y / size) + "\n");
-                board[(Int32)r.X / size][(Int32)r.Y / size] = 1; 
+                board[(Int32)r.X / size][(Int32)r.Y / size] = 1;
             }
             currentShape = shapes[this.r.Next(0, shapes.Count)];
-            currentShape.position = new Point(width / 2/size*size, 0); 
+            currentShape.position = new Point(width / 2 / size * size, 0);
         }
 
 
@@ -231,7 +250,7 @@ namespace Game {
             }
             if (currentShape.position.Y + currentShape.AABB.H > height) {
                 currentShape.position.Y = height - (Int32)currentShape.AABB.H;
-                StampStack(); 
+                StampStack();
             }
         }
 
