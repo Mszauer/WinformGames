@@ -171,7 +171,7 @@ namespace Game {
             if (KeyPressed(Keys.Up)) {
                 currentShape.Rotate(Tetromino.Direction.Left);
             }
-            if (KeyPressed(Keys.R)) {
+            /*if (KeyPressed(Keys.R)) {
                 //currentShape = shapes[r.Next(0, shapes.Count)];
                 int cIndex = shapes.IndexOf(currentShape);
                 cIndex++;
@@ -180,6 +180,7 @@ namespace Game {
                 }
                 currentShape = shapes[cIndex];
             }
+             */
             TetrominoMove();
         }
 
@@ -214,8 +215,10 @@ namespace Game {
             foreach (Rect r in currentShape.ReturnRects()) {
                 Console.WriteLine("X: " + r.X + ", stamped at: " + ((Int32)r.X / size));
                 Console.WriteLine("Y: " + r.Y + ", stamped at: " + ((Int32)r.Y / size) + "\n");
-                board[(Int32)r.X / size][(Int32)r.Y / size] = 1; // the y index is out of range
+                board[(Int32)r.X / size][(Int32)r.Y / size] = 1; 
             }
+            currentShape = shapes[this.r.Next(0, shapes.Count)];
+            currentShape.position = new Point(width / 2/size*size, 0); 
         }
 
 
@@ -228,8 +231,7 @@ namespace Game {
             }
             if (currentShape.position.Y + currentShape.AABB.H > height) {
                 currentShape.position.Y = height - (Int32)currentShape.AABB.H;
-                StampStack();
-                currentShape = shapes[r.Next(0, shapes.Count)];
+                StampStack(); 
             }
         }
 
