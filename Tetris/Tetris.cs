@@ -17,7 +17,7 @@ namespace Game {
         int fastSpeed = 15;
         int speed = 1;
         Tetromino currentShape = null;
-        Brush shapeColor = default(Brush);
+        Brush flashColor = default(Brush);
         bool gameOver = false;
         Random r = null;
         List<Tetromino> shapes = null;
@@ -25,6 +25,7 @@ namespace Game {
         enum GameState { update, destroy, fall };
         GameState currentState = GameState.update;
         float timeAccum = 0;
+        int flashes = 0;
 
         public Tetris() {
             width = 800 / size * size;
@@ -172,35 +173,19 @@ namespace Game {
                 DestroyRow();
                 return;
             }
-            if (currentShape == shapes[0]) {
-                shapeColor = Brushes.Purple;
+            else if (currentState == GameState.fall) {
+                RowFall();
+                return;
             }
-            else if (currentShape == shapes[1]) {
-                shapeColor = Brushes.Blue;
-            }
-            else if (currentShape == shapes[2]) {
-                shapeColor = Brushes.White;
-            }
-            else if (currentShape == shapes[3]) {
-                shapeColor = Brushes.Orange;
-            }
-            else if (currentShape == shapes[4]) {
-                shapeColor = Brushes.LightBlue;
-            }
-            else if (currentShape == shapes[5]) {
-                shapeColor = Brushes.LimeGreen;
-            }
-            else if (currentShape == shapes[6]) {
-                shapeColor = Brushes.Red;
-            }
-            if (KeyPressed(Keys.Up)) {
-                currentShape.Rotate(Tetromino.Direction.Left);
-                CheckBoundry();
-                if (CheckCollision()) {
-                    currentShape.Rotate(Tetromino.Direction.Right);
+            else if (currentState == GameState.update) {
+                if (KeyPressed(Keys.Up)) {
+                    currentShape.Rotate(Tetromino.Direction.Left);
+                    CheckBoundry();
+                    if (CheckCollision()) {
+                        currentShape.Rotate(Tetromino.Direction.Right);
+                    }
                 }
-            }
-            /*if (KeyPressed(Keys.R)) {
+                /*if (KeyPressed(Keys.R)) {
                 //currentShape = shapes[r.Next(0, shapes.Count)];
                 int cIndex = shapes.IndexOf(currentShape);
                 cIndex++;
@@ -210,7 +195,9 @@ namespace Game {
                 currentShape = shapes[cIndex];
             }
              */
-            TetrominoMove();
+                TetrominoMove();
+            }
+
         }
 
         public bool FullRows() {
@@ -231,6 +218,7 @@ namespace Game {
 
         public void DestroyRow() {
             timeAccum += deltaTime;
+            flashColor = Brushes.Green;
             if (timeAccum > 0.3) {
                 for (int y = 0; y < height / size; y++) {
                     bool FullRow = true;
@@ -240,12 +228,28 @@ namespace Game {
                         }
                     }
                     if (FullRow) {
-                        //TODO change color
+                        for (int x = 0; x < board.Length; x++) {
+                            board[x][y] = -1;
+                        }
                     }
+                }
+                flashColor = Brushes.Blue;
+                flashes++;
+                if (flashes == 3) {
+                    for (int y = 0; y < height / size; y++) {
+                        for (int x = 0; x < width / size; x++) {
+                            if (board[x][y] == -1) {
+                                board[x][y] = 0;
+                            }
+                        }
+                    }
+                    currentState = GameState.fall;
                 }
                 timeAccum -= 0.3f;
             }
-            
+        }
+
+        public void RowFall() {
         }
 
         public void TetrominoMove() {
@@ -304,6 +308,7 @@ namespace Game {
             currentShape.position = new Point(width / 2 / size * size, 0);
             if (FullRows()) {
                 timeAccum = 0;
+                flashes = 0;
                 currentState = GameState.destroy;
             }
         }
@@ -329,7 +334,11 @@ namespace Game {
                 for (int j = 0; j < board[i].Length; j++) { // j = col; col = x
                     if (board[i][j] == 1) {
                         Rect block = new Rect(i * size, j * size, size, size);
-                        g.FillRectangle(shapeColor, block.Rectangle);
+                        g.FillRectangle(Brushes.Red, block.Rectangle);
+                    }
+                    if (board[i][j] == -1) {
+                        Rect block = new Rect(i * size, j * size, size, size);
+                        g.FillRectangle(flashColor, block.Rectangle);
                     }
                 }
             }
