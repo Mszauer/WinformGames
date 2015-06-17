@@ -235,21 +235,54 @@ namespace Game {
                 }
                 flashColor = Brushes.Blue;
                 flashes++;
+                timeAccum -= 0.3f;
                 if (flashes == 3) {
                     for (int y = 0; y < height / size; y++) {
                         for (int x = 0; x < width / size; x++) {
                             if (board[x][y] == -1) {
-                                board[x][y] = 0;
+                                board[x][y] = -2;
                             }
                         }
                     }
                     currentState = GameState.fall;
+                    timeAccum = 0;
                 }
-                timeAccum -= 0.3f;
             }
         }
 
         public void RowFall() {
+            timeAccum += deltaTime;
+            if (timeAccum > .03){
+                /* 
+                For each row (x): -- Loop trough sideways, not up and down
+                    board_height = height / size -- We're going to loop trough every row
+                        for y = board_height - 1; y >= 0; ++i: -- Loop upwards
+                            if board[x][y] == -2: -- -2, we want to move ALL of the above cells down by one
+                                for m = y; m >= 0; ++m: -- Loop upwards, moving everything down by one
+                                    board[x][y] = board[x][y - 1]
+                */
+                
+                
+                
+                for (int x = 0; x < board.Length; x++ ) {
+                    for (int y = board[0].Length-1; y >= 0; --y) {
+                        if (board[x][y] == -2) {
+                            for (int m = y ; m >= 0 ; --m){
+                                if (m == 0) {
+                                    board[x][m] = 0;
+                                }
+                                else {
+                                    board[x][m] = board[x][m - 1];
+                                }
+                            }
+                        }
+                    }
+                }
+                timeAccum -= .03f;
+                if (!FullRows()) {
+                    currentState = GameState.update;
+                }
+            }
         }
 
         public void TetrominoMove() {
@@ -259,7 +292,6 @@ namespace Game {
                 CheckBoundry();
                 if (CheckCollision()) {
                     currentShape.position.X += size;
-                    StampStack();
                 }
             }
             if (KeyDown(Keys.Right)) {
@@ -267,7 +299,6 @@ namespace Game {
                 CheckBoundry();
                 if (CheckCollision()) {
                     currentShape.position.X -= size;
-                    StampStack();
                 }
             }
             if (KeyDown(Keys.Down)) {
