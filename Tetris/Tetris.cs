@@ -17,10 +17,14 @@ namespace Game {
         int fastSpeed = 15;
         int speed = 1;
         Tetromino currentShape = null;
+        Brush shapeColor = default(Brush);
         bool gameOver = false;
         Random r = null;
         List<Tetromino> shapes = null;
         int[][] board = null;
+        enum GameState { update, destroy, fall };
+        GameState currentState = GameState.update;
+        float timeAccum = 0;
 
         public Tetris() {
             width = 800 / size * size;
@@ -139,9 +143,9 @@ namespace Game {
                         new int[]{1,1,0,0},
                         new int[]{0,0,0,0}});
             sShape.CreateShape(new int[][]{
-                        new int[]{0,1,0,0},
-                        new int[]{0,1,1,0},
-                        new int[]{0,0,1,0}});
+                        new int[]{1,0,0},
+                        new int[]{1,1,0},
+                        new int[]{0,1,0}});
 
             Tetromino iShape = new Tetromino();
             shapes.Add(iShape);
@@ -164,6 +168,31 @@ namespace Game {
                 return;
             }
             deltaTime = dTime;
+            if (currentState == GameState.destroy) {
+                DestroyRow();
+                return;
+            }
+            if (currentShape == shapes[0]) {
+                shapeColor = Brushes.Purple;
+            }
+            else if (currentShape == shapes[1]) {
+                shapeColor = Brushes.Blue;
+            }
+            else if (currentShape == shapes[2]) {
+                shapeColor = Brushes.White;
+            }
+            else if (currentShape == shapes[3]) {
+                shapeColor = Brushes.Orange;
+            }
+            else if (currentShape == shapes[4]) {
+                shapeColor = Brushes.LightBlue;
+            }
+            else if (currentShape == shapes[5]) {
+                shapeColor = Brushes.LimeGreen;
+            }
+            else if (currentShape == shapes[6]) {
+                shapeColor = Brushes.Red;
+            }
             if (KeyPressed(Keys.Up)) {
                 currentShape.Rotate(Tetromino.Direction.Left);
                 CheckBoundry();
@@ -182,6 +211,41 @@ namespace Game {
             }
              */
             TetrominoMove();
+        }
+
+        public bool FullRows() {
+            for (int row = 0; row < height / size; row++) {
+                bool fullRow = true;
+                for (int col = 0; col < width / size; col++) {
+                    if (board[col][row] == 0) {
+                        fullRow = false;
+                    }
+
+                }
+                if (fullRow == true) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        public void DestroyRow() {
+            timeAccum += deltaTime;
+            if (timeAccum > 0.3) {
+                for (int y = 0; y < height / size; y++) {
+                    bool FullRow = true;
+                    for (int x = 0; x < width / size; x++) {
+                        if (board[x][y] == 0) {
+                            FullRow = false;
+                        }
+                    }
+                    if (FullRow) {
+                        //TODO change color
+                    }
+                }
+                timeAccum -= 0.3f;
+            }
+            
         }
 
         public void TetrominoMove() {
@@ -238,6 +302,10 @@ namespace Game {
             }
             currentShape = shapes[this.r.Next(0, shapes.Count)];
             currentShape.position = new Point(width / 2 / size * size, 0);
+            if (FullRows()) {
+                timeAccum = 0;
+                currentState = GameState.destroy;
+            }
         }
 
 
@@ -261,7 +329,7 @@ namespace Game {
                 for (int j = 0; j < board[i].Length; j++) { // j = col; col = x
                     if (board[i][j] == 1) {
                         Rect block = new Rect(i * size, j * size, size, size);
-                        g.FillRectangle(Brushes.Red, block.Rectangle);
+                        g.FillRectangle(shapeColor, block.Rectangle);
                     }
                 }
             }
