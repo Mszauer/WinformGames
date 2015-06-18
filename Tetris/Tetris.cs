@@ -18,6 +18,7 @@ namespace Game {
         int speed = 1;
         Tetromino currentShape = null;
         Brush flashColor = default(Brush);
+        List<Brush> tetrominoColors = null;
         bool gameOver = false;
         Random r = null;
         List<Tetromino> shapes = null;
@@ -44,6 +45,7 @@ namespace Game {
             this.width = width / size * size;
             this.height = height / size * size;
 
+            tetrominoColors = new List<Brush>();
             shapes = new List<Tetromino>();
             Tetromino lShape = new Tetromino();
             shapes.Add(lShape);
@@ -68,98 +70,112 @@ namespace Game {
                         new int[]{0,0,0,0},
                         new int[]{0,0,0,0}});
             lShape.position = new Point(width / 2 / size * size, 0);
+            Brush lShapeColor = Brushes.Orange;
+            tetrominoColors.Add(lShapeColor);
 
             Tetromino oShape = new Tetromino();
             shapes.Add(oShape);
             oShape.CreateShape(new int[][]{
-                        new int[]{1,1,0,0},
-                        new int[]{1,1,0,0},
+                        new int[]{2,2,0,0},
+                        new int[]{2,2,0,0},
                         new int[]{0,0,0,0},
                         new int[]{0,0,0,0}});
             oShape.position = new Point(width / 2 / size * size, 0);
+            Brush oShapeColor = Brushes.Yellow;
+            tetrominoColors.Add(oShapeColor);
 
             Tetromino jShape = new Tetromino();
             shapes.Add(jShape);
             jShape.CreateShape(new int[][]{
-                        new int[]{1,1,0,0},
-                        new int[]{1,0,0,0},
-                        new int[]{1,0,0,0},
+                        new int[]{3,3,0,0},
+                        new int[]{3,0,0,0},
+                        new int[]{3,0,0,0},
                         new int[]{0,0,0,0}});
             jShape.CreateShape(new int[][]{
-                        new int[]{1,1,1,0},
-                        new int[]{0,0,1,0},
+                        new int[]{3,3,3,0},
+                        new int[]{0,0,3,0},
                         new int[]{0,0,0,0}});
             jShape.CreateShape(new int[][]{
-                        new int[]{1,0,0,0},
-                        new int[]{1,1,1,0},
-                        new int[]{0,0,0,0},
+                        new int[]{0,3,0,0},
+                        new int[]{0,3,0,0},
+                        new int[]{3,3,0,0},
                         new int[]{0,0,0,0}});
             jShape.CreateShape(new int[][]{
-                        new int[]{0,1,0,0},
-                        new int[]{0,1,0,0},
-                        new int[]{1,1,0,0}});
+                        new int[]{3,0,0,0},
+                        new int[]{3,3,3,0},
+                        new int[]{0,0,0,0}});
             jShape.position = new Point(width / 2 / size * size, 0);
+            Brush jShapeColor = Brushes.Blue;
+            tetrominoColors.Add(jShapeColor);
 
             Tetromino tShape = new Tetromino();
             shapes.Add(tShape);
             tShape.CreateShape(new int[][]{
-                        new int[]{1,1,1,0},
-                        new int[]{0,1,0,0},
+                        new int[]{4,4,4,0},
+                        new int[]{0,4,0,0},
                         new int[]{0,0,0,0}});
             tShape.CreateShape(new int[][]{
-                        new int[]{0,1,0,0},
-                        new int[]{1,1,0,0},
-                        new int[]{0,1,0,0},
+                        new int[]{0,4,0,0},
+                        new int[]{4,4,0,0},
+                        new int[]{0,4,0,0},
                         new int[]{0,0,0,0}});
             tShape.CreateShape(new int[][]{
-                        new int[]{0,1,0,0},
-                        new int[]{1,1,1,0},
+                        new int[]{0,4,0,0},
+                        new int[]{4,4,4,0},
                         new int[]{0,0,0,0},
                         new int[]{0,0,0,0}});
             tShape.CreateShape(new int[][]{
-                        new int[]{1,0,0,0},
-                        new int[]{1,1,0,0},
-                        new int[]{1,0,0,0},
+                        new int[]{4,0,0,0},
+                        new int[]{4,4,0,0},
+                        new int[]{4,0,0,0},
                         new int[]{0,0,0,0}});
             tShape.position = new Point(width / 2 / size * size, 0);
+            Brush tShapeColor = Brushes.Lavender;
+            tetrominoColors.Add(tShapeColor);
 
             Tetromino zShape = new Tetromino();
             shapes.Add(zShape);
             zShape.CreateShape(new int[][]{
-                        new int[]{0,1,0,0},
-                        new int[]{1,1,0,0},
-                        new int[]{1,0,0,0},
+                        new int[]{0,5,0,0},
+                        new int[]{5,5,0,0},
+                        new int[]{5,0,0,0},
                         new int[]{0,0,0,0}});
             zShape.CreateShape(new int[][]{
-                        new int[]{1,1,0,0},
-                        new int[]{0,1,1,0},
+                        new int[]{5,5,0,0},
+                        new int[]{0,5,5,0},
                         new int[]{0,0,0,0}});
             zShape.position = new Point(width / 2 / size * size, 0);
+            Brush zShapeColor = Brushes.Red;
+            tetrominoColors.Add(zShapeColor);
 
             Tetromino sShape = new Tetromino();
             shapes.Add(sShape);
             sShape.position = new Point(width / 2 / size * size, 0);
             sShape.CreateShape(new int[][]{
-                        new int[]{0,1,1,0},
-                        new int[]{1,1,0,0},
+                        new int[]{0,6,6,0},
+                        new int[]{6,6,0,0},
                         new int[]{0,0,0,0}});
             sShape.CreateShape(new int[][]{
-                        new int[]{1,0,0},
-                        new int[]{1,1,0},
-                        new int[]{0,1,0}});
+                        new int[]{6,0,0},
+                        new int[]{6,6,0},
+                        new int[]{0,6,0}});
+            Brush sShapeColor = Brushes.LimeGreen;
+            tetrominoColors.Add(sShapeColor);
 
             Tetromino iShape = new Tetromino();
             shapes.Add(iShape);
             iShape.CreateShape(new int[][]{
-                        new int[]{1,0,0,0},
-                        new int[]{1,0,0,0},
-                        new int[]{1,0,0,0},
-                        new int[]{1,0,0,0}});
+                        new int[]{7,0,0,0},
+                        new int[]{7,0,0,0},
+                        new int[]{7,0,0,0},
+                        new int[]{7,0,0,0}});
             iShape.CreateShape(new int[][]{
-                        new int[]{1,1,1,1},
+                        new int[]{7,7,7,7},
                         new int[]{0,0,0,0},
                         new int[]{0,0,0,0}});
             iShape.position = new Point(width / 2 / size * size, 0);
+            Brush iShapeColor = Brushes.Teal;
+            tetrominoColors.Add(iShapeColor);
 
             currentShape = shapes[r.Next(0, shapes.Count)];
         }
@@ -322,7 +338,7 @@ namespace Game {
 
         public bool CheckCollision() {
             foreach (Rect r in currentShape.ReturnRects()) {
-                if (board[(Int32)r.X / size][(Int32)r.Y / size] == 1) {
+                if (board[(Int32)r.X / size][(Int32)r.Y / size] > 0) {
                     return true;
                 }
             }
@@ -333,7 +349,7 @@ namespace Game {
             foreach (Rect r in currentShape.ReturnRects()) {
                 Console.WriteLine("X: " + r.X + ", stamped at: " + ((Int32)r.X / size));
                 Console.WriteLine("Y: " + r.Y + ", stamped at: " + ((Int32)r.Y / size) + "\n");
-                board[(Int32)r.X / size][(Int32)r.Y / size] = 1;
+                board[(Int32)r.X / size][(Int32)r.Y / size] = shapes.IndexOf(currentShape)+1;
             }
             currentShape = shapes[this.r.Next(0, shapes.Count)];
             currentShape.position = new Point(width / 2 / size * size, 0);
@@ -360,12 +376,12 @@ namespace Game {
 
         public override void Render(Graphics g) {
             DebugRender(g);
-            currentShape.Draw(g);
+            currentShape.Draw(g,tetrominoColors[shapes.IndexOf(currentShape)]);
             for (int i = 0; i < board.Length; i++) { // i = row; row = y
                 for (int j = 0; j < board[i].Length; j++) { // j = col; col = x
-                    if (board[i][j] == 1) {
+                    if (board[i][j] > 0) {
                         Rect block = new Rect(i * size, j * size, size, size);
-                        g.FillRectangle(Brushes.Red, block.Rectangle);
+                        g.FillRectangle(tetrominoColors[board[i][j]-1], block.Rectangle);
                     }
                     if (board[i][j] == -1) {
                         Rect block = new Rect(i * size, j * size, size, size);

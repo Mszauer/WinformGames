@@ -60,9 +60,9 @@ namespace Game {
             return returnShape;
         }
 
-        public void Draw(Graphics g) {
+        public void Draw(Graphics g, Brush color) {
             for (int i = 0; i < states[currentState].Count; i++) {
-                g.FillRectangle(Brushes.White, states[currentState][i].X + position.X, states[currentState][i].Y + position.Y, states[currentState][i].W, states[currentState][i].H);
+                g.FillRectangle(color, (Int32)(states[currentState][i].X + position.X), (Int32)(states[currentState][i].Y + position.Y), (Int32)states[currentState][i].W, (Int32)states[currentState][i].H);
             }
             using (Pen p = new Pen(Brushes.LimeGreen)) {
                 g.DrawRectangle(p, AABB.X + position.X, AABB.Y + position.Y, AABB.W, AABB.H);
@@ -74,7 +74,7 @@ namespace Game {
             List<Rect> shape = new List<Rect>();
             for (int row = 0; row < rowcol.Length; row++) {
                 for (int col = 0; col < rowcol[row].Length; col++) {
-                    if (rowcol[row][col] == 1) {
+                    if (rowcol[row][col] > 0) {
                         Rect r = new Rect(col * size, row * size, size, size);
                         shape.Add(r);
                     }
