@@ -12,6 +12,7 @@ namespace Game {
     class Tetris : GameBase {
         float deltaTime = 0;
         float moveAccum = 0;
+        Size boardSize = default(Size);
         int size = 30;
         int currentSpeed = 1;
         int fastSpeed = 15;
@@ -29,15 +30,16 @@ namespace Game {
         int flashes = 0;
 
         public Tetris() {
+            boardSize = new Size(10, 20);
             width = 800 / size * size;
             height = 600 / size * size;
-            this.clearColor = Brushes.Black;
+            this.clearColor = Brushes.LightBlue;
             this.title = "Tetris";
             r = new Random();
 
-            board = new int[width / size][];
+            board = new int[boardSize.Width][];
             for (int i = 0; i < board.Length; i++) {
-                board[i] = new int[height / size];
+                board[i] = new int[boardSize.Height];
             }
         }
 
@@ -69,7 +71,7 @@ namespace Game {
                         new int[]{1,0,0,0},
                         new int[]{0,0,0,0},
                         new int[]{0,0,0,0}});
-            lShape.position = new Point(width / 2 / size * size, 0);
+            lShape.position = new Point(boardSize.Width / 2 * size, 0);
             Brush lShapeColor = Brushes.Orange;
             tetrominoColors.Add(lShapeColor);
 
@@ -80,7 +82,7 @@ namespace Game {
                         new int[]{2,2,0,0},
                         new int[]{0,0,0,0},
                         new int[]{0,0,0,0}});
-            oShape.position = new Point(width / 2 / size * size, 0);
+            oShape.position = new Point(boardSize.Width / 2 * size, 0);
             Brush oShapeColor = Brushes.Yellow;
             tetrominoColors.Add(oShapeColor);
 
@@ -104,7 +106,7 @@ namespace Game {
                         new int[]{3,0,0,0},
                         new int[]{3,3,3,0},
                         new int[]{0,0,0,0}});
-            jShape.position = new Point(width / 2 / size * size, 0);
+            jShape.position = new Point(boardSize.Width / 2 * size, 0);
             Brush jShapeColor = Brushes.Blue;
             tetrominoColors.Add(jShapeColor);
 
@@ -129,7 +131,7 @@ namespace Game {
                         new int[]{4,4,0,0},
                         new int[]{4,0,0,0},
                         new int[]{0,0,0,0}});
-            tShape.position = new Point(width / 2 / size * size, 0);
+            tShape.position = new Point(boardSize.Width / 2 * size, 0);
             Brush tShapeColor = Brushes.Lavender;
             tetrominoColors.Add(tShapeColor);
 
@@ -144,13 +146,13 @@ namespace Game {
                         new int[]{5,5,0,0},
                         new int[]{0,5,5,0},
                         new int[]{0,0,0,0}});
-            zShape.position = new Point(width / 2 / size * size, 0);
+            zShape.position = new Point(boardSize.Width / 2 * size, 0);
             Brush zShapeColor = Brushes.Red;
             tetrominoColors.Add(zShapeColor);
 
             Tetromino sShape = new Tetromino();
             shapes.Add(sShape);
-            sShape.position = new Point(width / 2 / size * size, 0);
+            sShape.position = new Point(boardSize.Width / 2 * size, 0);
             sShape.CreateShape(new int[][]{
                         new int[]{0,6,6,0},
                         new int[]{6,6,0,0},
@@ -173,7 +175,7 @@ namespace Game {
                         new int[]{7,7,7,7},
                         new int[]{0,0,0,0},
                         new int[]{0,0,0,0}});
-            iShape.position = new Point(width / 2 / size * size, 0);
+            iShape.position = new Point(boardSize.Width / 2 * size, 0);
             Brush iShapeColor = Brushes.Teal;
             tetrominoColors.Add(iShapeColor);
 
@@ -217,9 +219,9 @@ namespace Game {
         }
 
         public bool FullRows() {
-            for (int row = 0; row < height / size; row++) {
+            for (int row = 0; row < boardSize.Height; row++) {
                 bool fullRow = true;
-                for (int col = 0; col < width / size; col++) {
+                for (int col = 0; col < boardSize.Width; col++) {
                     if (board[col][row] == 0) {
                         fullRow = false;
                     }
@@ -236,9 +238,9 @@ namespace Game {
             timeAccum += deltaTime;
             flashColor = Brushes.Green;
             if (timeAccum > 0.3) {
-                for (int y = 0; y < height / size; y++) {
+                for (int y = 0; y < boardSize.Height; y++) {
                     bool FullRow = true;
-                    for (int x = 0; x < width / size; x++) {
+                    for (int x = 0; x < boardSize.Width; x++) {
                         if (board[x][y] == 0) {
                             FullRow = false;
                         }
@@ -253,8 +255,8 @@ namespace Game {
                 flashes++;
                 timeAccum -= 0.3f;
                 if (flashes == 3) {
-                    for (int y = 0; y < height / size; y++) {
-                        for (int x = 0; x < width / size; x++) {
+                    for (int y = 0; y < boardSize.Height; y++) {
+                        for (int x = 0; x < boardSize.Width; x++) {
                             if (board[x][y] == -1) {
                                 board[x][y] = -2;
                             }
@@ -268,18 +270,7 @@ namespace Game {
 
         public void RowFall() {
             timeAccum += deltaTime;
-            if (timeAccum > .03){
-                /* 
-                For each row (x): -- Loop trough sideways, not up and down
-                    board_height = height / size -- We're going to loop trough every row
-                        for y = board_height - 1; y >= 0; ++i: -- Loop upwards
-                            if board[x][y] == -2: -- -2, we want to move ALL of the above cells down by one
-                                for m = y; m >= 0; ++m: -- Loop upwards, moving everything down by one
-                                    board[x][y] = board[x][y - 1]
-                */
-                
-                
-                
+            if (timeAccum > .5f){
                 for (int x = 0; x < board.Length; x++ ) {
                     for (int y = board[0].Length-1; y >= 0; --y) {
                         if (board[x][y] == -2) {
@@ -294,7 +285,7 @@ namespace Game {
                         }
                     }
                 }
-                timeAccum -= .03f;
+                timeAccum -= .5f;
                 if (!FullRows()) {
                     currentState = GameState.update;
                 }
@@ -352,7 +343,7 @@ namespace Game {
                 board[(Int32)r.X / size][(Int32)r.Y / size] = shapes.IndexOf(currentShape)+1;
             }
             currentShape = shapes[this.r.Next(0, shapes.Count)];
-            currentShape.position = new Point(width / 2 / size * size, 0);
+            currentShape.position = new Point(boardSize.Width / 2 * size, 0);
             if (FullRows()) {
                 timeAccum = 0;
                 flashes = 0;
@@ -365,11 +356,11 @@ namespace Game {
             if (currentShape.position.X < 0) {
                 currentShape.position.X = 0;
             }
-            if (currentShape.position.X + currentShape.AABB.W > width) {
-                currentShape.position.X = width - (Int32)currentShape.AABB.W;
+            if (currentShape.position.X + currentShape.AABB.W > boardSize.Width* size) {
+                currentShape.position.X = boardSize.Width*size - (Int32)currentShape.AABB.W;
             }
-            if (currentShape.position.Y + currentShape.AABB.H > height) {
-                currentShape.position.Y = height - (Int32)currentShape.AABB.H;
+            if (currentShape.position.Y + currentShape.AABB.H > boardSize.Height * size) {
+                currentShape.position.Y = boardSize.Height*size - (Int32)currentShape.AABB.H;
                 StampStack();
             }
         }
@@ -393,10 +384,10 @@ namespace Game {
 
         void DebugRender(Graphics g) {
             int tileCount = 0;
-            for (int row = 0; row < height; row += size) {
-                tileCount = (row / size) % 2 == 0 ? 1 : 0;//row/size=1,2,3... : %2 returns 1 or 0
-                for (int col = 0; col < width; col += size) {
-                    Rect tile = new Rect(col, row, size, size);
+            for (int row = 0; row < boardSize.Height; row += 1) {
+                tileCount = (row ) % 2 == 0 ? 1 : 0;//row/size=1,2,3... : %2 returns 1 or 0
+                for (int col = 0; col < boardSize.Width; col += 1) {
+                    Rect tile = new Rect(col*size, row*size, size, size);
                     g.FillRectangle(tileCount % 2 == 0 ? Brushes.Gray : Brushes.DarkGray, tile.Rectangle);
                     tileCount++;
                 }
