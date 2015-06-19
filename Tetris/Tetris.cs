@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Game;
 using System.Drawing;
 using System.Windows.Forms;
+using System.Media;
 
 
 namespace Game {
@@ -17,14 +18,14 @@ namespace Game {
         int currentSpeed = 1;
         int fastSpeed = 15;
         int speed = 1;
+        bool isGameOver = false;
         Tetromino currentShape = null;
         Brush flashColor = default(Brush);
         List<Brush> tetrominoColors = null;
-        bool gameOver = false;
         Random r = null;
         List<Tetromino> shapes = null;
         int[][] board = null;
-        enum GameState { update, destroy, fall };
+        enum GameState { update, destroy, fall, over};
         GameState currentState = GameState.update;
         float timeAccum = 0;
         int flashes = 0;
@@ -32,8 +33,11 @@ namespace Game {
         int lines = 0;
         int score = 0;
         int nextShape = 0;
+        float leftRightAccum = 0;
+        SoundPlayer backgroundmusic = null;
 
         public Tetris() {
+            backgroundmusic = new SoundPlayer("Assets/Tetris.wav");
             boardSize = new Size(10, 20);
             width = 500 / size * size;
             height = 600 / size * size;
@@ -50,7 +54,12 @@ namespace Game {
         public override void Initialize() {
             this.width = width / size * size;
             this.height = height / size * size;
-
+            try {
+                backgroundmusic.PlayLooping();
+            }
+            catch (Exception ex) {
+                Console.WriteLine("Error" + ex);
+            }
             tetrominoColors = new List<Brush>();
             shapes = new List<Tetromino>();
             Tetromino lShape = new Tetromino();
@@ -189,9 +198,6 @@ namespace Game {
         }
 
         public override void Update(float dTime) {
-            if (gameOver) {
-                return;
-            }
             deltaTime = dTime;
             if (currentState == GameState.destroy) {
                 DestroyRow();
@@ -200,6 +206,9 @@ namespace Game {
             else if (currentState == GameState.fall) {
                 RowFall();
                 return;
+            }
+            else if (currentState == GameState.over) {
+                isGameOver = true;
             }
             else if (currentState == GameState.update) {
                 if (KeyPressed(Keys.Up)) {
@@ -332,19 +341,24 @@ namespace Game {
 
         public void TetrominoMove() {
             moveAccum += deltaTime;
-            if (KeyDown(Keys.Left)) {
-                currentShape.position.X -= size;
-                CheckBoundry();
-                if (CheckCollision()) {
-                    currentShape.position.X += size;
-                }
-            }
-            if (KeyDown(Keys.Right)) {
-                currentShape.position.X += size;
-                CheckBoundry();
-                if (CheckCollision()) {
+            leftRightAccum += deltaTime;
+
+            if (leftRightAccum > 0.1f) {
+                if (KeyDown(Keys.Left)) {
                     currentShape.position.X -= size;
+                    CheckBoundry();
+                    if (CheckCollision()) {
+                        currentShape.position.X += size;
+                    }
                 }
+                if (KeyDown(Keys.Right)) {
+                    currentShape.position.X += size;
+                    CheckBoundry();
+                    if (CheckCollision()) {
+                        currentShape.position.X -= size;
+                    }
+                }
+                leftRightAccum -= 0.1f;
             }
             if (KeyDown(Keys.Down)) {
                 currentSpeed = fastSpeed;
@@ -378,10 +392,14 @@ namespace Game {
             foreach (Rect r in currentShape.ReturnRects()) {
                 Console.WriteLine("X: " + r.X + ", stamped at: " + ((Int32)r.X / size));
                 Console.WriteLine("Y: " + r.Y + ", stamped at: " + ((Int32)r.Y / size) + "\n");
+                if (board[(Int32)r.X / size][(Int32)r.Y / size] > 0) {
+                    currentState = GameState.over;
+                }
                 board[(Int32)r.X / size][(Int32)r.Y / size] = shapes.IndexOf(currentShape)+1;
             }
             currentShape = shapes[nextShape];
             nextShape = shapes.IndexOf(shapes[this.r.Next(0, shapes.Count)]);
+            currentShape.TetrominoState = 0;
             currentShape.position = new Point(boardSize.Width / 2 * size, 0);
             if (FullRows()) {
                 timeAccum = 0;
@@ -419,15 +437,24 @@ namespace Game {
                     }
                 }
             }
-            g.DrawString("Level " + System.Convert.ToString(speed), new Font("Purisa", 20), Brushes.White, new Point(boardSize.Width * size + 35,50));
+            g.DrawString("Level " + System.Convert.ToString(speed), new Font("Purisa", 30), Brushes.White, new Point(boardSize.Width * size + 30,25));
             g.DrawString("Lines " + System.Convert.ToString(lines), new Font("Purisa", 20), Brushes.White, new Point(boardSize.Width * size + 35, 100));
-            g.DrawString("Score " + System.Convert.ToString(score), new Font("Purisa", 20), Brushes.White, new Point(boardSize.Width * size + 35, 150));
+            g.DrawString("Score ", new Font("Purisa", 20), Brushes.White, new Point(boardSize.Width * size + 35, 150));
+            g.DrawString(System.Convert.ToString(score), new Font("Purisa", 20), Brushes.White, new Point(boardSize.Width * size + 50, 175));
+
 
             Point oldPosition = new Point(shapes[nextShape].position.X, shapes[nextShape].position.Y);
-            g.DrawString("Next: ", new Font("Purisa", 20), Brushes.White, new Point(boardSize.Width * size + 35, 200));
-            shapes[nextShape].position = new Point(boardSize.Width * size + 50, 250);
+            g.DrawString("Next: ", new Font("Purisa", 20), Brushes.White, new Point(boardSize.Width * size + 35, 250));
+            shapes[nextShape].position = new Point(boardSize.Width * size + 50, 300);
+            int oldState = shapes[nextShape].TetrominoState;
+            shapes[nextShape].TetrominoState = 0;
             shapes[nextShape].Draw(g, tetrominoColors[nextShape]);
             shapes[nextShape].position = oldPosition;
+            shapes[nextShape].TetrominoState = oldState;
+            if (isGameOver) {
+                g.DrawString("Game Over ", new Font("Purisa", 50), Brushes.Black, new Point(boardSize.Width * size / 2 - 102, boardSize.Height * size / 2+2));
+                g.DrawString("Game Over ", new Font("Purisa", 50), Brushes.White, new Point(boardSize.Width * size / 2 - 100, boardSize.Height * size / 2));
+            }
         }
 
         void DebugRender(Graphics g) {
@@ -436,7 +463,7 @@ namespace Game {
                 tileCount = (row ) % 2 == 0 ? 1 : 0;//row/size=1,2,3... : %2 returns 1 or 0
                 for (int col = 0; col < boardSize.Width; col += 1) {
                     Rect tile = new Rect(col*size, row*size, size, size);
-                    g.FillRectangle(tileCount % 2 == 0 ? Brushes.Gray : Brushes.DarkGray, tile.Rectangle);
+                    g.FillRectangle(tileCount % 2 == 0 ? Brushes.Peru : Brushes.Peru, tile.Rectangle);
                     tileCount++;
                 }
             }

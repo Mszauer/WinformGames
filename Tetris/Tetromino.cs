@@ -16,6 +16,15 @@ namespace Game {
         public enum Direction { Left, Right };
         public Rect debugAABB = null;
 
+        public int TetrominoState{
+            get {
+                return currentState;
+            }
+            set {
+                currentState = value;
+            }
+        }
+
         public Rect AABB {//axis aligned boundry blocks
             get {
                 float minX = states[currentState][0].X;
@@ -64,10 +73,10 @@ namespace Game {
             for (int i = 0; i < states[currentState].Count; i++) {
                 g.FillRectangle(color, (Int32)(states[currentState][i].X + position.X), (Int32)(states[currentState][i].Y + position.Y), (Int32)states[currentState][i].W, (Int32)states[currentState][i].H);
             }
-            using (Pen p = new Pen(Brushes.LimeGreen)) {
-                g.DrawRectangle(p, AABB.X + position.X, AABB.Y + position.Y, AABB.W, AABB.H);
+            //using (Pen p = new Pen(Brushes.LimeGreen)) {
+            //    g.DrawRectangle(p, AABB.X + position.X, AABB.Y + position.Y, AABB.W, AABB.H);
 
-            }
+            //}
         }
 
         public void CreateShape(int[][] rowcol) {
