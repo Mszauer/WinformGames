@@ -31,6 +31,7 @@ namespace Game {
         int speedCounter = 0;
         int lines = 0;
         int score = 0;
+        int nextShape = 0;
 
         public Tetris() {
             boardSize = new Size(10, 20);
@@ -182,7 +183,9 @@ namespace Game {
             Brush iShapeColor = Brushes.Teal;
             tetrominoColors.Add(iShapeColor);
 
-            currentShape = shapes[r.Next(0, shapes.Count)];
+            nextShape = shapes.IndexOf(shapes[r.Next(0,shapes.Count)]);
+            currentShape = shapes[nextShape];
+            nextShape = shapes.IndexOf(shapes[r.Next(0, shapes.Count)]);
         }
 
         public override void Update(float dTime) {
@@ -377,7 +380,8 @@ namespace Game {
                 Console.WriteLine("Y: " + r.Y + ", stamped at: " + ((Int32)r.Y / size) + "\n");
                 board[(Int32)r.X / size][(Int32)r.Y / size] = shapes.IndexOf(currentShape)+1;
             }
-            currentShape = shapes[this.r.Next(0, shapes.Count)];
+            currentShape = shapes[nextShape];
+            nextShape = shapes.IndexOf(shapes[this.r.Next(0, shapes.Count)]);
             currentShape.position = new Point(boardSize.Width / 2 * size, 0);
             if (FullRows()) {
                 timeAccum = 0;
@@ -419,6 +423,11 @@ namespace Game {
             g.DrawString("Lines " + System.Convert.ToString(lines), new Font("Purisa", 20), Brushes.White, new Point(boardSize.Width * size + 35, 100));
             g.DrawString("Score " + System.Convert.ToString(score), new Font("Purisa", 20), Brushes.White, new Point(boardSize.Width * size + 35, 150));
 
+            Point oldPosition = new Point(shapes[nextShape].position.X, shapes[nextShape].position.Y);
+            g.DrawString("Next: ", new Font("Purisa", 20), Brushes.White, new Point(boardSize.Width * size + 35, 200));
+            shapes[nextShape].position = new Point(boardSize.Width * size + 50, 250);
+            shapes[nextShape].Draw(g, tetrominoColors[nextShape]);
+            shapes[nextShape].position = oldPosition;
         }
 
         void DebugRender(Graphics g) {
