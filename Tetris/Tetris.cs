@@ -28,12 +28,15 @@ namespace Game {
         GameState currentState = GameState.update;
         float timeAccum = 0;
         int flashes = 0;
+        int speedCounter = 0;
+        int lines = 0;
+        int score = 0;
 
         public Tetris() {
             boardSize = new Size(10, 20);
-            width = 800 / size * size;
+            width = 500 / size * size;
             height = 600 / size * size;
-            this.clearColor = Brushes.LightBlue;
+            this.clearColor = Brushes.Black;
             this.title = "Tetris";
             r = new Random();
 
@@ -238,6 +241,7 @@ namespace Game {
             timeAccum += deltaTime;
             flashColor = Brushes.Green;
             if (timeAccum > 0.3) {
+
                 for (int y = 0; y < boardSize.Height; y++) {
                     bool FullRow = true;
                     for (int x = 0; x < boardSize.Width; x++) {
@@ -245,7 +249,9 @@ namespace Game {
                             FullRow = false;
                         }
                     }
+
                     if (FullRow) {
+                        
                         for (int x = 0; x < board.Length; x++) {
                             board[x][y] = -1;
                         }
@@ -255,11 +261,40 @@ namespace Game {
                 flashes++;
                 timeAccum -= 0.3f;
                 if (flashes == 3) {
+                    int numDestroyedThisFrame = 0;
+
                     for (int y = 0; y < boardSize.Height; y++) {
+                        bool fullRow = false;
                         for (int x = 0; x < boardSize.Width; x++) {
                             if (board[x][y] == -1) {
                                 board[x][y] = -2;
+                                fullRow = true;
                             }
+                        }
+                        if (fullRow) {
+                            lines++;
+                            speedCounter++;
+                            numDestroyedThisFrame++;
+                            if (speedCounter >= 10) {
+                                if (speed < 22) {
+                                    speed++;
+                                }
+                                speedCounter = 0;
+                            }
+                        }
+                    }
+                    if (numDestroyedThisFrame > 0) {
+                        if (numDestroyedThisFrame == 1) {
+                            score += 40 * (speed);
+                        }
+                        else if (numDestroyedThisFrame == 2) {
+                            score += 100 * (speed);
+                        }
+                        else if (numDestroyedThisFrame == 3) {
+                            score += 300 * (speed);
+                        }
+                        else if(numDestroyedThisFrame == 4){
+                            score += 1200 * (speed);
                         }
                     }
                     currentState = GameState.fall;
@@ -380,6 +415,10 @@ namespace Game {
                     }
                 }
             }
+            g.DrawString("Level " + System.Convert.ToString(speed), new Font("Purisa", 20), Brushes.White, new Point(boardSize.Width * size + 35,50));
+            g.DrawString("Lines " + System.Convert.ToString(lines), new Font("Purisa", 20), Brushes.White, new Point(boardSize.Width * size + 35, 100));
+            g.DrawString("Score " + System.Convert.ToString(score), new Font("Purisa", 20), Brushes.White, new Point(boardSize.Width * size + 35, 150));
+
         }
 
         void DebugRender(Graphics g) {
