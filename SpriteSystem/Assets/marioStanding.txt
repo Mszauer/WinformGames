@@ -1,0 +1,6 @@
+R 85 0 17 27
+I Assets\mario-sprite-sheet.png
+O 17 27 True True
+G 0 0 255
+S 240 240 240
+P 0 False False False False

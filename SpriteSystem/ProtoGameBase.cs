@@ -13,27 +13,37 @@ namespace Game {
         ProtoAnimation animatedSprite = null;
         ProtoAnimation marioRun = null;
         Point spritePosition = default(Point);
+        ProtoAnimation marioStanding = null;
+        ProtoAnimation mario = null;
 
         public override void Initialize(){
             sprite = new Sprite("Assets\\flappyBat.png");
             animatedSprite = new ProtoAnimation("Assets/gohanrects.txt", 30f);
+            marioStanding = new ProtoAnimation("Assets/marioStanding.txt", 30f);
             marioRun = new ProtoAnimation("Assets/marioRun.txt",30f);
-            spritePosition.X = width - marioRun.spriteSize.Width - 1;
+            mario = marioStanding;
+            spritePosition.X = width - mario.spriteSize.Width - 1;
+
         }
 
         public override void Update(float deltaTime) {
             animatedSprite.Update(deltaTime);
             marioRun.Update(deltaTime);
-            if(spritePosition.X > 0){
-                spritePosition.X -= (Int32)(30f * deltaTime);
+            if (KeyDown(Keys.Left)) {
+                if (spritePosition.X > 0) {
+                    spritePosition.X -= (Int32)(30f * deltaTime);
+                }
+                mario = marioRun;
             }
-            
+            else {
+                mario = marioStanding;
+            }
         }
 
         public override void Render(Graphics g) {
             sprite.Draw(g, new Rect(new Point(0, 0), new Point(width, height)), new Rect(new Point(0, 0), new Point(285, 510)));
             animatedSprite.Render(g, new Point(width / 2, height / 2));
-            marioRun.Render(g, new Point(spritePosition.X, height - marioRun.spriteSize.Height));
+            mario.Render(g, new Point(spritePosition.X, height - mario.spriteSize.Height));
         }
     }
 }
