@@ -1,0 +1,12 @@
+R 0 337 27 48
+R 27 337 27 48
+R 54 337 27 48
+R 81 337 27 48
+R 108 337 27 48
+R 135 337 27 48
+R 162 337 27 48
+I Assets\gohanss2.png
+O 27 46 True True
+G 0 0 255
+S 255 0 0
+P 1 True True False False

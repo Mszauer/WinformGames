@@ -1,0 +1,7 @@
+R 36 0 18 27
+R 51 0 17 27
+I C:\Users\Martin\Documents\WinformGames\SpriteSystem\Assets\mario-sprite-sheet.png
+O 17 27 True True
+G 0 0 255
+S 255 0 0
+P 0 False False False False
