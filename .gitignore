@@ -1,0 +1,11 @@
+*.suo
+*.user
+*.zargo~
+[Oo]bj/
+[Bb]in/
+.vs/
+x86/
+x64/
+[Dd]ebug/
+[Rr]elease/
+
