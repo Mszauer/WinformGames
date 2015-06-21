@@ -9,41 +9,65 @@ using System.Drawing;
 
 namespace Game {
     class ProtoGameBase : GameBase{
-        Sprite sprite = null;
-        ProtoAnimation animatedSprite = null;
+        Sprite background = null;
+        FlipBook gohanJump = null;
         ProtoAnimation marioRun = null;
-        Point spritePosition = default(Point);
+        Point marioPosition = default(Point);
         ProtoAnimation marioStanding = null;
         ProtoAnimation mario = null;
 
+
         public override void Initialize(){
-            sprite = new Sprite("Assets\\flappyBat.png");
-            animatedSprite = new ProtoAnimation("Assets/gohanrects.txt", 30f);
+            background = new Sprite("Assets\\flappyBat.png");
+            gohanJump = new FlipBook("Assets/gohanrects.txt", 30f);
             marioStanding = new ProtoAnimation("Assets/marioStanding.txt", 30f);
             marioRun = new ProtoAnimation("Assets/marioRun.txt",30f);
             mario = marioStanding;
-            spritePosition.X = width - mario.spriteSize.Width - 1;
-
+            marioPosition.X = width - mario.spriteSize.Width - 1;
+            gohanJump.Flip = FlipBook.FlipStyle.Horizontal;
         }
 
         public override void Update(float deltaTime) {
-            animatedSprite.Update(deltaTime);
+            gohanJump.Update(deltaTime);
             marioRun.Update(deltaTime);
             if (KeyDown(Keys.Left)) {
-                if (spritePosition.X > 0) {
-                    spritePosition.X -= (Int32)(30f * deltaTime);
+                if (marioPosition.X > 0) {
+                    marioPosition.X -= (Int32)(30f * deltaTime);
                 }
                 mario = marioRun;
             }
+
             else {
                 mario = marioStanding;
+            }
+
+            if (KeyPressed(Keys.D)) {
+                gohanJump.Flip = FlipBook.FlipStyle.Horizontal;
+            }
+            if (KeyPressed(Keys.A)) {
+                gohanJump.Flip = FlipBook.FlipStyle.None;
+            }
+            if (KeyPressed(Keys.W)) {
+                gohanJump.Flip = FlipBook.FlipStyle.Vertical;
+            }
+            if (KeyPressed(Keys.S)) {
+                gohanJump.Flip = FlipBook.FlipStyle.Both;
+            }
+            if (KeyPressed(Keys.D1)) {
+                gohanJump.Anchor = FlipBook.AnchorPosition.Center;
+            }
+            if (KeyPressed(Keys.D2)) {
+                gohanJump.Anchor = FlipBook.AnchorPosition.TopLeft;
+            }
+            if (KeyPressed(Keys.D3)) {
+                gohanJump.Anchor = FlipBook.AnchorPosition.BottomMiddle;
             }
         }
 
         public override void Render(Graphics g) {
-            sprite.Draw(g, new Rect(new Point(0, 0), new Point(width, height)), new Rect(new Point(0, 0), new Point(285, 510)));
-            animatedSprite.Render(g, new Point(width / 2, height / 2));
-            mario.Render(g, new Point(spritePosition.X, height - mario.spriteSize.Height));
+            background.Draw(g, new Rect(new Point(0, 0), new Point(width, height)), new Rect(new Point(0, 0), new Point(285, 510))); //background
+            gohanJump.Render(g, new Point(width / 2, height / 2)); //gohan
+            mario.Render(g, new Point(marioPosition.X, height - mario.spriteSize.Height)); //mario
         }
     }
 }
