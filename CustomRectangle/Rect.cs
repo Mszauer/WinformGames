@@ -93,6 +93,10 @@ namespace Game {
             }
         }
 
+        public override string ToString() {
+            return "X: " + X + ", Y: " + Y + ", W: " + W + ", H: " + H;
+        }
+
         public System.Drawing.Rectangle Rectangle {
             get {
                 return new Rectangle(FloatClampToInt(mx), FloatClampToInt(my), FloatClampToInt(mw), FloatClampToInt(mh));

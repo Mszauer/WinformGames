@@ -7,6 +7,7 @@ using Game;
 using System.Windows.Forms;
 using System.Drawing;
 using System.IO;
+using System.Xml;
 
 namespace Game {
     class FlipBook {
@@ -27,23 +28,70 @@ namespace Game {
         public enum AnchorPosition { TopLeft, Center, BottomMiddle }
         public AnchorPosition Anchor = AnchorPosition.TopLeft;
 
-        public FlipBook(string filePath, float fps) {
-            updateRate = 1.0f / fps;
-            subSprites = new List<Rect>();
+        protected FlipBook() {
+
+        }
+
+        public static FlipBook LoadXML(string filePath, float fps = 30f) {
+            FlipBook result = new FlipBook();
+            result.updateRate = 1f / fps;
+            result.subSprites = new List<Rect>();
+            float sourceX = 0;
+            float sourceY = 0;
+            float sourceW = 0;
+            float sourceH = 0;
+            using (XmlReader reader = XmlReader.Create(new StreamReader(filePath))) {
+                while (reader.Read()) {
+                    if (reader.NodeType == XmlNodeType.Element) {
+                        if (reader.Name == "Texture") {
+                            reader.MoveToFirstAttribute();
+                            string texturePath = reader.Value;
+                            result.spriteSheet = Image.FromFile(texturePath);
+                        }
+                        if (reader.Name == "X") {
+                            reader.Read();
+                            sourceX = System.Convert.ToInt32(reader.Value);
+                        }
+                        if (reader.Name == "Y") {
+                            reader.Read();
+                            sourceY = System.Convert.ToInt32(reader.Value);
+                        }
+                        if (reader.Name == "Width") {
+                            reader.Read();
+                            sourceW = System.Convert.ToInt32(reader.Value);
+                        }
+                        if (reader.Name == "Height") {
+                            reader.Read();
+                            sourceH = System.Convert.ToInt32(reader.Value);
+                            Rect r = new Rect(sourceX, sourceY, sourceW, sourceH);
+                            result.subSprites.Add(r);
+                        }
+                    }
+                }
+            }
+            
+            return result;
+        }
+
+        public static FlipBook LoadCustom(string filePath, float fps = 30f) {
+            FlipBook result = new FlipBook();
+            result.updateRate = 1.0f / fps;
+            result.subSprites = new List<Rect>();
             using (StreamReader sr = new StreamReader(filePath)) {
                 string line;
                 while ((line = sr.ReadLine()) != null) {
                     if (line[0] == 'R') {
                         string[] split = line.Split(new Char[] { ' ' });
                         Rect r = new Rect(System.Convert.ToInt32(split[1]), System.Convert.ToInt32(split[2]), System.Convert.ToInt32(split[3]), System.Convert.ToInt32(split[4]));
-                        subSprites.Add(r);
+                        result.subSprites.Add(r);
                     }
                     else if (line[0] == 'I') {
                         string[] split = line.Split(new Char[] { ' ' });
-                        spriteSheet = Image.FromFile(split[1]);
+                        result.spriteSheet = Image.FromFile(split[1]);
                     }
                 }
             }
+            return result;
         }
 
         public void Update(float dTime) {
