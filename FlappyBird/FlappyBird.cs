@@ -15,6 +15,8 @@ namespace Game {
         bool playerCollision = false;
         bool gameOver = false;
         Random r = null;
+        enum GameState { Start, Play, Lose }
+        GameState CurrentState = GameState.Start;
 
         public FlappyBird() {
             width = 400;
@@ -34,32 +36,39 @@ namespace Game {
             Obstacles pipe3 = new Obstacles(new Size(width, height));
             pipe3.Generate(300);
             pipes.Add(pipe3);
-            float pipeSpacing = 150;//((45 / width) / 3) * 45;
+            float pipeSpacing = 150;
             pipe2.X = width + pipeSpacing;
             pipe3.X = width + pipeSpacing * 2;
+            player = new Player(new Size(width, height));
+            player.Generate();
         }
 
         public override void Update(float dTime) {
             timeAccum += dTime;
-            foreach (Obstacles pipe in pipes) {
-                pipe.Update(dTime);
+            if (CurrentState == GameState.Start) {
+                if (KeyPressed(Keys.Up)) {
+                    CurrentState = GameState.Play;
+                }
             }
-            /*if (timeAccum ==  1){
-                pipes[1].Update(dTime);
+            else if (CurrentState == GameState.Play) {
+                foreach (Obstacles pipe in pipes) {
+                    pipe.Update(dTime);
+                }
+                player.Update(dTime);
+                if (KeyPressed(Keys.Up)) {
+                    player.Jump();
+                }
+                if (KeyPressed(Keys.Down)) {
+                    CurrentState = GameState.Start;
+                }
             }
-            if (timeAccum == 2) {
-                pipes[2].Update(dTime);
-                timeAccum -= 2.0f;
-            }
-             */
-
-            
         }
 
         public override void Render(Graphics g){
             for (int i = 0; i < pipes.Count; i++) {
                 pipes[i].Draw(g);
             }
+            player.Draw(g);
 
         }
 

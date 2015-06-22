@@ -17,9 +17,8 @@ namespace Game {
         Random r = null;
         Size windowWH = default(Size);
         int startX = 0;
-        int openingOffset = 100;
         float openingSize = 50; // size of the opening
-        Size pipeSize = new Size(45,0);
+        Size pipeSize = new Size(45, 0);
         public float X {
             set {
                 collisionBoxTop.X = value;
@@ -30,7 +29,7 @@ namespace Game {
         public Obstacles(Size window) {
             startX = window.Width;
             windowWH.Height = window.Height;
-            r = new Random();
+            r = new System.Random(Guid.NewGuid().GetHashCode()); ;
         }
 
         public void Initializer() {
@@ -41,7 +40,7 @@ namespace Game {
             collisionBoxTop.X -= deltaTime * speed;
             collisionBoxBottom.X -= deltaTime * speed;
             if (collisionBoxTop.X < 0 - pipeSize.Width && collisionBoxBottom.X < 0 - pipeSize.Width) {
-                Generate(openingOffset);
+                Generate(r.Next(40,windowWH.Height-40)); // 40 is the amount it can move up or down
             }            
         }
 
