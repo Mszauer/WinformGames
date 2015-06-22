@@ -33,6 +33,7 @@ namespace Game {
         }
 
         public static FlipBook LoadXML(string filePath, float fps = 30f) {
+            //https://msdn.microsoft.com/en-us/library/cc189056(v=vs.95).aspx
             FlipBook result = new FlipBook();
             result.updateRate = 1f / fps;
             result.subSprites = new List<Rect>();

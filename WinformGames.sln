@@ -17,6 +17,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tetris", "Tetris\Tetris.csp
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SpriteSystem", "SpriteSystem\SpriteSystem.csproj", "{0316E3C0-BD0D-484D-A0B3-754E46E216B8}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FlappyBird", "FlappyBird\FlappyBird.csproj", "{095111BE-2294-4CFF-85E6-744410001DF1}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -51,6 +53,10 @@ Global
 		{0316E3C0-BD0D-484D-A0B3-754E46E216B8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0316E3C0-BD0D-484D-A0B3-754E46E216B8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0316E3C0-BD0D-484D-A0B3-754E46E216B8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{095111BE-2294-4CFF-85E6-744410001DF1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{095111BE-2294-4CFF-85E6-744410001DF1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{095111BE-2294-4CFF-85E6-744410001DF1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{095111BE-2294-4CFF-85E6-744410001DF1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
