@@ -17,8 +17,15 @@ namespace Game {
         Random r = null;
         Size windowWH = default(Size);
         int startX = 0;
+        int openingOffset = 100;
         float openingSize = 50; // size of the opening
         Size pipeSize = new Size(45,0);
+        public float X {
+            set {
+                collisionBoxTop.X = value;
+                collisionBoxBottom.X = value;
+            }
+        }
 
         public Obstacles(Size window) {
             startX = window.Width;
@@ -34,9 +41,8 @@ namespace Game {
             collisionBoxTop.X -= deltaTime * speed;
             collisionBoxBottom.X -= deltaTime * speed;
             if (collisionBoxTop.X < 0 - pipeSize.Width && collisionBoxBottom.X < 0 - pipeSize.Width) {
-                Generate(100);
-            }
-            
+                Generate(openingOffset);
+            }            
         }
 
         public void Draw(Graphics g) {
