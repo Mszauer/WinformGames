@@ -24,7 +24,7 @@ namespace Game {
         public override void Initialize(){
             pipes = new List<Obstacles>();
             Obstacles pipe = new Obstacles(new Size(width, height));
-            pipe.Generate(250); // height of pipes, opening == windowHeight - height*2
+            pipe.Generate(500); // sets base point for opening
             pipes.Add(pipe);
         }
 

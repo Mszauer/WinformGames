@@ -14,11 +14,10 @@ namespace Game {
         Rect collisionBoxBottom = null;
         Sprite pipeTop = null;
         Sprite pipeBottom = null;
-        float obstacleOpening = 0;
         Random r = null;
         Size windowWH = default(Size);
         int startX = 0;
-        int finishX = 0;
+        float openingSize = 50; // size of the opening
         Size pipeSize = new Size(45,0);
 
         public Obstacles(Size window) {
@@ -34,22 +33,20 @@ namespace Game {
         public void Update(float deltaTime) {
             collisionBoxTop.X -= deltaTime * speed;
             collisionBoxBottom.X -= deltaTime * speed;
-            if (collisionBoxTop.X < 0-pipeSize.Width) {
-                collisionBoxTop.X = startX;
+            if (collisionBoxTop.X < 0 - pipeSize.Width && collisionBoxBottom.X < 0 - pipeSize.Width) {
+                Generate(100);
             }
-            if (collisionBoxBottom.X < 0 - pipeSize.Width) {
-                collisionBoxBottom.X = startX;
-            }
+            
         }
 
         public void Draw(Graphics g) {
             DebugRender(g);
         }
 
-        public void Generate(int y) {
-            pipeSize.Height = y;
-            collisionBoxTop = new Rect(new Point(startX,0), pipeSize);
-            collisionBoxBottom = new Rect(new Point(startX, windowWH.Height -pipeSize.Height), pipeSize);
+        public void Generate(float opening) {
+            // opening = point where the gap begins, openingSize = distance of gap from both sides(gets doubled)
+            collisionBoxTop = new Rect(new Point(startX, 0), new Size(pipeSize.Width, (Int32)opening - (Int32)openingSize));
+            collisionBoxBottom = new Rect(new Point(startX, (Int32)opening + (Int32)openingSize), new Size(pipeSize.Width, windowWH.Height));
         }
 
         public void DebugRender(Graphics g) {
