@@ -9,8 +9,7 @@ using System.Drawing;
 namespace Game {
     class FlappyBird : GameBase{
         float timeAccum = 0;
-        List<Obstacles> pipes = null;
-        float pipeSpeed = 0;
+        List<Obstacle> pipes = null;
         Player player = null;
         bool playerCollision = false;
         bool gameOver = false;
@@ -26,19 +25,19 @@ namespace Game {
 
         public override void Initialize(){
             r = new Random();
-            pipes = new List<Obstacles>();
-            Obstacles pipe = new Obstacles(new Size(width, height));
-            pipe.Generate(100); // sets base point for opening
+            pipes = new List<Obstacle>();
+            Obstacle pipe = new Obstacle(new Size(width, height));           
+            pipe.Generate(150); // sets base point for opening            
             pipes.Add(pipe);
-            Obstacles pipe2 = new Obstacles(new Size(width, height));
+            Obstacle pipe2 = new Obstacle(new Size(width, height));
             pipe2.Generate(200);
+            pipe2.lastPipe = pipe;
+            pipe.lastPipe = pipe2;
             pipes.Add(pipe2);
-            Obstacles pipe3 = new Obstacles(new Size(width, height));
-            pipe3.Generate(300);
-            pipes.Add(pipe3);
-            float pipeSpacing = 150;
+            
+            float pipeSpacing = 280.0f;
+            pipe.X = width;
             pipe2.X = width + pipeSpacing;
-            pipe3.X = width + pipeSpacing * 2;
             player = new Player(new Size(width, height));
             player.Generate();
         }
@@ -51,7 +50,7 @@ namespace Game {
                 }
             }
             else if (CurrentState == GameState.Play) {
-                foreach (Obstacles pipe in pipes) {
+                foreach (Obstacle pipe in pipes) {
                     pipe.Update(dTime);
                 }
                 player.Update(dTime);
