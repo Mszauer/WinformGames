@@ -60,7 +60,7 @@
       <Link>Sprite.cs</Link>
     </Compile>
     <Compile Include="FlappyBird.cs" />
-    <Compile Include="Obstacles.cs" />
+    <Compile Include="Obstacle.cs" />
     <Compile Include="Player.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
