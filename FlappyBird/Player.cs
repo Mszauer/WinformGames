@@ -8,12 +8,17 @@ using System.Drawing;
 
 namespace Game {
     class Player {
-        Rect player = null;
+        public Rect player = null;
         FlipBook playerSprite = null;
         Point playerPosition = default(Point);
-        float fallConstant = 155.0f; //Jump height?
-        float velocity = 125.0f; // Same as constant for now
+        float fallConstant = 155.0f; 
+        float velocity = 125.0f; 
         float deltaTime = 0;
+        public float X {
+            get {
+                return player.X;
+            }
+        }
 
         public Player(Size window) {
             playerPosition = new Point(window.Width / 2, window.Height / 2);
@@ -37,6 +42,13 @@ namespace Game {
             velocity = -fallConstant;
             // if (fallRate < -fallConstant)
             //    Don't let fall rate go out of constant bounds.
+        }
+
+        public bool OutOfBounds(Size window) {
+            if (player.Y > window.Height || player.Y < 0){
+                return true;
+            }
+            return false;
         }
 
         public void Draw(Graphics g) {

@@ -10,17 +10,21 @@ namespace Game {
     class Obstacle {
         public float speed = 100;
         public Obstacle lastPipe = null; 
-        Rect topObstacle = null;
-        Rect bottomObstacle = null;
+        public Rect topObstacle = null;
+        public Rect bottomObstacle = null;
+        public bool canScore = true;
         Sprite pipeTop = null;
         Sprite pipeBottom = null;
         Random r = null;
         Size windowWH = default(Size);
         int startX = 0;
         float openingSize = 100; // size of the opening
-        Size pipeSize = new Size(120, 0);
+        Size pipeSize = new Size(100, 0);
         float lastOpening = 0;
         public float X {
+            get {
+                return topObstacle.X;
+            }
             set {
                 topObstacle.X = value;
                 bottomObstacle.X = value;
@@ -46,6 +50,7 @@ namespace Game {
                     randomY = r.Next(45, windowWH.Height - 45);
                 }
                 Generate(randomY);
+                canScore = true;
 
             }            
         }

@@ -5,15 +5,17 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Drawing;
+using System.IO;
 
 namespace Game {
     class FlappyBird : GameBase{
         float timeAccum = 0;
         List<Obstacle> pipes = null;
         Player player = null;
-        bool playerCollision = false;
-        bool gameOver = false;
         Random r = null;
+        Rect pointCard = null;
+        int score = 0;
+        int bestScore = 0;
         enum GameState { Start, Play, Lose }
         GameState CurrentState = GameState.Start;
 
@@ -26,6 +28,15 @@ namespace Game {
         public override void Initialize(){
             r = new Random();
             pipes = new List<Obstacle>();
+            score = 0;
+            using (StreamReader loadScore = new StreamReader("Assets/score.txt")) {
+                if (loadScore.ReadLine() != null) {
+                    bestScore = System.Convert.ToInt32(loadScore.ReadLine());
+                }
+            }
+
+            pointCard = new Rect(new Point(width / 2 - 150, height / 2 - 100), new Point(width / 2 + 150, height / 2 + 100));
+
             Obstacle pipe = new Obstacle(new Size(width, height));           
             pipe.Generate(150); // sets base point for opening            
             pipes.Add(pipe);
@@ -50,25 +61,72 @@ namespace Game {
                 }
             }
             else if (CurrentState == GameState.Play) {
+                Collision();
                 foreach (Obstacle pipe in pipes) {
                     pipe.Update(dTime);
+                    if (pipe.canScore && player.X > pipe.X ) {
+                        if (pipe.canScore) {
+                            score++;
+                            pipe.canScore = false;
+                        }
+                    }
                 }
                 player.Update(dTime);
                 if (KeyPressed(Keys.Up)) {
                     player.Jump();
                 }
+#if DEBUG
                 if (KeyPressed(Keys.Down)) {
                     CurrentState = GameState.Start;
                 }
+#endif
+            }
+            else if (CurrentState == GameState.Lose) {
+                if (KeyPressed(Keys.R)) {
+                    CurrentState = GameState.Start;
+                    Initialize();
+                }
+                if (score > bestScore) {
+                    bestScore = score;
+                    SaveScore();
+                }
+            }
+        }
+        void SaveScore() {
+            using (StreamWriter save = new StreamWriter("Assets/score.txt")) {
+                save.Write(System.Convert.ToString(bestScore));
+            }
+        }
+
+        public void Collision() {
+            foreach (Obstacle pipe in pipes){
+                if (player.player.Intersects(pipe.topObstacle) || player.player.Intersects(pipe.bottomObstacle)) {
+                    CurrentState = GameState.Lose;
+                }
+            }
+            if (player.OutOfBounds(new Size(width,height))) {
+                    CurrentState = GameState.Lose;
             }
         }
 
         public override void Render(Graphics g){
+#if DEBUG
+            player.Draw(g);
             for (int i = 0; i < pipes.Count; i++) {
                 pipes[i].Draw(g);
             }
-            player.Draw(g);
-
+#endif
+            if (CurrentState == GameState.Start) {
+                g.DrawString("Get Ready!", new Font("Purisa", 20), Brushes.Red, new Point(width / 2 - 50, 150));
+            }
+            else if (CurrentState == GameState.Play) {
+                g.DrawString("Score: " + System.Convert.ToString(score), new Font("Purisa", 20), Brushes.Red, new Point(width / 2 - 50, 0));                
+            }
+            else if (CurrentState == GameState.Lose) {
+#if DEBUG
+                g.FillRectangle(Brushes.Blue, pointCard.Rectangle);
+#endif
+            }
         }
 
 
