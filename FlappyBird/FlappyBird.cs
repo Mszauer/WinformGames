@@ -23,6 +23,7 @@ namespace Game {
         public FlappyBird() {
             width = 400;
             height = 600;
+            title = "FlappyBird";
             this.clearColor = Brushes.Black;
         }
 

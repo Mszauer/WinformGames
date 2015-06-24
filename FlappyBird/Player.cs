@@ -26,7 +26,7 @@ namespace Game {
         }
 
         public void Generate() {
-            player = new Rect(playerPosition, new Size(50, 50));
+            player = new Rect(playerPosition, new Size(50, 40));
         }
 
 
@@ -56,6 +56,8 @@ namespace Game {
         public void Draw(Graphics g) {
 #if DEBUG
             DebugRender(g);
+            playerSprite.Render(g, new Point((Int32)player.X - 5, (Int32)player.Y)); //the 5 just centers the bird in the collision box
+
 #else
             playerSprite.Render(g,new Point((Int32)player.X-5,(Int32)player.Y)); //the 5 just centers the bird in the collision box
 #endif
