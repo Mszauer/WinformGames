@@ -25,10 +25,10 @@ namespace Game {
         public Sprite(string filepath) {
             spriteSheet = Image.FromFile(filepath);
         }
-        public void Draw(Graphics g,Point p) {
-            g.DrawImage(spriteSheet, p);
-        }
 
+        public void Draw(Graphics g, Point p) {
+            g.DrawImage(spriteSheet, p.X, p.Y, spriteSheet.Width, spriteSheet.Height);
+        }
         public void Draw(Graphics g, float x1, float y1, float w, float h) {
             g.DrawImage(spriteSheet, x1,y1,w,h);
         }

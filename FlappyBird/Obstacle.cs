@@ -54,10 +54,10 @@ namespace Game {
         public void Draw(Graphics g) {
 #if DEBUG
             DebugRender(g);
-#endif
+#else
             pipe.Draw(g, topObstacle, new Rect(0,pipe.H - topObstacle.H,topObstacle.W,topObstacle.H));//topObstacle.X,topObstacle.Y,topObstacle.W,topObstacle.H);
             pipe.Draw(g, bottomObstacle, new Rect(0, 0, bottomObstacle.W, bottomObstacle.H));//bottomObstacle.X,bottomObstacle.Y,bottomObstacle.W,bottomObstacle.H);
-
+#endif
         }
 
         public void Generate(float opening) {

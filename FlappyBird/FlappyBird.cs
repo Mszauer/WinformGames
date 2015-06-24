@@ -31,10 +31,13 @@ namespace Game {
             pipes = new List<Obstacle>();
             score = 0;
             using (StreamReader loadScore = new StreamReader("Assets/score.txt")) {
-                if (loadScore.ReadLine() != null) {
-                    bestScore = System.Convert.ToInt32(loadScore.ReadLine());
+                string prevScore = loadScore.ReadLine();
+                if (prevScore != null) { // << reads in first line
+                    bestScore = System.Convert.ToInt32(prevScore); // << reads in second line
                 }
             }
+
+            Console.WriteLine(bestScore);
 
             pointCard = new Rect(new Point(width / 2 - 150, height / 2 - 100), new Point(width / 2 + 150, height / 2 + 100));
 
@@ -53,7 +56,9 @@ namespace Game {
             player = new Player(new Size(width, height));
             player.Generate();
             background = new Background(new Size(width,height));
+#if !DEBUG
             background.Initialize();
+#endif
         }
 
         public override void Update(float dTime) {
@@ -64,6 +69,9 @@ namespace Game {
                 }
             }
             else if (CurrentState == GameState.Play) {
+#if !DEBUG
+                background.Update(dTime);
+#endif
                 Collision();
                 foreach (Obstacle pipe in pipes) {
                     pipe.Update(dTime);
@@ -94,7 +102,6 @@ namespace Game {
                     SaveScore();
                 }
             }
-            background.Update(dTime);
         }
         void SaveScore() {
             using (StreamWriter save = new StreamWriter("Assets/score.txt")) {
@@ -114,14 +121,16 @@ namespace Game {
         }
 
         public override void Render(Graphics g){
+#if !DEBUG
             background.Draw(g);
+#endif
             player.Draw(g);
             for (int i = 0; i < pipes.Count; i++) {
                 pipes[i].Draw(g);
             }
 
             if (CurrentState == GameState.Start) {
-                g.DrawString("Get Ready!", new Font("Purisa", 20), Brushes.Red, new Point(width / 2 - 50, 150));
+                g.DrawString("Press ↑ to begin", new Font("Purisa", 20), Brushes.Red, new Point(width / 2 - 100, 150));
             }
             else if (CurrentState == GameState.Play) {
                 g.DrawString("Score: " + System.Convert.ToString(score), new Font("Purisa", 20), Brushes.Red, new Point(width / 2 - 50, 0));                
@@ -129,6 +138,10 @@ namespace Game {
             else if (CurrentState == GameState.Lose) {
 #if DEBUG
                 g.FillRectangle(Brushes.Blue, pointCard.Rectangle);
+#else
+                g.DrawString("Your Score: " + System.Convert.ToString(score), new Font("Purisa", 20), Brushes.Red, new Point(width / 2 - 100, height / 2 - 50));
+                g.DrawString("Best Score: " + System.Convert.ToString(bestScore), new Font("Purisa", 20), Brushes.Red, new Point(width / 2 - 100, height / 2));
+                g.DrawString("Press R to try again" , new Font("Purisa", 20), Brushes.Red, new Point(width / 2-100, height/2 + 50));                
 #endif
             }
         }

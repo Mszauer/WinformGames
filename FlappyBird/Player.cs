@@ -56,8 +56,9 @@ namespace Game {
         public void Draw(Graphics g) {
 #if DEBUG
             DebugRender(g);
+#else
+            playerSprite.Render(g,new Point((Int32)player.X-5,(Int32)player.Y)); //the 5 just centers the bird in the collision box
 #endif
-            playerSprite.Render(g,new Point((Int32)player.X,(Int32)player.Y));
         }
 
         public void DebugRender(Graphics g) {
