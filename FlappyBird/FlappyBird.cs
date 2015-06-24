@@ -18,6 +18,7 @@ namespace Game {
         int bestScore = 0;
         enum GameState { Start, Play, Lose }
         GameState CurrentState = GameState.Start;
+        Background background = null;
 
         public FlappyBird() {
             width = 400;
@@ -51,6 +52,8 @@ namespace Game {
             pipe2.X = width + pipeSpacing;
             player = new Player(new Size(width, height));
             player.Generate();
+            background = new Background(new Size(width,height));
+            background.Initialize();
         }
 
         public override void Update(float dTime) {
@@ -91,6 +94,7 @@ namespace Game {
                     SaveScore();
                 }
             }
+            background.Update(dTime);
         }
         void SaveScore() {
             using (StreamWriter save = new StreamWriter("Assets/score.txt")) {
@@ -110,7 +114,7 @@ namespace Game {
         }
 
         public override void Render(Graphics g){
-
+            background.Draw(g);
             player.Draw(g);
             for (int i = 0; i < pipes.Count; i++) {
                 pipes[i].Draw(g);
