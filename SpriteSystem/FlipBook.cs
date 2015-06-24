@@ -47,7 +47,7 @@ namespace Game {
                         if (reader.Name == "Texture") {
                             reader.MoveToFirstAttribute();
                             string texturePath = reader.Value;
-                            result.spriteSheet = Image.FromFile(texturePath);
+                            result.spriteSheet = Image.FromFile(texturePath); // was texture path
                         }
                         if (reader.Name == "X") {
                             reader.Read();

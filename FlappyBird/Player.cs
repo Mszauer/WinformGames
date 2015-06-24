@@ -22,6 +22,7 @@ namespace Game {
 
         public Player(Size window) {
             playerPosition = new Point(window.Width / 2, window.Height / 2);
+            playerSprite = FlipBook.LoadXML("Assets/birdie.xml", 30.0f);
         }
 
         public void Generate() {
@@ -36,6 +37,7 @@ namespace Game {
             if (velocity > fallConstant) {
                 velocity = fallConstant;
             }
+            playerSprite.Update(dTime);
         }
 
         public void Jump() {
@@ -55,6 +57,7 @@ namespace Game {
 #if DEBUG
             DebugRender(g);
 #endif
+            playerSprite.Render(g,new Point((Int32)player.X,(Int32)player.Y));
         }
 
         public void DebugRender(Graphics g) {

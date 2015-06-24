@@ -38,10 +38,10 @@ namespace Game {
             pointCard = new Rect(new Point(width / 2 - 150, height / 2 - 100), new Point(width / 2 + 150, height / 2 + 100));
 
             Obstacle pipe = new Obstacle(new Size(width, height));           
-            pipe.Generate(150); // sets base point for opening            
+            pipe.Generate(200); // sets base point for opening            
             pipes.Add(pipe);
             Obstacle pipe2 = new Obstacle(new Size(width, height));
-            pipe2.Generate(200);
+            pipe2.Generate(250);
             pipe2.lastPipe = pipe;
             pipe.lastPipe = pipe2;
             pipes.Add(pipe2);
@@ -110,12 +110,12 @@ namespace Game {
         }
 
         public override void Render(Graphics g){
-#if DEBUG
+
             player.Draw(g);
             for (int i = 0; i < pipes.Count; i++) {
                 pipes[i].Draw(g);
             }
-#endif
+
             if (CurrentState == GameState.Start) {
                 g.DrawString("Get Ready!", new Font("Purisa", 20), Brushes.Red, new Point(width / 2 - 50, 150));
             }

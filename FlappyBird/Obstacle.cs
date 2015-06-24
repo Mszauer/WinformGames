@@ -13,8 +13,7 @@ namespace Game {
         public Rect topObstacle = null;
         public Rect bottomObstacle = null;
         public bool canScore = true;
-        Sprite pipeTop = null;
-        Sprite pipeBottom = null;
+        Sprite pipe = null;
         Random r = null;
         Size windowWH = default(Size);
         int startX = 0;
@@ -33,12 +32,9 @@ namespace Game {
 
         public Obstacle(Size window) {
             startX = window.Width;
-            windowWH.Height = window.Height;
-            r = new System.Random(Guid.NewGuid().GetHashCode()); ;
-        }
-
-        public void Initializer() {
-
+            windowWH = window;
+            r = new System.Random(Guid.NewGuid().GetHashCode());
+            pipe = new Sprite("Assets/pipe.png");
         }
 
         public void Update(float deltaTime) {
@@ -59,6 +55,9 @@ namespace Game {
 #if DEBUG
             DebugRender(g);
 #endif
+            pipe.Draw(g, topObstacle, new Rect(0,pipe.H - topObstacle.H,topObstacle.W,topObstacle.H));//topObstacle.X,topObstacle.Y,topObstacle.W,topObstacle.H);
+            pipe.Draw(g, bottomObstacle, new Rect(0, 0, bottomObstacle.W, bottomObstacle.H));//bottomObstacle.X,bottomObstacle.Y,bottomObstacle.W,bottomObstacle.H);
+
         }
 
         public void Generate(float opening) {
