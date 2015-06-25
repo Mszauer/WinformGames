@@ -35,7 +35,9 @@ namespace Game {
 
             Text = gameInstance.title;
             Size = new Size(gameInstance.width, gameInstance.height);
-
+            if (gameInstance.WindowIcon != null) {
+                this.Icon = gameInstance.WindowIcon;
+            }
             int twidth = Size.Width + (Size.Width - ClientRectangle.Width);
             int theight = Size.Height + (Size.Height - ClientRectangle.Height);
             Size = new Size(twidth, theight);

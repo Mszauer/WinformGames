@@ -10,7 +10,7 @@ namespace Game {
     class Player {
         public Rect player = null;
         FlipBook playerSprite = null;
-        Point playerPosition = default(Point);
+        Point startPosition = default(Point);
         float fallConstant = 155.0f; 
         float velocity = 125.0f; 
         float deltaTime = 0;
@@ -21,12 +21,12 @@ namespace Game {
         }
 
         public Player(Size window) {
-            playerPosition = new Point(window.Width / 2, window.Height / 2);
+            startPosition = new Point(window.Width / 2, window.Height / 2);
             playerSprite = FlipBook.LoadXML("Assets/birdie.xml", 30.0f);
         }
 
         public void Generate() {
-            player = new Rect(playerPosition, new Size(50, 40));
+            player = new Rect(startPosition, new Size(50, 35));
         }
 
 
@@ -56,10 +56,10 @@ namespace Game {
         public void Draw(Graphics g) {
 #if DEBUG
             DebugRender(g);
-            playerSprite.Render(g, new Point((Int32)player.X - 5, (Int32)player.Y)); //the 5 just centers the bird in the collision box
+            playerSprite.Render(g, new Point((Int32)player.X - 5, (Int32)player.Y-5)); //the 5 just centers the bird in the collision box
 
 #else
-            playerSprite.Render(g,new Point((Int32)player.X-5,(Int32)player.Y)); //the 5 just centers the bird in the collision box
+            playerSprite.Render(g,new Point((Int32)player.X-5,(Int32)player.Y-5)); //the 5 just centers the bird in the collision box
 #endif
         }
 

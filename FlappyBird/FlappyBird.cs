@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Drawing;
 using System.IO;
+using System.Resources;
 
 namespace Game {
     class FlappyBird : GameBase{
@@ -24,6 +25,8 @@ namespace Game {
             width = 400;
             height = 600;
             title = "FlappyBird";
+            //ResourceManager resources = new ResourceManager("FlappyBird.imbededIcons", GetType().Assembly);
+            WindowIcon = new Icon("Assets/red_bird.ico");//((System.Drawing.Icon)(resources.GetObject("red_bird")));
             this.clearColor = Brushes.Black;
         }
 
@@ -65,7 +68,7 @@ namespace Game {
         public override void Update(float dTime) {
             timeAccum += dTime;
             if (CurrentState == GameState.Start) {
-                if (KeyPressed(Keys.Up)) {
+                if (KeyPressed(Keys.Up) || LeftMousePressed) {
                     CurrentState = GameState.Play;
                 }
             }
@@ -84,7 +87,7 @@ namespace Game {
                     }
                 }
                 player.Update(dTime);
-                if (KeyPressed(Keys.Up)) {
+                if (KeyPressed(Keys.Up) || LeftMousePressed) {
                     player.Jump();
                 }
 #if DEBUG
@@ -94,7 +97,7 @@ namespace Game {
 #endif
             }
             else if (CurrentState == GameState.Lose) {
-                if (KeyPressed(Keys.R)) {
+                if (KeyPressed(Keys.R)|| LeftMousePressed) {
                     CurrentState = GameState.Start;
                     Initialize();
                 }

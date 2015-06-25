@@ -23,6 +23,7 @@ namespace Game {
         public int width = 800;
         public int height = 600;
         public Brush clearColor = Brushes.LightBlue;
+        public System.Drawing.Icon WindowIcon = null;
 
 
         public GameBase() {
