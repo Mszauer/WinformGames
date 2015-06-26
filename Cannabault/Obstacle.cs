@@ -8,23 +8,25 @@ using System.Drawing;
 
 namespace Game {
     class Obstacle {
-        Rect building = null;
+        public Rect building = null;
         public Obstacle lastBuilding = null;
         public float speed = 100;
         Random r = null;
-        public float bldgSpacing = 0;
+        public float bldgSpacing = 50; //sets initial spacing
         Size windowWH = default(Size);
         public float X {
             get {
                 return building.X;
             }
-            set {
-                building.X = value;
-            }
         }
         public float W {
             get {
                 return building.W;
+            }
+        }
+        public float Y {
+            get {
+                return building.Y;
             }
         }
 
@@ -38,8 +40,8 @@ namespace Game {
             float bldgHeight = r.Next(300, windowWH.Height - 250); //350min height, 300max height (in y terms)
             bldgSpacing = r.Next(50, 150);
 #if DEBUG
-            Console.WriteLine("Width: " + bldgWidth);
-            Console.WriteLine("Height: " + bldgHeight);
+            Console.WriteLine("Width: "+bldgWidth);
+            Console.WriteLine("Height: "+bldgHeight);
             Console.WriteLine("Spacing: " + bldgSpacing);
 #endif
             building = new Rect(x, bldgHeight, bldgWidth, windowWH.Height);
@@ -48,8 +50,6 @@ namespace Game {
         public void Update(float dTime) {
             building.X -= dTime * speed;
             if (building.X < 0 - building.W) {
-                // dont set the building x just generate new one?
-                //building.X = lastBuilding.X + lastBuilding.W + bldgSpacing ;
                 Initialize(lastBuilding.X + lastBuilding.W + bldgSpacing);
             }
 

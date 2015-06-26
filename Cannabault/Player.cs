@@ -8,32 +8,72 @@ using System.Drawing;
 
 namespace Game {
     class Player {
+        public Rect player = null;
+        float startX = 50.0f;// allows room for sprite movement
+        Size windowWH = default(Size);
+        float velocity = 125.0f; 
+        float fallConstant = 155.0f;
+        float deltaTime = 0f;
+        public bool canJump = true;
+        public float X {
+            get {
+                return player.X;
+            }
+        }
+        public float W {
+            get {
+                return player.W;
+            }
+        }
+        public float Y {
+            set {
+                player.Y = value;
+            }
+        }
 
         public Player(Size window) {
-
+            windowWH = window;
         }
 
         public void Initialize() {
-
+            player = new Rect(new Point((Int32)startX, windowWH.Height / 2), new Size(15, 15));
         }
         public void Update(float dTime) {
-
+            deltaTime = dTime;
+            player.Y += velocity * dTime; //sets downward force on the player
+            velocity += fallConstant * dTime; //goes up, then down as it approaches fallconstant
+            if (velocity > fallConstant) { //sets limit to falling speed
+                velocity = fallConstant;
+            }
         }
 
         bool OutOfBounds(Size window) {
+            if (player.Y < 0 || player.Y > windowWH.Height) {
+                return true;
+            }
+            if (player.X < 0) {
+                return true;
+            }
             return false;
         }
 
-        void Jump() {
-
+        public void Jump() {
+            if (canJump) {
+                velocity = -fallConstant;
+                canJump = false;
+            }
         }
 
         public void Render(Graphics g) {
+#if DEBUG
             DebugRender(g);
+#endif
         }
 
         void DebugRender(Graphics g) {
-
+            g.FillRectangle(Brushes.Purple, player.Rectangle);
+            g.DrawLine(Pens.Black, player.Center.X, player.Center.Y, player.Center.X, player.Center.Y + velocity);
+            g.DrawLine(Pens.Red, player.Center.X, player.Center.Y, player.Center.X, player.Center.Y + velocity * deltaTime);
         }
     }
 }

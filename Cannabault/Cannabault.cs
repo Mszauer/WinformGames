@@ -8,10 +8,8 @@ using System.Drawing;
 
 namespace Game {
     class Cannabault : GameBase{
-        Obstacle bldg1 = null;
-        Obstacle bldg2 = null;
-        Obstacle bldg3 = null;
-        
+        List<Obstacle> buildings = null;
+        Player player = null;
 
         public Cannabault() {
             width = 400;
@@ -19,9 +17,10 @@ namespace Game {
         }
 
         public override void Initialize() {
-            bldg1 = new Obstacle(new Size(width, height));
-            bldg2 = new Obstacle(new Size(width, height));
-            bldg3 = new Obstacle(new Size(width, height));
+            buildings = new List<Obstacle>();
+            Obstacle bldg1 = new Obstacle(new Size(width, height));
+            Obstacle bldg2 = new Obstacle(new Size(width, height));
+            Obstacle bldg3 = new Obstacle(new Size(width, height));
             bldg1.lastBuilding = bldg3;
             bldg2.lastBuilding = bldg1;
             bldg3.lastBuilding = bldg2;
@@ -29,24 +28,54 @@ namespace Game {
             bldg1.Initialize(0);
             bldg2.Initialize(bldg2.lastBuilding.X+bldg2.lastBuilding.W +bldg2.bldgSpacing);
             bldg3.Initialize(bldg3.lastBuilding.X+bldg3.lastBuilding.W+bldg3.bldgSpacing);
+
+            buildings.Add(bldg1);
+            buildings.Add(bldg2);
+            buildings.Add(bldg3);
+
+            player = new Player(new Size(width,height));
+            player.Initialize();
         }
 
         public override void Update(float dTime) {
-            bldg1.Update(dTime);
-            bldg2.Update(dTime);
-            bldg3.Update(dTime);
+            Collision();
+            for (int i = 0; i < buildings.Count; i++) {
+                buildings[i].Update(dTime);
+            }
+                player.Update(dTime);
+            //pressing keys.up allows double jump
+            if (KeyPressed(Keys.Up) || LeftMouseDown == true) {
+                player.Jump();
+            }
+        }
+
+        void Collision() {
+                if (player.player.Intersects(buildings[0].building)) {
+                    player.Y = buildings[0].Y - player.W;
+                    player.canJump = true;
+                }
+                if (player.player.Intersects(buildings[1].building)) {
+                    player.Y = buildings[1].Y - player.W;
+                    player.canJump = true;
+                }
+                if (player.player.Intersects(buildings[2].building)) {
+                    player.Y = buildings[2].Y - player.W;
+                    player.canJump = true;
+                }
+            
         }
 
         public override void Render(Graphics g) {
-            bldg1.Render(g,Brushes.Red);
-            bldg2.Render(g, Brushes.Green);
-            bldg3.Render(g, Brushes.Blue);
+            buildings[0].Render(g,Brushes.Red);
+            buildings[1].Render(g, Brushes.Green);
+            buildings[2].Render(g, Brushes.Blue);
+            player.Render(g);
         }
 
         void DebugControls() {
-            if (KeyPressed(Keys.R)) {
-                bldg1.Initialize(0);
-            }
+#if DEBUG
+            
+#endif
         }
     }
 }

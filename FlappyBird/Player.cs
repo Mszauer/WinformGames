@@ -24,7 +24,7 @@ namespace Game {
             startPosition = new Point(window.Width / 2, window.Height / 2);
             playerSprite = FlipBook.LoadXML("Assets/birdie.xml", 30.0f);
         }
-
+        
         public void Generate() {
             player = new Rect(startPosition, new Size(50, 35));
         }
