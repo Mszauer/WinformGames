@@ -55,7 +55,7 @@
     </Compile>
     <Compile Include="Background.cs" />
     <Compile Include="Cannabault.cs" />
-    <Compile Include="Obstacles.cs" />
+    <Compile Include="Obstacle.cs" />
     <Compile Include="Player.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
