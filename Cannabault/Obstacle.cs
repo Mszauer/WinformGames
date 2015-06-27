@@ -9,11 +9,15 @@ using System.Drawing;
 namespace Game {
     class Obstacle {
         public Rect building = null;
+        Rect topBuilding = null;
         public Obstacle lastBuilding = null;
         public float speed = 100;
         Random r = null;
         public float bldgSpacing = 50; //sets initial spacing
         Size windowWH = default(Size);
+        public enum ObstacleType { Normal, Cloud, Closed }
+        public ObstacleType type = ObstacleType.Normal;
+        float closedOpening = 100f;
         public float X {
             get {
                 return building.X;
@@ -45,10 +49,13 @@ namespace Game {
             Console.WriteLine("Spacing: " + bldgSpacing);
 #endif
             building = new Rect(x, bldgHeight, bldgWidth, windowWH.Height);
+            topBuilding = new Rect(x, 0, bldgWidth, building.Y - closedOpening);
+            
         }
 
         public void Update(float dTime) {
             building.X -= dTime * speed;
+            topBuilding.X -= dTime * speed;
             if (building.X < 0 - building.W) {
                 Initialize(lastBuilding.X + lastBuilding.W + bldgSpacing);
             }
@@ -63,8 +70,17 @@ namespace Game {
         }
 
         void DebugRender(Graphics g, Brush brushColor) {
-            g.FillRectangle(brushColor, building.Rectangle);
+            if (type == ObstacleType.Normal) {
+                g.FillRectangle(brushColor, building.Rectangle);
+            }
+            else if (type == ObstacleType.Closed) {
+                g.FillRectangle(brushColor, building.Rectangle);
+                g.FillRectangle(brushColor, topBuilding.Rectangle);
 
+            }
+            else if (type == ObstacleType.Cloud) {
+
+            }
         }
     }
 }

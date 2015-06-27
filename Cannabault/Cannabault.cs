@@ -19,6 +19,7 @@ namespace Game {
         public override void Initialize() {
             buildings = new List<Obstacle>();
             Obstacle bldg1 = new Obstacle(new Size(width, height));
+            bldg1.type = Obstacle.ObstacleType.Closed;
             Obstacle bldg2 = new Obstacle(new Size(width, height));
             Obstacle bldg3 = new Obstacle(new Size(width, height));
             bldg1.lastBuilding = bldg3;
@@ -53,19 +54,18 @@ namespace Game {
         }
 
         void Collision() {
-                if (player.player.Intersects(buildings[0].building)) {
-                    player.Y = buildings[0].Y - player.W+1;
-                    player.Land();
+            for (int i = 0; i < buildings.Count; i++) {
+                if (buildings[i].building.Intersects(player.player)) {
+                    Rect result = player.player.Intersection(buildings[i].building);
+                    if (result.Left == buildings[i].building.Left && result.Right == player.player.Right) {
+                        player.X -= result.W;
+                    }
+                    if (result.Top == buildings[i].building.Top && result.Bottom == player.player.Bottom) {
+                        player.player.Y -= result.H;
+                        player.Land();
+                    }
                 }
-                if (player.player.Intersects(buildings[1].building)) {
-                    player.Y = buildings[1].Y - player.W+1;
-                    player.Land() ;
-                }
-                if (player.player.Intersects(buildings[2].building)) {
-                    player.Y = buildings[2].Y - player.W+1;
-                    player.Land();
-                }
-            
+            }
         }
 
         public override void Render(Graphics g) {

@@ -22,6 +22,9 @@ namespace Game {
             get {
                 return player.X;
             }
+            set {
+                player.X = value;
+            }
         }
         public float W {
             get {
@@ -29,6 +32,9 @@ namespace Game {
             }
         }
         public float Y {
+            get {
+                return player.Y;
+            }
             set {
                 player.Y = value;
             }
