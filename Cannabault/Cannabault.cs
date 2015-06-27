@@ -38,29 +38,32 @@ namespace Game {
         }
 
         public override void Update(float dTime) {
-            Collision();
+            if (KeyPressed(Keys.Up) || LeftMouseDown == true) {
+                player.Jump();
+            }
+            if (KeyReleased(Keys.Up) || LeftMouseReleased) {
+                player.InterruptJump();
+            }
             for (int i = 0; i < buildings.Count; i++) {
                 buildings[i].Update(dTime);
             }
                 player.Update(dTime);
-            //pressing keys.up allows double jump
-            if (KeyPressed(Keys.Up) || LeftMouseDown == true) {
-                player.Jump();
-            }
+            Collision();
+            
         }
 
         void Collision() {
                 if (player.player.Intersects(buildings[0].building)) {
-                    player.Y = buildings[0].Y - player.W;
-                    player.canJump = true;
+                    player.Y = buildings[0].Y - player.W+1;
+                    player.Land();
                 }
                 if (player.player.Intersects(buildings[1].building)) {
-                    player.Y = buildings[1].Y - player.W;
-                    player.canJump = true;
+                    player.Y = buildings[1].Y - player.W+1;
+                    player.Land() ;
                 }
                 if (player.player.Intersects(buildings[2].building)) {
-                    player.Y = buildings[2].Y - player.W;
-                    player.canJump = true;
+                    player.Y = buildings[2].Y - player.W+1;
+                    player.Land();
                 }
             
         }

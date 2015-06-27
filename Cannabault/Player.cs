@@ -12,9 +12,12 @@ namespace Game {
         float startX = 50.0f;// allows room for sprite movement
         Size windowWH = default(Size);
         float velocity = 125.0f; 
-        float fallConstant = 155.0f;
+        float fallConstant = 300.0f;
+        float jumpMax = -350f;
+        float jumpMin = -100f;
+
         float deltaTime = 0f;
-        public bool canJump = true;
+        bool canJump = true;
         public float X {
             get {
                 return player.X;
@@ -57,11 +60,23 @@ namespace Game {
             return false;
         }
 
+        public void InterruptJump() {
+            if (velocity < jumpMin) {
+                velocity = jumpMin;
+            }
+        }
+
         public void Jump() {
             if (canJump) {
-                velocity = -fallConstant;
                 canJump = false;
+                velocity = jumpMax;
+                Console.WriteLine("Player has jumped");
             }
+        }
+
+        public void Land() {
+            canJump = true;
+            Console.WriteLine("Player has landed");
         }
 
         public void Render(Graphics g) {
