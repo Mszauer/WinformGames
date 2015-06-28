@@ -54,6 +54,7 @@ namespace Game {
         }
 
         void Collision() {
+            //add collision for top
             for (int i = 0; i < buildings.Count; i++) {
                 if (buildings[i].building.Intersects(player.player)) {
                     Rect result = player.player.Intersection(buildings[i].building);
