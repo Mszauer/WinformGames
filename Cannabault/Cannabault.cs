@@ -10,6 +10,7 @@ namespace Game {
     class Cannabault : GameBase{
         List<Obstacle> buildings = null;
         Player player = null;
+        Background background = null;
 
         public Cannabault() {
             width = 400;
@@ -18,15 +19,15 @@ namespace Game {
 
         public override void Initialize() {
             buildings = new List<Obstacle>();
+            background = new Background(new Size(width, height));
             Obstacle bldg1 = new Obstacle(new Size(width, height));
-            bldg1.type = Obstacle.ObstacleType.Closed;
             Obstacle bldg2 = new Obstacle(new Size(width, height));
-            bldg2.type = Obstacle.ObstacleType.Cloud;
             Obstacle bldg3 = new Obstacle(new Size(width, height));
             bldg1.lastBuilding = bldg3;
             bldg2.lastBuilding = bldg1;
             bldg3.lastBuilding = bldg2;
 
+            background.Initialize();
             bldg1.Initialize(0);
             bldg2.Initialize(bldg2.lastBuilding.X+bldg2.lastBuilding.W +bldg2.bldgSpacing);
             bldg3.Initialize(bldg3.lastBuilding.X+bldg3.lastBuilding.W+bldg3.bldgSpacing);
@@ -40,6 +41,7 @@ namespace Game {
         }
 
         public override void Update(float dTime) {
+            background.Update(dTime);
             if (KeyPressed(Keys.Up) || LeftMouseDown == true) {
                 player.Jump();
             }
@@ -93,6 +95,7 @@ namespace Game {
         }
 
         public override void Render(Graphics g) {
+            background.Render(g);
             buildings[0].Render(g,Brushes.Red);
             buildings[1].Render(g, Brushes.Green);
             buildings[2].Render(g, Brushes.Blue);
