@@ -45,7 +45,7 @@ namespace Game {
         }
 
         public void Initialize() {
-            player = new Rect(new Point((Int32)startX, windowWH.Height / 2), new Size(15, 15));
+            player = new Rect(new Point((Int32)startX, windowWH.Height / 2-15), new Size(15, 15));
         }
         public void Update(float dTime) {
             deltaTime = dTime;
@@ -54,6 +54,10 @@ namespace Game {
             if (velocity > fallConstant) { //sets limit to falling speed
                 velocity = fallConstant;
             }
+        }
+
+        public void StopJump() {
+            velocity = 0;
         }
 
         bool OutOfBounds(Size window) {

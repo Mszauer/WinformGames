@@ -21,6 +21,7 @@ namespace Game {
             Obstacle bldg1 = new Obstacle(new Size(width, height));
             bldg1.type = Obstacle.ObstacleType.Closed;
             Obstacle bldg2 = new Obstacle(new Size(width, height));
+            bldg2.type = Obstacle.ObstacleType.Cloud;
             Obstacle bldg3 = new Obstacle(new Size(width, height));
             bldg1.lastBuilding = bldg3;
             bldg2.lastBuilding = bldg1;
@@ -56,11 +57,33 @@ namespace Game {
         void Collision() {
             //add collision for top
             for (int i = 0; i < buildings.Count; i++) {
-                if (buildings[i].building.Intersects(player.player)) {
-                    Rect result = player.player.Intersection(buildings[i].building);
-                    if (result.Left == buildings[i].building.Left && result.Right == player.player.Right) {
-                        player.X -= result.W;
+                if (buildings[i].type == Obstacle.ObstacleType.Normal || buildings[i].type == Obstacle.ObstacleType.Closed) {
+                    if (buildings[i].building.Intersects(player.player)) {
+                        Rect result = player.player.Intersection(buildings[i].building);
+                        if (result.Left == buildings[i].building.Left && result.Right == player.player.Right) {
+                            player.X -= result.W;
+                        }
+                        if (result.Top == buildings[i].building.Top && result.Bottom == player.player.Bottom) {
+                            player.player.Y -= result.H;
+                            player.Land();
+                        }
+
                     }
+                }
+                if (buildings[i].type == Obstacle.ObstacleType.Closed) {
+                    if (buildings[i].topBuilding.Intersects(player.player)) {
+                        Rect result2 = player.player.Intersection(buildings[i].topBuilding);
+                        if (result2.Bottom == buildings[i].topBuilding.Bottom && result2.Top == player.player.Top) {
+                            player.StopJump();
+                            player.player.Y += result2.H;
+                        }
+                        if (result2.Left == buildings[i].topBuilding.Left && result2.Right == player.player.Right) {
+                            player.X -= result2.W;
+                        }
+                    }
+                }
+                if (buildings[i].type == Obstacle.ObstacleType.Cloud) {
+                    Rect result = player.player.Intersection(buildings[i].building);
                     if (result.Top == buildings[i].building.Top && result.Bottom == player.player.Bottom) {
                         player.player.Y -= result.H;
                         player.Land();

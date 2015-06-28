@@ -9,7 +9,7 @@ using System.Drawing;
 namespace Game {
     class Obstacle {
         public Rect building = null;
-        Rect topBuilding = null;
+        public Rect topBuilding = null;
         public Obstacle lastBuilding = null;
         public float speed = 100;
         Random r = null;
@@ -49,6 +49,10 @@ namespace Game {
             Console.WriteLine("Spacing: " + bldgSpacing);
 #endif
             building = new Rect(x, bldgHeight, bldgWidth, windowWH.Height);
+
+            if (type == ObstacleType.Cloud) {
+                building.Y -= 150;
+            }
             topBuilding = new Rect(x, 0, bldgWidth, building.Y - closedOpening);
             
         }
@@ -79,7 +83,7 @@ namespace Game {
 
             }
             else if (type == ObstacleType.Cloud) {
-
+                g.FillRectangle(brushColor, building.Rectangle);
             }
         }
     }
