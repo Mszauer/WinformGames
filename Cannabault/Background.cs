@@ -49,11 +49,13 @@ namespace Game {
         }
 
         public void Render(Graphics g) {
+#if !HIDESPRITE
             background.Draw(g, new Point(0, 0));
             paralax1.Draw(g, new Point((Int32)para1_0X, 0));
             paralax1.Draw(g, new Point((Int32)para1_1X, 0));
             paralax2.Draw(g, new Point((Int32)para2_0X, 0));
             paralax2.Draw(g, new Point((Int32)para2_1X, 0));
+#endif
 
         }
 

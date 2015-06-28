@@ -16,6 +16,16 @@ namespace Game {
         float timeAccum = 0;
         float updateRate = 0;
         int spriteIndex = 0;
+        public float W {
+            get {
+                return subSprites[spriteIndex].W;
+            }
+        }
+        public float H {
+            get {
+                return subSprites[spriteIndex].H;
+            }
+        }
         public Size spriteSize {
             get {
                 return new Size((Int32)subSprites[spriteIndex].W,

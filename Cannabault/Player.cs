@@ -11,10 +11,15 @@ namespace Game {
         public Rect player = null;
         float startX = 50.0f;// allows room for sprite movement
         Size windowWH = default(Size);
+        FlipBook batmanState = null;
+        FlipBook batmanIdle = null;
+        FlipBook batmanRun = null;
         float velocity = 125.0f; 
         float fallConstant = 300.0f;
         float jumpMax = -350f;
         float jumpMin = -100f;
+        public enum BatmanState { Idle, Run }
+        public BatmanState currentState = BatmanState.Idle;
 
         float deltaTime = 0f;
         bool canJump = true;
@@ -46,9 +51,21 @@ namespace Game {
 
         public void Initialize() {
             player = new Rect(new Point((Int32)startX, windowWH.Height / 2-15), new Size(15, 15));
+            batmanIdle = FlipBook.LoadCustom("Assets/batmanIdle.txt");
+            batmanRun = FlipBook.LoadXML("Assets/newrun.xml", 12);
+            batmanRun.Anchor = FlipBook.AnchorPosition.BottomMiddle;
+            batmanIdle.Anchor = FlipBook.AnchorPosition.BottomMiddle;
+            batmanState = batmanIdle;
         }
         public void Update(float dTime) {
             deltaTime = dTime;
+            if (currentState == BatmanState.Idle) {
+                batmanState = batmanIdle;
+            }
+            else if (currentState == BatmanState.Run) {
+                batmanState = batmanRun;
+            }
+            batmanState.Update(dTime);
             player.Y += velocity * dTime; //sets downward force on the player
             velocity += fallConstant * dTime; //goes up, then down as it approaches fallconstant
             if (velocity > fallConstant) { //sets limit to falling speed
@@ -60,11 +77,11 @@ namespace Game {
             velocity = 0;
         }
 
-        bool OutOfBounds(Size window) {
-            if (player.Y < 0 || player.Y > windowWH.Height) {
+        public bool OutOfBounds(Size window) {
+            if (player.Y > windowWH.Height) {
                 return true;
             }
-            if (player.X < 0) {
+            if (player.X+player.W < 0) {
                 return true;
             }
             return false;
@@ -92,6 +109,9 @@ namespace Game {
         public void Render(Graphics g) {
 #if DEBUG
             DebugRender(g);
+#endif
+#if !HIDESPRITE
+            batmanState.Render(g, new Point((Int32)player.X + (Int32)player.W/2, (Int32)player.Y+(Int32)player.H));
 #endif
         }
 

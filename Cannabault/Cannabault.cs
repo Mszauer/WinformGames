@@ -11,6 +11,9 @@ namespace Game {
         List<Obstacle> buildings = null;
         Player player = null;
         Background background = null;
+        enum GameState { Start, Playing, Lose }
+        GameState CurrentGState = GameState.Start;
+        int score = 0;
 
         public Cannabault() {
             width = 400;
@@ -32,6 +35,8 @@ namespace Game {
             bldg2.Initialize(bldg2.lastBuilding.X+bldg2.lastBuilding.W +bldg2.bldgSpacing);
             bldg3.Initialize(bldg3.lastBuilding.X+bldg3.lastBuilding.W+bldg3.bldgSpacing);
 
+            bldg1.Y = height / 2 - 5;
+
             buildings.Add(bldg1);
             buildings.Add(bldg2);
             buildings.Add(bldg3);
@@ -41,23 +46,44 @@ namespace Game {
         }
 
         public override void Update(float dTime) {
-            background.Update(dTime);
-            if (KeyPressed(Keys.Up) || LeftMouseDown == true) {
-                player.Jump();
+            if (CurrentGState == GameState.Start) {
+                player.currentState = Player.BatmanState.Idle;
+                if (KeyPressed(Keys.Up) || LeftMouseDown == true) {
+                    score = 0;
+                    Console.WriteLine("Current State: " + CurrentGState);
+                    CurrentGState = GameState.Playing;
+                }
             }
-            if (KeyReleased(Keys.Up) || LeftMouseReleased) {
-                player.InterruptJump();
-            }
-            for (int i = 0; i < buildings.Count; i++) {
-                buildings[i].Update(dTime);
-            }
+            else if (CurrentGState == GameState.Playing) {
+
+                Console.WriteLine("Current State: " + CurrentGState);
+                background.Update(dTime);
+                if (KeyPressed(Keys.Up) || LeftMouseDown == true) {
+                    player.Jump();
+                }
+                if (KeyReleased(Keys.Up) || LeftMouseReleased) {
+                    player.InterruptJump();
+                }
+                for (int i = 0; i < buildings.Count; i++) {
+                    buildings[i].Update(dTime);
+                }
+                score += 2;
                 player.Update(dTime);
-            Collision();
-            
+                Collision();
+                player.currentState = Player.BatmanState.Run;
+            }
+            else if (CurrentGState == GameState.Lose) {
+                if (KeyPressed(Keys.R) || LeftMouseDown == true) {
+                    Initialize();
+                    CurrentGState = GameState.Start;
+                }
+            }
+            if (player.OutOfBounds(new Size(width,height))) {
+                CurrentGState = GameState.Lose;
+            }
         }
 
         void Collision() {
-            //add collision for top
             for (int i = 0; i < buildings.Count; i++) {
                 if (buildings[i].type == Obstacle.ObstacleType.Normal || buildings[i].type == Obstacle.ObstacleType.Closed) {
                     if (buildings[i].building.Intersects(player.player)) {
@@ -99,6 +125,7 @@ namespace Game {
             buildings[0].Render(g,Brushes.Red);
             buildings[1].Render(g, Brushes.Green);
             buildings[2].Render(g, Brushes.Blue);
+            g.DrawString("Distance: "+System.Convert.ToString(score), new Font("Purisia", 20), Brushes.White, new Point(width / 2-60, 0));
             player.Render(g);
         }
 

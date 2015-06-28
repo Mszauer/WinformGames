@@ -35,6 +35,9 @@ namespace Game {
             get {
                 return building.Y;
             }
+            set {
+                building.Y = value;
+            }
         }
 
         public Obstacle(Size window) {
@@ -105,6 +108,7 @@ namespace Game {
 #if DEBUG
             DebugRender(g, brushColor);
 #endif
+#if !HIDESPRITE
             if (type == ObstacleType.Normal) {
                 display.Draw(g, new Point((Int32)building.X, (Int32)building.Y));
             }
@@ -115,6 +119,7 @@ namespace Game {
             else if (type == ObstacleType.Cloud) {
                 display.Draw(g, new Point((Int32)building.X, (Int32)building.Y));
             }
+#endif
         }
 
         void DebugRender(Graphics g, Brush brushColor) {

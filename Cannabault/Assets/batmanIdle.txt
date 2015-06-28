@@ -1,0 +1,6 @@
+R 0 70 70 70
+I Assets\batmanSprites.png
+O 69 70 True True
+G 0 0 255
+S 255 0 0
+P 0 False False False False

@@ -1,0 +1,11 @@
+R 0 210 70 70
+R 70 210 70 70
+R 140 210 70 70
+R 210 210 70 70
+R 280 210 70 70
+R 350 204 70 76
+I Assets\batmanSprites.png
+O 70 70 True True
+G 0 128 255
+S 240 240 240
+P 0 False False False False

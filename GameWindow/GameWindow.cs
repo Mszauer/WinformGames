@@ -22,6 +22,7 @@ namespace Game {
         Image backBuffer = null;
         System.DateTime thisTime = default(System.DateTime);
         System.DateTime lastTime = default(System.DateTime);
+        float fixTimeStep = 1.0f / 30.0f;
 
         GameBase gameInstance = null;
 
@@ -187,7 +188,16 @@ namespace Game {
                 //Console.WriteLine("Mouse position: " + Cursor.Position);
                 //Console.WriteLine("Processing Idle Event: " + (idleCounter++));
                 float fDelta = System.Convert.ToSingle(deltaTime.TotalSeconds);
+#if FIXTIMESTAMP
+                while (fDelta > 0) {
+                    bool useDelta = fDelta < fixTimeStep;
+                    fDelta -= fixTimeStep;
+                    gameInstance.Update(useDelta? fDelta + fixTimeStep : fixTimeStep);
+                }
+#else
                 gameInstance.Update(fDelta);
+
+#endif
                 lastTime = thisTime;
                 //Update Game Here
                 BufferedPaint();
