@@ -16,11 +16,13 @@ namespace Game {
         int score = 0;
         bool firstPress = true;
         public Cannabault() {
+            WindowIcon = new Icon("Assets/icon.ico");
             width = 400;
             height = 600;
         }
 
         public override void Initialize() {
+            
             buildings = new List<Obstacle>();
             background = new Background(new Size(width, height));
             Obstacle bldg1 = new Obstacle(new Size(width, height));
