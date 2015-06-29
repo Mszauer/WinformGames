@@ -14,15 +14,16 @@ namespace Game {
         FlipBook batmanState = null;
         FlipBook batmanIdle = null;
         FlipBook batmanRun = null;
+        FlipBook batmanJump = null;
         float velocity = 125.0f; 
         float fallConstant = 300.0f;
         float jumpMax = -350f;
         float jumpMin = -100f;
-        public enum BatmanState { Idle, Run }
+        public enum BatmanState { Idle, Run}
         public BatmanState currentState = BatmanState.Idle;
 
         float deltaTime = 0f;
-        bool canJump = true;
+        bool canJump = false;
         public float X {
             get {
                 return player.X;
@@ -53,8 +54,10 @@ namespace Game {
             player = new Rect(new Point((Int32)startX, windowWH.Height / 2-15), new Size(15, 15));
             batmanIdle = FlipBook.LoadCustom("Assets/batmanIdle.txt");
             batmanRun = FlipBook.LoadXML("Assets/newrun.xml", 12);
+            batmanJump = FlipBook.LoadCustom("Assets/batmanJump.txt",2);
             batmanRun.Anchor = FlipBook.AnchorPosition.BottomMiddle;
             batmanIdle.Anchor = FlipBook.AnchorPosition.BottomMiddle;
+            batmanJump.Anchor = FlipBook.AnchorPosition.BottomMiddle;
             batmanState = batmanIdle;
         }
         public void Update(float dTime) {
@@ -65,8 +68,16 @@ namespace Game {
             else if (currentState == BatmanState.Run) {
                 batmanState = batmanRun;
             }
+            if (!canJump) {
+                batmanState = batmanJump;
+            }
             batmanState.Update(dTime);
             player.Y += velocity * dTime; //sets downward force on the player
+            if (canJump) {
+                if (player.X < windowWH.Width / 2) {
+                    player.X += 10.0f * dTime;
+                }
+            }
             velocity += fallConstant * dTime; //goes up, then down as it approaches fallconstant
             if (velocity > fallConstant) { //sets limit to falling speed
                 velocity = fallConstant;

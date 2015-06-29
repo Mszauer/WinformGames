@@ -5,7 +5,7 @@ R 350 274 70 76
 R 210 280 70 70
 R 280 280 70 70
 R 350 280 70 70
-I C:\Users\Martin\Documents\WinformGames\Cannabault\Assets\batmanSprites.png
+I Assets\batmanSprites.png
 O 70 70 True True
 G 0 0 160
 S 255 0 0

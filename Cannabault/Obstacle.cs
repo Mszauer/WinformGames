@@ -11,7 +11,9 @@ namespace Game {
         public Rect building = null;
         public Rect topBuilding = null;
         public Obstacle lastBuilding = null;
-        public float speed = 100;
+        public float speed = 100.0f;
+        public static float baseSpeed = 100.0f;
+        public static float maxSpeed = 300.0f;
         public List<Sprite> buildingSprites = null;
         Random r = null;
         Sprite display = null;

@@ -14,7 +14,7 @@ namespace Game {
         enum GameState { Start, Playing, Lose }
         GameState CurrentGState = GameState.Start;
         int score = 0;
-
+        bool firstPress = true;
         public Cannabault() {
             width = 400;
             height = 600;
@@ -49,31 +49,43 @@ namespace Game {
             if (CurrentGState == GameState.Start) {
                 player.currentState = Player.BatmanState.Idle;
                 if (KeyPressed(Keys.Up) || LeftMouseDown == true) {
+                    firstPress = true;
                     score = 0;
                     Console.WriteLine("Current State: " + CurrentGState);
                     CurrentGState = GameState.Playing;
                 }
             }
             else if (CurrentGState == GameState.Playing) {
-
                 Console.WriteLine("Current State: " + CurrentGState);
                 background.Update(dTime);
-                if (KeyPressed(Keys.Up) || LeftMouseDown == true) {
-                    player.Jump();
-                }
                 if (KeyReleased(Keys.Up) || LeftMouseReleased) {
-                    player.InterruptJump();
+                    firstPress = false;
+                }
+                if (!firstPress) {
+                    if (KeyPressed(Keys.Up) || LeftMouseDown == true) {
+                        player.Jump();
+                    }
+                    if (KeyReleased(Keys.Up) || LeftMouseReleased) {
+                        player.InterruptJump();
+                    }
                 }
                 for (int i = 0; i < buildings.Count; i++) {
                     buildings[i].Update(dTime);
                 }
+                    
                 score += 2;
+                foreach (Obstacle building in buildings) {
+                    building.speed = Obstacle.baseSpeed + (float)score / 15.0f;
+                    if (building.speed > Obstacle.maxSpeed) {
+                        building.speed = Obstacle.maxSpeed;
+                    }
+                }
                 player.Update(dTime);
                 Collision();
                 player.currentState = Player.BatmanState.Run;
             }
             else if (CurrentGState == GameState.Lose) {
-                if (KeyPressed(Keys.R) || LeftMouseDown == true) {
+                if (KeyPressed(Keys.Up) || LeftMouseDown == true) {
                     Initialize();
                     CurrentGState = GameState.Start;
                 }
@@ -127,6 +139,14 @@ namespace Game {
             buildings[2].Render(g, Brushes.Blue);
             g.DrawString("Distance: "+System.Convert.ToString(score), new Font("Purisia", 20), Brushes.White, new Point(width / 2-60, 0));
             player.Render(g);
+            if (CurrentGState == GameState.Start) {
+                g.DrawString("Press Up Arrow or click to start", new Font("Purisia", 20), Brushes.Red, new Point(width / 2 - 190, height / 4));
+            }
+            else if (CurrentGState == GameState.Lose) {
+                g.DrawString("You have fallen!", new Font("Purisia",20),Brushes.Red,new Point(width/2-80,height/4));
+                g.DrawString("Press Up Arrow or click to start again", new Font("Purisia", 15), Brushes.Red, new Point(width / 2 - 160, height / 4+30));
+                
+            }
         }
 
         void DebugControls() {
