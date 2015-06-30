@@ -7,17 +7,37 @@ using Game;
 using System.Windows.Forms;
 using System.Drawing;
 
+
+/* WE ARE ABOUT TO GENERATE A NEW ONE
+q a b r 
+w d b c 
+a a 
+*/
+
+/* GENERATED A B, IF STATEMENT EXECUTES
+q a b r 
+w d b c 
+a a b
+*/
+
+/* IT REPLACED B WITH A :X
+q a b r 
+w d b c 
+a a a
+*/
+
+/* AND THE NEXT ONE IS GENERATED, BUT WE HAVE A STREAK
+q a b r 
+w d b c 
+a a a e
+*/
+
 namespace Game {
     class Bejewled : GameBase {
         int[][] logicBoard = null;
         int tileSize = 50;
         Random r = null;
-        Brush[] debugJewels = new Brush[] { Brushes.Red, Brushes.Salmon, Brushes.Teal, Brushes.Black, Brushes.White, Brushes.Purple, Brushes.Green, Brushes.Blue };
-
-#if VISUALIZE
-        int gen_row = 0;
-        int gen_col = -1;
-#endif
+        Brush[] debugJewels = new Brush[] { Brushes.Red, Brushes.Salmon, Brushes.Teal, Brushes.Black, Brushes.White, Brushes.Purple, Brushes.Green, Brushes.Blue, Brushes.Crimson };
 
         public Bejewled() {
             width = 400;
@@ -33,39 +53,36 @@ namespace Game {
                 logicBoard[i] = new int[8];
             }
 
+            //Assigns values to cells, if it's 3in a row it will reassign a new value
             for (int col = 0; col < logicBoard.Length; col++) {
                 for (int row = 0; row < logicBoard[col].Length; row++) {
-#if !VISUALIZE
                     logicBoard[col][row] = r.Next(0, 8);
-                    //Checks to make sure there aren't 3 in a row
-                    if (CheckNeighbors(col, row)) {
+                    while (CheckNeighbors(col, row)) {
                         logicBoard[col][row] = r.Next(0, 8);
                     }
-#else
-                    logicBoard[col][row] = -1;
-#endif
                 }
             }
         }
 
         bool CheckNeighbors(int col, int row) {
-            if (col - 1 > 0 && col - 2 > 0) {
-                if (logicBoard[col - 1][row] == logicBoard[col][row] && logicBoard[col - 2][row] == logicBoard[col][row]) {
+            // >= to include 0 index
+            if (col - 1 >= 0 && col - 2 >= 0) {
+                if (logicBoard[col - 1][row] == logicBoard[col][row] && logicBoard[col - 2][row] == logicBoard[col - 1][row]) {
                     return true;
                 }
             }
-            else if (col + 1 < logicBoard.Length && col + 2 < logicBoard.Length) {
-                if (logicBoard[col + 1][row] == logicBoard[col][row] && logicBoard[col + 2][row] == logicBoard[col][row]) {
+            if (col + 1 < logicBoard.Length && col + 2 < logicBoard.Length) {
+                if (logicBoard[col + 1][row] == logicBoard[col][row] && logicBoard[col + 2][row] == logicBoard[col + 1][row]) {
                     return true;
                 }
             }
-            if (row - 1 > 0 && row - 2 > 0) {
-                if (logicBoard[col][row - 1] == logicBoard[col][row] && logicBoard[col][row - 2] == logicBoard[col][row]) {
+            if (row - 1 >= 0 && row - 2 >= 0) {
+                if (logicBoard[col][row - 1] == logicBoard[col][row] && logicBoard[col][row - 2] == logicBoard[col][row - 1]) {
                     return true;
                 }
             }
-            else if (row + 1 < logicBoard[col].Length && row + 2 < logicBoard[col].Length) {
-                if (logicBoard[col][row + 1] == logicBoard[col][row] && logicBoard[col][row + 2] == logicBoard[col][row]) {
+            if (row + 1 < logicBoard[col].Length && row + 2 < logicBoard[col].Length) {
+                if (logicBoard[col][row + 1] == logicBoard[col][row] && logicBoard[col][row + 2] == logicBoard[col][row + 1]) {
                     return true;
                 }
             }
@@ -79,28 +96,16 @@ namespace Game {
             //GENERATE JEWELS
             //MOVE GENERATE JEWELS DOWN
             //CLICK MOVING LOGIC
-#if VISUALIZE
-            if (KeyPressed(Keys.Space)) {
-
-                gen_col += 1;
-                if (gen_col >= logicBoard.Length) {
-                    gen_row += 1;
-                    gen_col = 0;
-                }
-                if (gen_row < logicBoard[gen_col].Length) {
-                    logicBoard[gen_col][gen_row] = r.Next(0, 8);
-                    //Checks to make sure there aren't 3 in a row
-                    if (CheckNeighbors(gen_col, gen_row)) {
-                        bool breakHere = CheckNeighbors(gen_col, gen_row);
-                        Console.WriteLine("CheckNeighbors(" + gen_col + ", " + gen_row + ") == true");
-                        Console.WriteLine("old logicBoard[" + gen_col + "][" + gen_row + "] == " + logicBoard[gen_col][gen_row] + " | " + debugJewels[logicBoard[gen_col][gen_row]]);
-                        logicBoard[gen_col][gen_row] = r.Next(0, 8);
-                        Console.WriteLine("new logicBoard[" + gen_col + "][" + gen_row + "] == " + logicBoard[gen_col][gen_row] + " | " + debugJewels[logicBoard[gen_col][gen_row]]);
-                        Console.Write("\n");
+            if (KeyPressed(Keys.R)) {
+                for (int col = 0; col < logicBoard.Length; col++) {
+                    for (int row = 0; row < logicBoard[col].Length; row++) {
+                        logicBoard[col][row] = r.Next(0, 8);
+                        while (CheckNeighbors(col, row)) {
+                            logicBoard[col][row] = r.Next(0, 8);
+                        }
                     }
                 }
             }
-#endif
         }
 
         public override void Render(Graphics g) {
@@ -118,11 +123,6 @@ namespace Game {
             for (int col = 0; col < logicBoard.Length; col++) {
                 for (int row = 0; row < logicBoard[col].Length; row++) {
                     // checks values and assigns corresponding brush
-#if VISUALIZE
-                    if (logicBoard[col][row] == -1) {
-                        continue;
-                    }
-#endif
                     Rect r = new Rect(new Point(col * tileSize, row * tileSize), new Size(tileSize, tileSize));
                     g.FillRectangle(debugJewels[logicBoard[col][row]], r.Rectangle);
                 }
