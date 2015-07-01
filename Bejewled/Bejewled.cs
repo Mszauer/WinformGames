@@ -124,9 +124,13 @@ namespace Game {
                         DestroyStreak(CheckStreak(xIndex1, yIndex1));
                         DestroyStreak(CheckStreak(xIndex2, yIndex2));
                         //Move jewels down
-                        Movedown();
-                        //Generate new Jewels
-                        //GenerateJewels();
+                        // Repeat N times, where n is logicBoard[0].Length
+                        for (int n = 0; n < logicBoard[0].Length; n++) {
+                            Movedown();
+                            //Generate new Jewels
+                            GenerateJewels();
+                        }
+                        
                         //Deselect
                         xIndex1 = xIndex2 = -1;
                         yIndex1 = yIndex2 = -1;
@@ -150,8 +154,7 @@ namespace Game {
                 }
 
             }
-            //MOVE JEWELS DOWN
-            //GENERATE JEWELS
+#if DEBUG
             if (KeyPressed(Keys.R)) {
                 for (int col = 0; col < logicBoard.Length; col++) {
                     for (int row = 0; row < logicBoard[col].Length; row++) {
@@ -162,26 +165,30 @@ namespace Game {
                     }
                 }
             }
+#endif
         }
 
         void Movedown() {
-            for (int x = logicBoard.Length - 1 ; x > 0; x--) { // columns
-                for (int y = logicBoard[x].Length - 1; y > 0 ; y--){ // rows
+            for (int x = logicBoard.Length - 1; x >= 0; x--) { // columns
+                for (int y = logicBoard[x].Length - 1; y >= 0; y--) { // rows
                     if (logicBoard[x][y] == -1) {
                         //Stores value, swaps value upwards
                         int _value = logicBoard[x][y];
-                        logicBoard[x][y] = logicBoard[x][y - 1];
-                        logicBoard[x][y - 1] = _value;
+                        if (y != 0) {
+                            logicBoard[x][y] = logicBoard[x][y - 1];
+                            logicBoard[x][y - 1] = _value;
+                        }
                     }
                 }
             }
         }
 
         void GenerateJewels() {
-            for (int x = logicBoard.Length - 1; x > 0; x--) { // columns
-                for (int y = logicBoard[x].Length - 1; y > 0; y--) { // rows
-                    if (logicBoard[x][y] == -1) {
-                        logicBoard[x][y] = r.Next(0, 8);
+            for (int x = logicBoard.Length - 1; x >= 0; x--) { // columns
+                for (int y = logicBoard[x].Length - 1; y >= 0; y--) { // rows
+                        if (logicBoard[x][y] == -1) {
+                            logicBoard[x][y] = r.Next(0, 8);
+                        
                     }
                 }
             }
@@ -215,12 +222,15 @@ namespace Game {
             }
 
             //draws jewels depending on cell value
+
             for (int col = 0; col < logicBoard.Length; col++) {
                 for (int row = 0; row < logicBoard[col].Length; row++) {
                     // checks values and assigns corresponding brush
                     if (logicBoard[col][row] > -1) {
                         Rect r = new Rect(new Point(col * tileSize, row * tileSize), new Size(tileSize, tileSize));
+#if DEBUG
                         g.FillRectangle(debugJewels[logicBoard[col][row]], r.Rectangle);
+#endif
                     }
                 }
             }
