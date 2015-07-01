@@ -37,8 +37,34 @@ namespace Game {
         int[][] logicBoard = null;
         int tileSize = 50;
         Random r = null;
-        Brush[] debugJewels = new Brush[] { Brushes.Red, Brushes.Salmon, Brushes.Teal, Brushes.Black, Brushes.White, Brushes.Purple, Brushes.Green, Brushes.Blue, Brushes.Crimson };
-
+        Brush[] debugJewels = new Brush[] { Brushes.Red, Brushes.Salmon, Brushes.Teal, Brushes.Black, Brushes.White, Brushes.Purple, Brushes.Green, Brushes.Blue };
+        
+        int xIndex1 = -1;
+        int yIndex1 = -1;
+        int xIndex2 = -1;
+        int yIndex2 = -1;
+        
+        bool oneSelected {
+            get{
+                if (xIndex1 != -1 && yIndex1 != 1){
+                    return true;
+                }
+                return false;
+            }
+        }
+        
+        bool twoSelected {
+            get {
+               return xIndex2 != -1 && yIndex2 != -1;
+            }
+        }
+        
+        bool hasSelection {
+            get{
+                return oneSelected || twoSelected;
+            }
+        }
+        
         public Bejewled() {
             width = 400;
             height = 600;
@@ -90,12 +116,23 @@ namespace Game {
         }
 
         public override void Update(float deltaTime) {
+            //CLICK MOVING LOGIC
+            if (LeftMousePressed && !oneSelected || LeftMousePressed && twoSelected) {
+                xIndex1 = (MousePosition.X / tileSize);
+                yIndex1 = (MousePosition.Y / tileSize);
+                Console.WriteLine("xIndex1 :" + xIndex1 + "yIndex1: " + yIndex1);
+            }
+            else if (LeftMousePressed && oneSelected) {
+                xIndex2 = (MousePosition.X / tileSize);
+                yIndex2 = (MousePosition.Y / tileSize);
+                Console.WriteLine("xIndex2 :" + xIndex2 + "yIndex2: " + yIndex2);
+
+            }
+
             //TODO CHECK IF 3 IN A ROW (CHECKNEIGHBOR())
             //DESTROY THOSE 3
             //MOVE JEWELS DOWN
             //GENERATE JEWELS
-            //MOVE GENERATE JEWELS DOWN
-            //CLICK MOVING LOGIC
             if (KeyPressed(Keys.R)) {
                 for (int col = 0; col < logicBoard.Length; col++) {
                     for (int row = 0; row < logicBoard[col].Length; row++) {
@@ -127,8 +164,12 @@ namespace Game {
                     g.FillRectangle(debugJewels[logicBoard[col][row]], r.Rectangle);
                 }
             }
+
+            //Outlines selected jewels
+            using (Pen p = new Pen(Brushes.Crimson, 1.0f)) {
+                g.DrawRectangle(p, new Rectangle(new Point(xIndex1 * tileSize, yIndex1 * tileSize), new Size(tileSize, tileSize)));
+                g.DrawRectangle(p, new Rectangle(new Point(xIndex2 * tileSize, yIndex2 * tileSize), new Size(tileSize, tileSize)));
+            }
         }
-
-
     }
 }
