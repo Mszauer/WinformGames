@@ -117,18 +117,27 @@ namespace Game {
 
         public override void Update(float deltaTime) {
             //CLICK MOVING LOGIC
-            if (LeftMousePressed && !oneSelected || LeftMousePressed && twoSelected) {
+
+            if (LeftMousePressed && !oneSelected) {
                 xIndex1 = (MousePosition.X / tileSize);
                 yIndex1 = (MousePosition.Y / tileSize);
                 Console.WriteLine("xIndex1 :" + xIndex1 + "yIndex1: " + yIndex1);
             }
-            else if (LeftMousePressed && oneSelected) {
+            else if (LeftMousePressed && !twoSelected) {
                 xIndex2 = (MousePosition.X / tileSize);
                 yIndex2 = (MousePosition.Y / tileSize);
+                
+                //does not work
+                if (!SelectionNeighbors()) {
+                    xIndex1 = xIndex2;
+                    yIndex1 = yIndex2;
+                    xIndex2 = -1;
+                    yIndex2 = -1;
+                }
+
                 Console.WriteLine("xIndex2 :" + xIndex2 + "yIndex2: " + yIndex2);
 
             }
-
             //TODO CHECK IF 3 IN A ROW (CHECKNEIGHBOR())
             //DESTROY THOSE 3
             //MOVE JEWELS DOWN
@@ -145,6 +154,15 @@ namespace Game {
             }
         }
 
+        bool SelectionNeighbors() {
+            if ((xIndex2 == xIndex1 - 1 || xIndex2 == xIndex1 +1) && yIndex2 == yIndex1) {
+                return true;
+            }
+            if ((yIndex2 == yIndex1 - 1 || yIndex2 == yIndex1 + 1) && xIndex2 == xIndex1 ) {
+                return true;
+            }
+            return false;
+        }
         public override void Render(Graphics g) {
             //visually draw logic board
             using (Pen p = new Pen(Brushes.Green, 1.0f)) {
