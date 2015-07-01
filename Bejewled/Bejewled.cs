@@ -46,7 +46,7 @@ namespace Game {
         
         bool oneSelected {
             get{
-                if (xIndex1 != -1 && yIndex1 != 1){
+                if (xIndex1 != -1 && yIndex1 != -1){
                     return true;
                 }
                 return false;
@@ -92,6 +92,7 @@ namespace Game {
 
         bool CheckNeighbors(int col, int row) {
             // >= to include 0 index
+            //add logic for adding to the middle +1 -1 x/y
             if (col - 1 >= 0 && col - 2 >= 0) {
                 if (logicBoard[col - 1][row] == logicBoard[col][row] && logicBoard[col - 2][row] == logicBoard[col - 1][row]) {
                     return true;
@@ -121,23 +122,42 @@ namespace Game {
             if (LeftMousePressed && !oneSelected) {
                 xIndex1 = (MousePosition.X / tileSize);
                 yIndex1 = (MousePosition.Y / tileSize);
-                Console.WriteLine("xIndex1 :" + xIndex1 + "yIndex1: " + yIndex1);
             }
             else if (LeftMousePressed && !twoSelected) {
                 xIndex2 = (MousePosition.X / tileSize);
                 yIndex2 = (MousePosition.Y / tileSize);
-                
-                //does not work
+
                 if (!SelectionNeighbors()) {
                     xIndex1 = xIndex2;
                     yIndex1 = yIndex2;
                     xIndex2 = -1;
                     yIndex2 = -1;
                 }
+                    //Swap logic
+                else {
+                    // swap
+                    int _value = logicBoard[xIndex1][yIndex1];
+                    logicBoard[xIndex1][yIndex1] = logicBoard[xIndex2][yIndex2];
+                    logicBoard[xIndex2][yIndex2] = _value;
 
-                Console.WriteLine("xIndex2 :" + xIndex2 + "yIndex2: " + yIndex2);
+                    //streak?
+                    if (CheckNeighbors(xIndex2, yIndex2) || CheckNeighbors(xIndex1,yIndex1)) {                       
+                        xIndex1 = xIndex2 = -1;
+                        yIndex1 = yIndex2 = -1;
+                    }
+                        //not streak
+                    else {
+                        //  swap
+                        int _value2 = logicBoard[xIndex1][yIndex1];
+                        logicBoard[xIndex1][yIndex1] = logicBoard[xIndex2][yIndex2];
+                        logicBoard[xIndex2][yIndex2] = _value2;
 
-            }
+                        xIndex1 = xIndex2 = -1;
+                        yIndex1 = yIndex2 = -1;
+                    }
+                }
+               
+            }            
             //TODO CHECK IF 3 IN A ROW (CHECKNEIGHBOR())
             //DESTROY THOSE 3
             //MOVE JEWELS DOWN
