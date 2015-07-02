@@ -22,14 +22,14 @@ namespace Game {
 #endif
 
 #if UNDO
-            bejeweled = new Bejewled(8, 30, 50, 50);// 3 + 4th argument determine offset (x/y) in pixels
+            bejeweled = new Bejewled(8, 50, 0, 0);// 3 + 4th argument determine offset (x/y) in pixels
 #else
             bejeweled = new Bejewled(Guid.NewGuid().GetHashCode());
 #endif
         }
 
         public override void Initialize() {
-            bejeweled.Initialize(7);
+            bejeweled.Initialize(8);
         }
 
         public override void Update(float deltaTime) {
