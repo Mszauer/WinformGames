@@ -88,6 +88,7 @@ namespace Game {
                     }
                 }
             }
+            RecordUndo();
         }
 
         List<Point> CheckStreak(int col, int row) {
@@ -155,7 +156,9 @@ namespace Game {
              
         }
 
-        public void Update(float deltaTime, bool LeftMousePressed,Point MousePosition) {
+        public void Update(float deltaTime, bool LeftMousePressed,Point MousePosition, int xOffset, int yOffset) {
+            MousePosition.X = MousePosition.X - xOffset;
+            MousePosition.Y = MousePosition.Y - yOffset;
             for (int x = 0; x < logicBoard.Length; x++) {
                 for (int y = 0; y < logicBoard[x].Length; y++) {
                     DestroyStreak(CheckStreak(x, y));
@@ -167,14 +170,14 @@ namespace Game {
             }
             //CLICK MOVING LOGIC
             if (LeftMousePressed && !oneSelected) {
-                xIndex1 = (MousePosition.X / tileSize);
+                xIndex1 = ((MousePosition.X) / tileSize);
                 xIndex1 = xIndex1 < logicBoard.Length ? MousePosition.X / tileSize : -1;
                 yIndex1 = (MousePosition.Y / tileSize);
                 yIndex1 = yIndex1 < logicBoard[0].Length ? MousePosition.Y / tileSize : -1;
 
             }
             else if (LeftMousePressed && !twoSelected) {
-                xIndex2 = (MousePosition.X / tileSize);
+                xIndex2 = ((MousePosition.X) / tileSize);
                 xIndex2 = xIndex1 < logicBoard.Length ? MousePosition.X / tileSize : -1;
                 yIndex2 = (MousePosition.Y / tileSize);
                 yIndex2 = yIndex2 < logicBoard[0].Length ? MousePosition.Y / tileSize : -1;
@@ -183,9 +186,7 @@ namespace Game {
                 if (SelectionNeighbors()) {
                     //Swap logic
                     // swap
-#if UNDO
                     RecordUndo();
-#endif
                     int _value = logicBoard[xIndex1][yIndex1];
                     logicBoard[xIndex1][yIndex1] = logicBoard[xIndex2][yIndex2];
                     logicBoard[xIndex2][yIndex2] = _value;
@@ -226,22 +227,18 @@ namespace Game {
 
             }
         }
-#if DEBUG
-            public void Reset(){
+        public void Reset(){
             
-#if UNDO
-                RecordUndo();
-#endif
-                for (int col = 0; col < logicBoard.Length; col++) {
-                    for (int row = 0; row < logicBoard[col].Length; row++) {
+            RecordUndo();
+            for (int col = 0; col < logicBoard.Length; col++) {
+                for (int row = 0; row < logicBoard[col].Length; row++) {
+                    logicBoard[col][row] = r.Next(0, 8);
+                    while (CheckStreak(col, row).Count > 0) {
                         logicBoard[col][row] = r.Next(0, 8);
-                        while (CheckStreak(col, row).Count > 0) {
-                            logicBoard[col][row] = r.Next(0, 8);
-                        }
                     }
                 }
-                #endif
             }
+        }
             
 
         
@@ -289,14 +286,14 @@ namespace Game {
             return false;
         }
 
-        public void Render(Graphics g) {
+        public void Render(Graphics g, int xOffset, int yOffset) {
 #if DEBUG
             //visually draw logic board
             using (Pen p = new Pen(Brushes.Green, 1.0f)) {
                 for (int col = 0; col < logicBoard.Length ; col++) {
-                    g.DrawLine(p, new Point(col * tileSize, 0), new Point(col * tileSize, logicBoard[col].Length * tileSize));
+                    g.DrawLine(p, new Point(xOffset + col * tileSize, yOffset), new Point(xOffset + col * tileSize, logicBoard[col].Length * tileSize));
                     for (int row = 0; row < logicBoard[col].Length ; row++) {
-                        g.DrawLine(p, new Point(0, row * tileSize), new Point(logicBoard.Length*tileSize, row * tileSize));
+                        g.DrawLine(p, new Point(xOffset, yOffset + row * tileSize), new Point(logicBoard.Length * tileSize, yOffset + row * tileSize));
                     }
                 }
             }
@@ -307,7 +304,7 @@ namespace Game {
                 for (int row = 0; row < logicBoard[col].Length; row++) {
                     // checks values and assigns corresponding brush
                     if (logicBoard[col][row] > -1) {
-                        Rect r = new Rect(new Point(col * tileSize, row * tileSize), new Size(tileSize, tileSize));
+                        Rect r = new Rect(new Point(xOffset + col * tileSize, yOffset + row * tileSize), new Size(tileSize, tileSize));
                         g.FillRectangle(debugJewels[logicBoard[col][row]], r.Rectangle);
 
                     }
@@ -316,8 +313,8 @@ namespace Game {
 
             //Outlines selected jewels
             using (Pen p = new Pen(Brushes.Crimson, 1.0f)) {
-                g.DrawRectangle(p, new Rectangle(new Point(xIndex1 * tileSize, yIndex1 * tileSize), new Size(tileSize, tileSize)));
-                g.DrawRectangle(p, new Rectangle(new Point(xIndex2 * tileSize, yIndex2 * tileSize), new Size(tileSize, tileSize)));
+                g.DrawRectangle(p, new Rectangle(new Point(xIndex1 * tileSize +xOffset, yIndex1 * tileSize + xOffset), new Size(tileSize, tileSize)));
+                g.DrawRectangle(p, new Rectangle(new Point(xIndex2 * tileSize + yOffset, yIndex2 * tileSize +yOffset), new Size(tileSize, tileSize)));
             }
         }
 #endif

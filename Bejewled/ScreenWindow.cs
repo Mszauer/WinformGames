@@ -33,7 +33,7 @@ namespace Game {
         }
 
         public override void Update(float deltaTime) {
-            bejeweled.Update(deltaTime, LeftMousePressed, MousePosition);
+            bejeweled.Update(deltaTime, LeftMousePressed, MousePosition, 50, 50);// 4 + 5th argument determine offset (x/y) in pixels
 #if UNDO
             if (KeyPressed(Keys.U)) {
                 bejeweled.PerformUndo();
@@ -48,7 +48,7 @@ namespace Game {
         
 
         public override void Render(Graphics g) {
-            bejeweled.Render(g);
+            bejeweled.Render(g,50,50); // second + third argument determine offset (x/y) in pixels
         }
     }
 }
