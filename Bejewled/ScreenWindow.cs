@@ -22,7 +22,7 @@ namespace Game {
 #endif
 
 #if UNDO
-            bejeweled = new Bejewled(8,60);
+            bejeweled = new Bejewled(8, 30, 50, 50);// 3 + 4th argument determine offset (x/y) in pixels
 #else
             bejeweled = new Bejewled(Guid.NewGuid().GetHashCode());
 #endif
@@ -33,7 +33,7 @@ namespace Game {
         }
 
         public override void Update(float deltaTime) {
-            bejeweled.Update(deltaTime, LeftMousePressed, MousePosition, 50, 50);// 4 + 5th argument determine offset (x/y) in pixels
+            bejeweled.Update(deltaTime, LeftMousePressed, MousePosition);
 #if UNDO
             if (KeyPressed(Keys.U)) {
                 bejeweled.PerformUndo();
@@ -48,7 +48,7 @@ namespace Game {
         
 
         public override void Render(Graphics g) {
-            bejeweled.Render(g,50,50); // second + third argument determine offset (x/y) in pixels
+            bejeweled.Render(g);
         }
     }
 }

@@ -9,7 +9,7 @@ using System.Drawing;
 
 namespace Game {
     class Bejewled {
-
+        
         int[][] undoBoard = null;
 
         public void RecordUndo() {
@@ -36,6 +36,8 @@ namespace Game {
         int[][] logicBoard = null;
         int tileSize = 50;
         Random r = null;
+        int xOffset = 0;
+        int yOffset = 0;
 #if DEBUG
         Brush[] debugJewels = new Brush[] { Brushes.Red, Brushes.Salmon, Brushes.Teal, Brushes.Black, Brushes.White, Brushes.Purple, Brushes.Green, Brushes.Blue };
 #endif
@@ -66,7 +68,9 @@ namespace Game {
             }
         }
 
-        public Bejewled(int seed,int tileSize=50) {
+        public Bejewled(int seed,int tileSize=50,int xOffset = 0,int yOffset = 0) {
+            this.xOffset = xOffset;
+            this.yOffset = yOffset;
             this.tileSize = tileSize;
             r = new Random(seed);
         }
@@ -156,7 +160,7 @@ namespace Game {
              
         }
 
-        public void Update(float deltaTime, bool LeftMousePressed,Point MousePosition, int xOffset, int yOffset) {
+        public void Update(float deltaTime, bool LeftMousePressed,Point MousePosition) {
             MousePosition.X = MousePosition.X - xOffset;
             MousePosition.Y = MousePosition.Y - yOffset;
             for (int x = 0; x < logicBoard.Length; x++) {
@@ -286,7 +290,7 @@ namespace Game {
             return false;
         }
 
-        public void Render(Graphics g, int xOffset, int yOffset) {
+        public void Render(Graphics g) {
 #if DEBUG
             //visually draw logic board
             using (Pen p = new Pen(Brushes.Green, 1.0f)) {
