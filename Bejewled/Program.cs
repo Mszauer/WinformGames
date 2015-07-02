@@ -9,7 +9,7 @@ using System.Windows.Forms;
 namespace Game {
     class Program {
         static void Main(string[] args) {
-            Application.Run(new GameWindow(new Bejewled()));
+            Application.Run(new GameWindow(new ScreenWindow()));
         }
     }
 }

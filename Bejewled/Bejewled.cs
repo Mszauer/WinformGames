@@ -1,5 +1,4 @@
-﻿#define UNDO
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -9,11 +8,11 @@ using System.Windows.Forms;
 using System.Drawing;
 
 namespace Game {
-    class Bejewled : GameBase {
-#if UNDO
+    class Bejewled {
+
         int[][] undoBoard = null;
 
-        void RecordUndo() {
+        public void RecordUndo() {
             undoBoard = new int[logicBoard.Length][];
             for (int i = 0; i < logicBoard.Length; ++i) {
                 undoBoard[i] = new int[logicBoard[i].Length];
@@ -26,19 +25,20 @@ namespace Game {
             }
         }
 
-        void PerformUndo() {
+        public void PerformUndo() {
             for (int x = 0; x < logicBoard.Length; ++x) {
                 for (int y = 0; y < logicBoard[x].Length; ++y) {
                     logicBoard[x][y] = undoBoard[x][y];
                 }
             }
         }
-#endif
 
         int[][] logicBoard = null;
         int tileSize = 50;
         Random r = null;
+#if DEBUG
         Brush[] debugJewels = new Brush[] { Brushes.Red, Brushes.Salmon, Brushes.Teal, Brushes.Black, Brushes.White, Brushes.Purple, Brushes.Green, Brushes.Blue };
+#endif
 
         int xIndex1 = -1;
         int yIndex1 = -1;
@@ -66,26 +66,25 @@ namespace Game {
             }
         }
 
-        public Bejewled() {
-            width = 400;
-            height = 600;
-            r = new Random();
+        public Bejewled(int seed,int tileSize=50) {
+            this.tileSize = tileSize;
+            r = new Random(seed);
         }
 
-        public override void Initialize() {
+        public void Initialize(int boardSize = 8) {
 
             //create logical board
-            logicBoard = new int[8][];
+            logicBoard = new int[boardSize][];
             for (int i = 0; i < logicBoard.Length; i++) {
-                logicBoard[i] = new int[8];
+                logicBoard[i] = new int[boardSize];
             }
 
             //Assigns values to cells, if it's 3in a row it will reassign a new value
             for (int col = 0; col < logicBoard.Length; col++) {
                 for (int row = 0; row < logicBoard[col].Length; row++) {
-                    logicBoard[col][row] = r.Next(0, 8);
+                    logicBoard[col][row] = r.Next(0, boardSize);
                     while (CheckStreak(col, row).Count > 0) {
-                        logicBoard[col][row] = r.Next(0, 8);
+                        logicBoard[col][row] = r.Next(0, boardSize);
                     }
                 }
             }
@@ -152,114 +151,84 @@ namespace Game {
             if (verticalStreak.Count >= 3) {
                 return verticalStreak;
             }
-            /*if (col - 1 >= 0 && col + 1 < logicBoard.Length) {
-                if (logicBoard[col - 1][row] == logicBoard[col][row] && logicBoard[col + 1][row] == logicBoard[col][row]) {
-                    return new List<Point>() { new Point(col - 1, row), new Point(col, row), new Point(col + 1, row) };
-                }
-            }
-            if (row - 1 >= 0 && row + 1 < logicBoard[col].Length) {
-                if (logicBoard[col][row - 1] == logicBoard[col][row] && logicBoard[col][row + 1] == logicBoard[col][row]) {
-                    return new List<Point>() { new Point(col, row - 1), new Point(col, row), new Point(col, row + 1) };
-                }
-            }
-            if (col - 1 >= 0 && col - 2 >= 0) {
-                if (logicBoard[col - 1][row] == logicBoard[col][row] && logicBoard[col - 2][row] == logicBoard[col - 1][row]) {
-                    return new List<Point>() { new Point(col - 2, row), new Point(col - 1, row), new Point(col, row) };
-                }
-            }
-             
-            if (col + 1 < logicBoard.Length && col + 2 < logicBoard.Length) {
-                if (logicBoard[col + 1][row] == logicBoard[col][row] && logicBoard[col + 2][row] == logicBoard[col + 1][row]) {
-                    return new List<Point>() { new Point(col, row), new Point(col + 1, row), new Point(col + 2, row) };
-                }
-            }
-             
-            if (row - 1 >= 0 && row - 2 >= 0) {
-                if (logicBoard[col][row - 1] == logicBoard[col][row] && logicBoard[col][row - 2] == logicBoard[col][row - 1]) {
-                    return new List<Point>() { new Point(col, row - 2), new Point(col, row - 1), new Point(col, row) };
-                }
-            }
-            if (row + 1 < logicBoard[col].Length && row + 2 < logicBoard[col].Length) {
-                if (logicBoard[col][row + 1] == logicBoard[col][row] && logicBoard[col][row + 2] == logicBoard[col][row + 1]) {
-                    return new List<Point>() { new Point(col, row), new Point(col, row + 1), new Point(col, row + 2) };
-                }
-            }*/
             return new List<Point>();
              
         }
 
-        public override void Update(float deltaTime) {
+        public void Update(float deltaTime, bool LeftMousePressed,Point MousePosition) {
             for (int x = 0; x < logicBoard.Length; x++) {
                 for (int y = 0; y < logicBoard[x].Length; y++) {
                     DestroyStreak(CheckStreak(x, y));
                     for (int n = 0; n < logicBoard[0].Length; n++) {
                         Movedown();
                     }
-                    //GenerateJewels();
+                    GenerateJewels();
                 }
             }
-                //CLICK MOVING LOGIC
-                if (LeftMousePressed && !oneSelected) {
-                    xIndex1 = (MousePosition.X / tileSize);
-                    xIndex1 = xIndex1 < logicBoard.Length ? MousePosition.X / tileSize : -1;
-                    yIndex1 = (MousePosition.Y / tileSize);
-                    yIndex1 = yIndex1 < logicBoard[0].Length ? MousePosition.Y / tileSize : -1;
+            //CLICK MOVING LOGIC
+            if (LeftMousePressed && !oneSelected) {
+                xIndex1 = (MousePosition.X / tileSize);
+                xIndex1 = xIndex1 < logicBoard.Length ? MousePosition.X / tileSize : -1;
+                yIndex1 = (MousePosition.Y / tileSize);
+                yIndex1 = yIndex1 < logicBoard[0].Length ? MousePosition.Y / tileSize : -1;
 
-                }
-                else if (LeftMousePressed && !twoSelected) {
-                    xIndex2 = (MousePosition.X / tileSize);
-                    xIndex2 = xIndex1 < logicBoard.Length ? MousePosition.X / tileSize : -1;
-                    yIndex2 = (MousePosition.Y / tileSize);
-                    yIndex2 = yIndex2 < logicBoard[0].Length ? MousePosition.Y / tileSize : -1;
+            }
+            else if (LeftMousePressed && !twoSelected) {
+                xIndex2 = (MousePosition.X / tileSize);
+                xIndex2 = xIndex1 < logicBoard.Length ? MousePosition.X / tileSize : -1;
+                yIndex2 = (MousePosition.Y / tileSize);
+                yIndex2 = yIndex2 < logicBoard[0].Length ? MousePosition.Y / tileSize : -1;
 
-                    //checks to see if its a valid move
-                    if (SelectionNeighbors()) {
-                        //Swap logic
-                        // swap
+                //checks to see if its a valid move
+                if (SelectionNeighbors()) {
+                    //Swap logic
+                    // swap
 #if UNDO
-                        RecordUndo();
+                    RecordUndo();
 #endif
-                        int _value = logicBoard[xIndex1][yIndex1];
-                        logicBoard[xIndex1][yIndex1] = logicBoard[xIndex2][yIndex2];
-                        logicBoard[xIndex2][yIndex2] = _value;
-                        //streak?
-                        if (CheckStreak(xIndex2, yIndex2).Count > 0 || CheckStreak(xIndex1, yIndex1).Count > 0) {
-                            //Destroy Row
-                            DestroyStreak(CheckStreak(xIndex1, yIndex1));
-                            DestroyStreak(CheckStreak(xIndex2, yIndex2));
-                            //Move jewels down
-                            for (int n = 0; n < logicBoard[0].Length; n++) {
-                                Movedown();
-                                
-                            }
-                            //Generate new Jewels
-                            //GenerateJewels();
+                    int _value = logicBoard[xIndex1][yIndex1];
+                    logicBoard[xIndex1][yIndex1] = logicBoard[xIndex2][yIndex2];
+                    logicBoard[xIndex2][yIndex2] = _value;
+                    //streak?
+                    if (CheckStreak(xIndex2, yIndex2).Count > 0 || CheckStreak(xIndex1, yIndex1).Count > 0) {
+                        //Destroy Row
+                        DestroyStreak(CheckStreak(xIndex1, yIndex1));
+                        DestroyStreak(CheckStreak(xIndex2, yIndex2));
+                        //Move jewels down
+                        for (int n = 0; n < logicBoard[0].Length; n++) {
+                            Movedown();
 
-                            //Deselect
-                            xIndex1 = xIndex2 = -1;
-                            yIndex1 = yIndex2 = -1;
                         }
-                        //not streak
-                        else {
-                            //  swap back to original
-                            int _value2 = logicBoard[xIndex1][yIndex1];
-                            logicBoard[xIndex1][yIndex1] = logicBoard[xIndex2][yIndex2];
-                            logicBoard[xIndex2][yIndex2] = _value2;
+                        //Generate new Jewels
+                        GenerateJewels();
 
-                            xIndex1 = xIndex2 = -1;
-                            yIndex1 = yIndex2 = -1;
-                        }
+                        //Deselect
+                        xIndex1 = xIndex2 = -1;
+                        yIndex1 = yIndex2 = -1;
                     }
+                    //not streak
                     else {
-                        xIndex1 = xIndex2;
-                        yIndex1 = yIndex2;
-                        xIndex2 = -1;
-                        yIndex2 = -1;
-                    }
+                        //  swap back to original
+                        int _value2 = logicBoard[xIndex1][yIndex1];
+                        logicBoard[xIndex1][yIndex1] = logicBoard[xIndex2][yIndex2];
+                        logicBoard[xIndex2][yIndex2] = _value2;
 
+                        xIndex1 = xIndex2 = -1;
+                        yIndex1 = yIndex2 = -1;
+                    }
                 }
+                else {
+                    xIndex1 = xIndex2;
+                    yIndex1 = yIndex2;
+                    xIndex2 = -1;
+                    yIndex2 = -1;
+                }
+
+            }
+        }
 #if DEBUG
-            if (KeyPressed(Keys.R)) {
+            public void Reset(){
+            
 #if UNDO
                 RecordUndo();
 #endif
@@ -271,14 +240,11 @@ namespace Game {
                         }
                     }
                 }
+                #endif
             }
-#endif
-#if UNDO
-            if (KeyPressed(Keys.U)) {
-                PerformUndo();
-            }
-#endif
-        }
+            
+
+        
 
         void Movedown() {
             for (int x = logicBoard.Length - 1; x >= 0; x--) { // columns
@@ -322,13 +288,15 @@ namespace Game {
             }
             return false;
         }
-        public override void Render(Graphics g) {
+
+        public void Render(Graphics g) {
+#if DEBUG
             //visually draw logic board
             using (Pen p = new Pen(Brushes.Green, 1.0f)) {
-                for (int col = 0; col < logicBoard.Length; col++) {
-                    g.DrawLine(p, new Point(col * tileSize, 0), new Point(col * tileSize, height));
-                    for (int row = 0; row < logicBoard[col].Length; row++) {
-                        g.DrawLine(p, new Point(0, row * tileSize), new Point(width, row * tileSize));
+                for (int col = 0; col < logicBoard.Length ; col++) {
+                    g.DrawLine(p, new Point(col * tileSize, 0), new Point(col * tileSize, logicBoard[col].Length * tileSize));
+                    for (int row = 0; row < logicBoard[col].Length ; row++) {
+                        g.DrawLine(p, new Point(0, row * tileSize), new Point(logicBoard.Length*tileSize, row * tileSize));
                     }
                 }
             }
@@ -340,9 +308,8 @@ namespace Game {
                     // checks values and assigns corresponding brush
                     if (logicBoard[col][row] > -1) {
                         Rect r = new Rect(new Point(col * tileSize, row * tileSize), new Size(tileSize, tileSize));
-#if DEBUG
                         g.FillRectangle(debugJewels[logicBoard[col][row]], r.Rectangle);
-#endif
+
                     }
                 }
             }
@@ -353,5 +320,6 @@ namespace Game {
                 g.DrawRectangle(p, new Rectangle(new Point(xIndex2 * tileSize, yIndex2 * tileSize), new Size(tileSize, tileSize)));
             }
         }
+#endif
     }
 }
