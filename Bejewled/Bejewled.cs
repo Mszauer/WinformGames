@@ -86,9 +86,9 @@ namespace Game {
             //Assigns values to cells, if it's 3in a row it will reassign a new value
             for (int col = 0; col < logicBoard.Length; col++) {
                 for (int row = 0; row < logicBoard[col].Length; row++) {
-                    logicBoard[col][row] = r.Next(0, boardSize);
+                    logicBoard[col][row] = r.Next(0, 8);
                     while (CheckStreak(col, row).Count > 0) {
-                        logicBoard[col][row] = r.Next(0, boardSize);
+                        logicBoard[col][row] = r.Next(0, 8);
                     }
                 }
             }
@@ -161,6 +161,7 @@ namespace Game {
         }
 
         public void Update(float deltaTime, bool LeftMousePressed,Point MousePosition) {
+            MousePosition = new Point(MousePosition.X, MousePosition.Y);
             MousePosition.X = MousePosition.X - xOffset;
             MousePosition.Y = MousePosition.Y - yOffset;
             for (int x = 0; x < logicBoard.Length; x++) {
@@ -172,6 +173,15 @@ namespace Game {
                     GenerateJewels();
                 }
             }
+
+            // if mouse is out of bounds
+            if (MousePosition.X < 0 || MousePosition.Y < 0) {
+                return;
+            }
+            if (MousePosition.X > logicBoard.Length * tileSize || MousePosition.Y > logicBoard[0].Length * tileSize) {
+                return;
+            }
+
             //CLICK MOVING LOGIC
             if (LeftMousePressed && !oneSelected) {
                 xIndex1 = ((MousePosition.X) / tileSize);
@@ -317,8 +327,8 @@ namespace Game {
 
             //Outlines selected jewels
             using (Pen p = new Pen(Brushes.Crimson, 1.0f)) {
-                g.DrawRectangle(p, new Rectangle(new Point(xIndex1 * tileSize +xOffset, yIndex1 * tileSize + xOffset), new Size(tileSize, tileSize)));
-                g.DrawRectangle(p, new Rectangle(new Point(xIndex2 * tileSize + yOffset, yIndex2 * tileSize +yOffset), new Size(tileSize, tileSize)));
+                g.DrawRectangle(p, new Rectangle(new Point(xIndex1 * tileSize +xOffset, yIndex1 * tileSize + yOffset), new Size(tileSize, tileSize)));
+                g.DrawRectangle(p, new Rectangle(new Point(xIndex2 * tileSize + xOffset, yIndex2 * tileSize +yOffset), new Size(tileSize, tileSize)));
             }
         }
 #endif
