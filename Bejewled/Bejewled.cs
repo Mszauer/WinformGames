@@ -101,59 +101,68 @@ namespace Game {
         }
 
         public override void Update(float deltaTime) {
-            //CLICK MOVING LOGIC
-
-            if (LeftMousePressed && !oneSelected) {
-                xIndex1 = (MousePosition.X / tileSize);
-                yIndex1 = (MousePosition.Y / tileSize);
+            for (int x = 0; x < logicBoard.Length; x++) {
+                for (int y = 0; y < logicBoard[x].Length; y++) {
+                    DestroyStreak(CheckStreak(x, y));
+                    GenerateJewels();
+                }
             }
-            else if (LeftMousePressed && !twoSelected) {
-                xIndex2 = (MousePosition.X / tileSize);
-                yIndex2 = (MousePosition.Y / tileSize);
+                //CLICK MOVING LOGIC
+                if (LeftMousePressed && !oneSelected) {
+                    xIndex1 = (MousePosition.X / tileSize);
+                    xIndex1 = xIndex1 < logicBoard.Length ? MousePosition.X / tileSize : -1;
+                    yIndex1 = (MousePosition.Y / tileSize);
+                    yIndex1 = yIndex1 < logicBoard[0].Length ? MousePosition.Y / tileSize : -1;
 
-                //checks to see if its a valid move
-                if (SelectionNeighbors()) {
-                    //Swap logic
-                    // swap
-                    int _value = logicBoard[xIndex1][yIndex1];
-                    logicBoard[xIndex1][yIndex1] = logicBoard[xIndex2][yIndex2];
-                    logicBoard[xIndex2][yIndex2] = _value;
-                    //streak?
-                    if (CheckStreak(xIndex2, yIndex2).Count > 0 || CheckStreak(xIndex1, yIndex1).Count > 0) {
-                        //Destroy Row
-                        DestroyStreak(CheckStreak(xIndex1, yIndex1));
-                        DestroyStreak(CheckStreak(xIndex2, yIndex2));
-                        //Move jewels down
-                        // Repeat N times, where n is logicBoard[0].Length
-                        for (int n = 0; n < logicBoard[0].Length; n++) {
-                            Movedown();
-                            //Generate new Jewels
-                            GenerateJewels();
-                        }
-                        
-                        //Deselect
-                        xIndex1 = xIndex2 = -1;
-                        yIndex1 = yIndex2 = -1;
-                    }
-                    //not streak
-                    else {
-                        //  swap back to original
-                        int _value2 = logicBoard[xIndex1][yIndex1];
+                }
+                else if (LeftMousePressed && !twoSelected) {
+                    xIndex2 = (MousePosition.X / tileSize);
+                    xIndex2 = xIndex1 < logicBoard.Length ? MousePosition.X / tileSize : -1;
+                    yIndex2 = (MousePosition.Y / tileSize);
+                    yIndex2 = yIndex2 < logicBoard[0].Length ? MousePosition.Y / tileSize : -1;
+
+                    //checks to see if its a valid move
+                    if (SelectionNeighbors()) {
+                        //Swap logic
+                        // swap
+                        int _value = logicBoard[xIndex1][yIndex1];
                         logicBoard[xIndex1][yIndex1] = logicBoard[xIndex2][yIndex2];
-                        logicBoard[xIndex2][yIndex2] = _value2;
+                        logicBoard[xIndex2][yIndex2] = _value;
+                        //streak?
+                        if (CheckStreak(xIndex2, yIndex2).Count > 0 || CheckStreak(xIndex1, yIndex1).Count > 0) {
+                            //Destroy Row
+                            DestroyStreak(CheckStreak(xIndex1, yIndex1));
+                            DestroyStreak(CheckStreak(xIndex2, yIndex2));
+                            //Move jewels down
+                            for (int n = 0; n < logicBoard[0].Length; n++) {
+                                Movedown();
+                                //Generate new Jewels
+                                GenerateJewels();
+                            }
 
-                        xIndex1 = xIndex2 = -1;
-                        yIndex1 = yIndex2 = -1;
+                            //Deselect
+                            xIndex1 = xIndex2 = -1;
+                            yIndex1 = yIndex2 = -1;
+                        }
+                        //not streak
+                        else {
+                            //  swap back to original
+                            int _value2 = logicBoard[xIndex1][yIndex1];
+                            logicBoard[xIndex1][yIndex1] = logicBoard[xIndex2][yIndex2];
+                            logicBoard[xIndex2][yIndex2] = _value2;
+
+                            xIndex1 = xIndex2 = -1;
+                            yIndex1 = yIndex2 = -1;
+                        }
                     }
-                }
-                else {
-                    xIndex1 = xIndex2;
-                    yIndex1 = yIndex2;
-                    xIndex2 = -1;
-                    yIndex2 = -1;
-                }
+                    else {
+                        xIndex1 = xIndex2;
+                        yIndex1 = yIndex2;
+                        xIndex2 = -1;
+                        yIndex2 = -1;
+                    }
 
-            }
+                }
 #if DEBUG
             if (KeyPressed(Keys.R)) {
                 for (int col = 0; col < logicBoard.Length; col++) {
