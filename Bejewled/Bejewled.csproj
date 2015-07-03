@@ -46,6 +46,9 @@
     <Compile Include="..\CustomRectangle\Rect.cs">
       <Link>Rect.cs</Link>
     </Compile>
+    <Compile Include="..\GameWindow\Easing.cs">
+      <Link>Easing.cs</Link>
+    </Compile>
     <Compile Include="..\GameWindow\GameBase.cs">
       <Link>GameBase.cs</Link>
     </Compile>
