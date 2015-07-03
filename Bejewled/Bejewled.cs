@@ -33,7 +33,7 @@ namespace Game {
             }
         }
 
-        int[][] logicBoard = null;
+        public int[][] logicBoard = null;
         int tileSize = 50;
         Random r = null;
         int xOffset = 0;

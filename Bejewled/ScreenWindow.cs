@@ -11,7 +11,7 @@ using System.Drawing;
 namespace Game {
     class ScreenWindow : GameBase {
         Bejewled bejeweled = null;
-
+        BejewledGraphics graphics = null;
         public ScreenWindow() {
             width = 400;
             height = 600;
@@ -20,9 +20,9 @@ namespace Game {
             width = 800;
             height = 600;
 #endif
-
+            graphics = new BejewledGraphics(50,400,0); //tilesize,xOffset,yOffset
 #if UNDO
-            bejeweled = new Bejewled(8, 50, 0, 0);// 3 + 4th argument determine offset (x/y) in pixels
+            bejeweled = new Bejewled(8, 50, 0, 0);// random seed, tilesize, xoffset, yoffset
 #else
             bejeweled = new Bejewled(Guid.NewGuid().GetHashCode());
 #endif
@@ -30,6 +30,7 @@ namespace Game {
 
         public override void Initialize() {
             bejeweled.Initialize(8);
+            graphics.Initialize(bejeweled.logicBoard);
         }
 
         public override void Update(float deltaTime) {
@@ -49,6 +50,7 @@ namespace Game {
 
         public override void Render(Graphics g) {
             bejeweled.Render(g);
+            graphics.Render(g);
         }
     }
 }
