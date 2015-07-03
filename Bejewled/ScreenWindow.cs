@@ -31,9 +31,12 @@ namespace Game {
         public override void Initialize() {
             bejeweled.Initialize(8);
             graphics.Initialize(bejeweled.logicBoard);
+            bejeweled.OnStreak += graphics.DoStreak;
+            bejeweled.OnSwap += graphics.DoSwap;
         }
 
         public override void Update(float deltaTime) {
+            graphics.Update(deltaTime);
             bejeweled.Update(deltaTime, LeftMousePressed, MousePosition);
 #if UNDO
             if (KeyPressed(Keys.U)) {

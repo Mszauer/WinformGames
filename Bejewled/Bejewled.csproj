@@ -62,6 +62,7 @@
     <Compile Include="..\SpriteSystem\Sprite.cs">
       <Link>Sprite.cs</Link>
     </Compile>
+    <Compile Include="AnimationHelpers.cs" />
     <Compile Include="Bejewled.cs" />
     <Compile Include="BejewledGraphics.cs" />
     <Compile Include="Program.cs" />

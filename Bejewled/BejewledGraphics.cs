@@ -10,6 +10,7 @@ using System.Drawing;
 
 namespace Game {
     class BejewledGraphics {
+        List<LerpAnimation> lerp = null; 
         List<Sprite> icons = null;
         
         int [][] graphicsBoard = null;
@@ -18,6 +19,7 @@ namespace Game {
         int yOffset = 0;
 
         public BejewledGraphics(int tileSize,int xOffset, int yOffset) {
+            lerp = new List<LerpAnimation>();
             this.tileSize = tileSize;
             this.xOffset = xOffset;
             this.yOffset = yOffset;
@@ -42,16 +44,50 @@ namespace Game {
             }
         }
 
-        public void Update(float dTime){
+        public void DoStreak(List<Point> removedCells){
+            /*List<Point> removeThis = new List<Point>(removedCells);
+            foreach (Point p in removedCells) {
+                graphicsBoard[p.X][p.Y] = -1;
+            }*/
+        }
 
+        public void DoSwap(Point a, Point b, LerpAnimation.FinishedAnimationCallback onDone, int aVal, int bVal) {
+            lerp.Add(new LerpAnimation(aVal, new Point(a.X * tileSize, a.Y * tileSize), new Point(b.X * tileSize, b.Y * tileSize)));
+            lerp[lerp.Count - 1].OnFinished += OnFinished;
+            lerp[lerp.Count - 1].OnFinished += onDone;
+
+            lerp.Add(new LerpAnimation(bVal, new Point(b.X * tileSize, b.Y * tileSize), new Point(a.X * tileSize, a.Y * tileSize)));
+            lerp[lerp.Count - 1].OnFinished += OnFinished;
+
+
+            graphicsBoard[a.X][a.Y] = -1;
+            graphicsBoard[b.X][b.Y] = -1;
+
+        }
+
+        void OnFinished(Point cell, int value, LerpAnimation anim) {
+            graphicsBoard[cell.X/tileSize][cell.Y/tileSize] = value;
+            lerp.Remove(anim);
+        }
+
+        public void Update(float dTime){
+            for (int i = lerp.Count - 1; i >= 0; i--) {
+                lerp[i].Update(dTime);
+            }
         }
 
         public void Render(Graphics g) {
             for (int x = 0; x < graphicsBoard.Length; x++) {
                 for (int y = 0; y < graphicsBoard[x].Length; y++) {
                     int index = graphicsBoard[x][y];
-                    icons[index].Draw(g,new Point(x * tileSize + xOffset, y*tileSize + yOffset));
+                    if (index >= 0) {
+                        icons[index].Draw(g, new Point(x * tileSize + xOffset, y * tileSize + yOffset));
+                    }
                 }
+            }
+            //Console.WriteLine("num lerp: " + lerp.Count);
+            foreach (LerpAnimation l in lerp) {
+                icons[l.cellValue].Draw(g, new Point(l.currentPosition.X  + xOffset, l.currentPosition.Y + yOffset));
             }
         }
     }

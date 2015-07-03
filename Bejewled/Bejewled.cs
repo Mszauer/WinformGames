@@ -9,7 +9,12 @@ using System.Drawing;
 
 namespace Game {
     class Bejewled {
-        
+        public delegate void StreakCallback(List<Point> removedCells);
+        public StreakCallback OnStreak = null;
+        public delegate void SwapCallback(Point a, Point b, LerpAnimation.FinishedAnimationCallback finished, int aVal, int bVal);
+        public SwapCallback OnSwap = null;
+        enum State { Idle, WaitSwap1, WaitSwap2}
+        State gameState = State.Idle;
         int[][] undoBoard = null;
 
         public void RecordUndo() {
@@ -161,84 +166,114 @@ namespace Game {
         }
 
         public void Update(float deltaTime, bool LeftMousePressed,Point MousePosition) {
-            MousePosition = new Point(MousePosition.X, MousePosition.Y);
-            MousePosition.X = MousePosition.X - xOffset;
-            MousePosition.Y = MousePosition.Y - yOffset;
-            for (int x = 0; x < logicBoard.Length; x++) {
-                for (int y = 0; y < logicBoard[x].Length; y++) {
-                    DestroyStreak(CheckStreak(x, y));
-                    for (int n = 0; n < logicBoard[0].Length; n++) {
-                        Movedown();
-                    }
-                    GenerateJewels();
-                }
-            }
-
-            // if mouse is out of bounds
-            if (MousePosition.X < 0 || MousePosition.Y < 0) {
-                return;
-            }
-            if (MousePosition.X > logicBoard.Length * tileSize || MousePosition.Y > logicBoard[0].Length * tileSize) {
-                return;
-            }
-
-            //CLICK MOVING LOGIC
-            if (LeftMousePressed && !oneSelected) {
-                xIndex1 = ((MousePosition.X) / tileSize);
-                xIndex1 = xIndex1 < logicBoard.Length ? MousePosition.X / tileSize : -1;
-                yIndex1 = (MousePosition.Y / tileSize);
-                yIndex1 = yIndex1 < logicBoard[0].Length ? MousePosition.Y / tileSize : -1;
-
-            }
-            else if (LeftMousePressed && !twoSelected) {
-                xIndex2 = ((MousePosition.X) / tileSize);
-                xIndex2 = xIndex1 < logicBoard.Length ? MousePosition.X / tileSize : -1;
-                yIndex2 = (MousePosition.Y / tileSize);
-                yIndex2 = yIndex2 < logicBoard[0].Length ? MousePosition.Y / tileSize : -1;
-
-                //checks to see if its a valid move
-                if (SelectionNeighbors()) {
-                    //Swap logic
-                    // swap
-                    RecordUndo();
-                    int _value = logicBoard[xIndex1][yIndex1];
-                    logicBoard[xIndex1][yIndex1] = logicBoard[xIndex2][yIndex2];
-                    logicBoard[xIndex2][yIndex2] = _value;
-                    //streak?
-                    if (CheckStreak(xIndex2, yIndex2).Count > 0 || CheckStreak(xIndex1, yIndex1).Count > 0) {
-                        //Destroy Row
-                        DestroyStreak(CheckStreak(xIndex1, yIndex1));
-                        DestroyStreak(CheckStreak(xIndex2, yIndex2));
-                        //Move jewels down
+            if (gameState == State.Idle) {
+                MousePosition = new Point(MousePosition.X, MousePosition.Y);
+                MousePosition.X = MousePosition.X - xOffset;
+                MousePosition.Y = MousePosition.Y - yOffset;
+                for (int x = 0; x < logicBoard.Length; x++) {
+                    for (int y = 0; y < logicBoard[x].Length; y++) {
+                        DestroyStreak(CheckStreak(x, y));
                         for (int n = 0; n < logicBoard[0].Length; n++) {
                             Movedown();
-
                         }
-                        //Generate new Jewels
                         GenerateJewels();
-
-                        //Deselect
-                        xIndex1 = xIndex2 = -1;
-                        yIndex1 = yIndex2 = -1;
                     }
-                    //not streak
-                    else {
-                        //  swap back to original
-                        int _value2 = logicBoard[xIndex1][yIndex1];
+                }
+
+                // if mouse is out of bounds
+                if (MousePosition.X < 0 || MousePosition.Y < 0) {
+                    return;
+                }
+                if (MousePosition.X > logicBoard.Length * tileSize || MousePosition.Y > logicBoard[0].Length * tileSize) {
+                    return;
+                }
+
+                //CLICK MOVING LOGIC
+                if (LeftMousePressed && !oneSelected) {
+                    xIndex1 = ((MousePosition.X) / tileSize);
+                    xIndex1 = xIndex1 < logicBoard.Length ? MousePosition.X / tileSize : -1;
+                    yIndex1 = (MousePosition.Y / tileSize);
+                    yIndex1 = yIndex1 < logicBoard[0].Length ? MousePosition.Y / tileSize : -1;
+
+                }
+                else if (LeftMousePressed && !twoSelected) {
+                    xIndex2 = ((MousePosition.X) / tileSize);
+                    xIndex2 = xIndex1 < logicBoard.Length ? MousePosition.X / tileSize : -1;
+                    yIndex2 = (MousePosition.Y / tileSize);
+                    yIndex2 = yIndex2 < logicBoard[0].Length ? MousePosition.Y / tileSize : -1;
+
+                    //checks to see if its a valid move
+                    if (SelectionNeighbors()) {
+                        //Swap logic
+                        // swap
+                        RecordUndo();
+                        //visual swap
+                        OnSwap(new Point(xIndex1, yIndex1), new Point(xIndex2, yIndex2), AnimationFinished, logicBoard[xIndex1][yIndex1], logicBoard[xIndex2][yIndex2]);
+                        //logical swap
+                        int _value = logicBoard[xIndex1][yIndex1];
                         logicBoard[xIndex1][yIndex1] = logicBoard[xIndex2][yIndex2];
-                        logicBoard[xIndex2][yIndex2] = _value2;
+                        logicBoard[xIndex2][yIndex2] = _value;
 
-                        xIndex1 = xIndex2 = -1;
-                        yIndex1 = yIndex2 = -1;
+                        //State switches to waitSwap1
+                        gameState = State.WaitSwap1;
+                        //streak?
+                       
                     }
-                }
-                else {
-                    xIndex1 = xIndex2;
-                    yIndex1 = yIndex2;
-                    xIndex2 = -1;
-                    yIndex2 = -1;
-                }
+                    else {
+                        xIndex1 = xIndex2;
+                        yIndex1 = yIndex2;
+                        xIndex2 = -1;
+                        yIndex2 = -1;
+                    }
 
+                }
+            } //end idle
+        }
+
+        void AnimationFinished(Point cell, int value, LerpAnimation anim) {
+            if (gameState == State.WaitSwap2) {
+                gameState = State.Idle;
+            }
+            else if (gameState == State.WaitSwap1) {
+                if (CheckStreak(xIndex2, yIndex2).Count > 0 || CheckStreak(xIndex1, yIndex1).Count > 0) {
+                    //Call animation to remove removed cells
+                    OnStreak(CheckStreak(xIndex1, yIndex1));
+                    OnStreak(CheckStreak(xIndex2, yIndex2));
+
+                    //Destroy Row
+                    DestroyStreak(CheckStreak(xIndex1, yIndex1));
+                    DestroyStreak(CheckStreak(xIndex2, yIndex2));
+
+                    //Move jewels down
+                    for (int n = 0; n < logicBoard[0].Length; n++) {
+                        Movedown();
+
+                    }
+                    //Generate new Jewels
+                    GenerateJewels();
+
+                    //Deselect
+                    xIndex1 = xIndex2 = -1;
+                    yIndex1 = yIndex2 = -1;
+
+                    //Put into idle state
+                    gameState = State.Idle;
+                }
+                //not streak
+                else {
+                    //Visual Swap
+                    if (OnSwap != null) {
+                        OnSwap(new Point(xIndex1, yIndex1), new Point(xIndex2, yIndex2), AnimationFinished, logicBoard[xIndex1][yIndex1], logicBoard[xIndex2][yIndex2]);
+                    }
+                    //  swap back to original
+                    int _value2 = logicBoard[xIndex1][yIndex1];
+                    logicBoard[xIndex1][yIndex1] = logicBoard[xIndex2][yIndex2];
+                    logicBoard[xIndex2][yIndex2] = _value2;
+                    
+                    gameState = State.WaitSwap2;
+                    xIndex1 = xIndex2 = -1;
+                    yIndex1 = yIndex2 = -1;
+                }
             }
         }
         public void Reset(){
