@@ -34,7 +34,7 @@ namespace Game {
             //bejeweled.OnStreak += graphics.DoStreak;
             bejeweled.OnSwap += graphics.DoSwap;
             bejeweled.OnDestroy += graphics.DoDestroy;
-            graphics.SetExplosionFinishedCallback(bejeweled.DoExplosion);
+            graphics.SetExplosionFinishedCallback(bejeweled.TriggerAnimFinished);
             bejeweled.OnFall += graphics.DoFall;
         }
 

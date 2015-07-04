@@ -15,9 +15,9 @@ namespace Game {
         public SwapCallback OnSwap = null;
         public delegate void DestroyCallBack(List<Point> streakPos);
         public DestroyCallBack OnDestroy = null;
-        public delegate void FallCallback(Dictionary<Point, int> result);
+        public delegate void FallCallback(Dictionary<Point, int> result, EaseAnimation.FinishedAnimationCallback finished);
         public FallCallback OnFall = null;
-        enum State { Idle, WaitSwap1, WaitSwap2,WaitDestroy1, WaitDestroy2}
+        enum State { Idle, WaitSwap1, WaitSwap2,WaitDestroy1, WaitDestroy2,WaitFall1}
         State gameState = State.Idle;
         int[][] undoBoard = null;
 
@@ -34,7 +34,7 @@ namespace Game {
             }
         }
 
-        public void DoExplosion (){
+        public void TriggerAnimFinished (){
             AnimationFinished(default(Point), 0, null);
         }
 
@@ -179,13 +179,14 @@ namespace Game {
                 MousePosition.X = MousePosition.X - xOffset;
                 MousePosition.Y = MousePosition.Y - yOffset;
                 //board creates a streak by itself
-                for (int x = 0; x < logicBoard.Length; x++) {
+                /*for (int x = 0; x < logicBoard.Length; x++) {
                     for (int y = 0; y < logicBoard[x].Length; y++) {
                         DestroyStreak(CheckStreak(x, y));
                         Movedown();
                         GenerateJewels();
                     }
                 }
+                 */
 
                 // if mouse is out of bounds
                 if (MousePosition.X < 0 || MousePosition.Y < 0) {
@@ -297,11 +298,15 @@ namespace Game {
 
                 //Move jewels down
                 Dictionary <Point,int> result = Movedown();
+                gameState = State.WaitFall1;
                 if (OnFall != null) {
-                    OnFall(result);
+                    OnFall(result,AnimationFinished);
                 }
-                //TODO SWITCH STATE
-                
+                else {
+                    AnimationFinished(default(Point), 0, null);
+                }
+            }
+            else if (gameState == State.WaitFall1) {
                 //Generate new Jewels
                 GenerateJewels();
 

@@ -38,7 +38,7 @@ namespace Game {
             cellExplode.AnimationFinished += this.DoExplosionFinished;
         }
 
-        public void DoFall(Dictionary<Point, int> result) {
+        public void DoFall(Dictionary<Point, int> result, EaseAnimation.FinishedAnimationCallback finished) {
             foreach (KeyValuePair<Point, int> kvp in result) {
                 int value = graphicsBoard[kvp.Key.X][kvp.Key.Y];
                 Point startPos = new Point(kvp.Key.X*tileSize, kvp.Key.Y*tileSize);
@@ -48,6 +48,7 @@ namespace Game {
                 lerp[lerp.Count-1].AnimationSpeed = 0.75f;
                 graphicsBoard[kvp.Key.X][kvp.Key.Y] = -1;
             }
+            lerp[lerp.Count - 1].OnFinished += finished;
         }
 
         public void SetExplosionFinishedCallback(FlipBook.AnimationFinishedCallback Callback) {
