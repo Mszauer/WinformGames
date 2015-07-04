@@ -14,6 +14,7 @@ namespace Game {
     class BejewledGraphics {
         List<LerpAnimation> lerp = null; 
         List<Sprite> icons = null;
+        List<Point> destroyPos = null;
         FlipBook cellExplode = null;
         
         int [][] graphicsBoard = null;
@@ -52,7 +53,7 @@ namespace Game {
 
         public void DoStreak(List<Point> removedCells){
             List<Point> removeThis = new List<Point>(removedCells);
-            foreach (Point p in removedCells) {
+            foreach (Point p in removeThis) {
                 graphicsBoard[p.X][p.Y] = -1;
             }
         }
@@ -71,8 +72,8 @@ namespace Game {
 
         }
 
-        void ClearStreak(List<Point>){
-
+        void OnDestroy(List<Point> streak){
+            destroyPos = streak;
         }
 
         void OnFinished(Point cell, int value, LerpAnimation anim) {
@@ -100,7 +101,10 @@ namespace Game {
             foreach (LerpAnimation l in lerp) {
                 icons[l.cellValue].Draw(g, new Point(l.currentPosition.X  + xOffset, l.currentPosition.Y + yOffset));
             }
+            foreach (Point p in destroyPos){
+                cellExplode.Render(g, new Point(p.X,p.Y));
 
+            }
         }
     }
 }

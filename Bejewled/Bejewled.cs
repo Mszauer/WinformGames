@@ -13,6 +13,8 @@ namespace Game {
         public StreakCallback OnStreak = null;
         public delegate void SwapCallback(Point a, Point b, LerpAnimation.FinishedAnimationCallback finished, int aVal, int bVal);
         public SwapCallback OnSwap = null;
+        public delegate void DestroyCallBack(List<Point> streakPos);
+        public DestroyCallBack OnDestroy = null;
         enum State { Idle, WaitSwap1, WaitSwap2}
         State gameState = State.Idle;
         int[][] undoBoard = null;
@@ -239,6 +241,13 @@ namespace Game {
                     //Call animation to remove removed cells
                     OnStreak(CheckStreak(xIndex1, yIndex1));
                     OnStreak(CheckStreak(xIndex2, yIndex2));
+
+                    //Play Destroyed Animation
+                    if (OnDestroy != null) {
+                        OnDestroy(CheckStreak(xIndex1, yIndex1));
+                        OnDestroy(CheckStreak(xIndex2, yIndex2));
+
+                    }
 
                     //Destroy Row
                     DestroyStreak(CheckStreak(xIndex1, yIndex1));
