@@ -328,22 +328,22 @@ namespace Game {
 
         Dictionary<Point,int> Movedown() {
             Dictionary<Point,int> result = new Dictionary<Point,int>();
-            for (int n = 0; n < logicBoard[0].Length; n++) {
-                for (int x = logicBoard.Length - 1; x >= 0; x--) { // columns
-                    for (int y = logicBoard[x].Length - 1; y >= 0; y--) { // rows
+            for (int x = logicBoard.Length - 1; x >= 0; x--) { // columns
+                int emptyY = 0;
+                for (int y = logicBoard[x].Length - 1; y >= 0; y--) { // rows
+                    if (logicBoard[x][y] == -1) {
+                        emptyY++;
+                    } // If !-1
+                } // Y
+                if (emptyY > 0){
+                    for (int y = 0; y < logicBoard[x].Length; y++) {
                         if (logicBoard[x][y] == -1) {
-                            //Stores value, swaps value upwards
-                            int _value = logicBoard[x][y];
-                            if (y != 0) {
-                                logicBoard[x][y] = logicBoard[x][y - 1];
-                                logicBoard[x][y - 1] = _value;
-                            }
-
-                         
-                        } // If !-1
-                    } // Y
-                } // X
-            } // N
+                            break;
+                        }
+                        result.Add(new Point(x, y), emptyY);
+                    }
+                }
+            } // X
             return result;
         }
 
