@@ -12,7 +12,7 @@ using System.Drawing;
 //generate new
 namespace Game {
     class BejewledGraphics {
-        List<LerpAnimation> lerp = null; 
+        List<EaseAnimation> lerp = null; 
         List<Sprite> icons = null;
         List<Point> destroyPos = null;
         FlipBook cellExplode = null;
@@ -23,7 +23,7 @@ namespace Game {
         int yOffset = 0;
 
         public BejewledGraphics(int tileSize,int xOffset, int yOffset) {
-            lerp = new List<LerpAnimation>();
+            lerp = new List<EaseAnimation>();
             cellExplode = FlipBook.LoadCustom("Assets/explosion.txt",60f);
             destroyPos = new List<Point>();
             cellExplode.Playback = FlipBook.PlaybackStyle.Single;
@@ -36,6 +36,18 @@ namespace Game {
                 icons.Add(new Sprite("Assets/icon_" +i+".png"));
             }
             cellExplode.AnimationFinished += this.DoExplosionFinished;
+        }
+
+        public void DoFall(Dictionary<Point, int> result) {
+            foreach (KeyValuePair<Point, int> kvp in result) {
+                int value = graphicsBoard[kvp.Key.X][kvp.Key.Y];
+                Point startPos = new Point(kvp.Key.X*tileSize, kvp.Key.Y*tileSize);
+                Point endPos = new Point(kvp.Key.X * tileSize, (kvp.Key.Y + kvp.Value) * tileSize);
+                lerp.Add(new EaseAnimation(value, startPos, endPos));
+                lerp[lerp.Count - 1].FallType = EaseAnimation.FallStyle.Bounce;
+                lerp[lerp.Count-1].AnimationSpeed = 0.75f;
+                graphicsBoard[kvp.Key.X][kvp.Key.Y] = -1;
+            }
         }
 
         public void SetExplosionFinishedCallback(FlipBook.AnimationFinishedCallback Callback) {
@@ -63,12 +75,12 @@ namespace Game {
             destroyPos = new List<Point>();
         }
 
-        public void DoSwap(Point a, Point b, LerpAnimation.FinishedAnimationCallback onDone, int aVal, int bVal) {
-            lerp.Add(new LerpAnimation(aVal, new Point(a.X * tileSize, a.Y * tileSize), new Point(b.X * tileSize, b.Y * tileSize)));
+        public void DoSwap(Point a, Point b, EaseAnimation.FinishedAnimationCallback onDone, int aVal, int bVal) {
+            lerp.Add(new EaseAnimation(aVal, new Point(a.X * tileSize, a.Y * tileSize), new Point(b.X * tileSize, b.Y * tileSize)));
             lerp[lerp.Count - 1].OnFinished += OnFinished;
             lerp[lerp.Count - 1].OnFinished += onDone;
 
-            lerp.Add(new LerpAnimation(bVal, new Point(b.X * tileSize, b.Y * tileSize), new Point(a.X * tileSize, a.Y * tileSize)));
+            lerp.Add(new EaseAnimation(bVal, new Point(b.X * tileSize, b.Y * tileSize), new Point(a.X * tileSize, a.Y * tileSize)));
             lerp[lerp.Count - 1].OnFinished += OnFinished;
 
 
@@ -82,7 +94,7 @@ namespace Game {
             destroyPos = streak;
         }
 
-        void OnFinished(Point cell, int value, LerpAnimation anim) {
+        void OnFinished(Point cell, int value, EaseAnimation anim) {
             graphicsBoard[cell.X/tileSize][cell.Y/tileSize] = value;
             lerp.Remove(anim);
         }
@@ -104,7 +116,7 @@ namespace Game {
                 }
             }
             //Console.WriteLine("num lerp: " + lerp.Count);
-            foreach (LerpAnimation l in lerp) {
+            foreach (EaseAnimation l in lerp) {
                 icons[l.cellValue].Draw(g, new Point(l.currentPosition.X  + xOffset, l.currentPosition.Y + yOffset));
             }
             foreach (Point p in destroyPos){

@@ -35,6 +35,7 @@ namespace Game {
             bejeweled.OnSwap += graphics.DoSwap;
             bejeweled.OnDestroy += graphics.DoDestroy;
             graphics.SetExplosionFinishedCallback(bejeweled.DoExplosion);
+            bejeweled.OnFall += graphics.DoFall;
         }
 
         public override void Update(float deltaTime) {

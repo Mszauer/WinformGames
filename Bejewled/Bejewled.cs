@@ -11,7 +11,7 @@ namespace Game {
     class Bejewled {
         //public delegate void StreakCallback(List<Point> removedCells);
         //public StreakCallback OnStreak = null;
-        public delegate void SwapCallback(Point a, Point b, LerpAnimation.FinishedAnimationCallback finished, int aVal, int bVal);
+        public delegate void SwapCallback(Point a, Point b, EaseAnimation.FinishedAnimationCallback finished, int aVal, int bVal);
         public SwapCallback OnSwap = null;
         public delegate void DestroyCallBack(List<Point> streakPos);
         public DestroyCallBack OnDestroy = null;
@@ -237,7 +237,7 @@ namespace Game {
             } //end idle
         }
 
-        void AnimationFinished(Point cell, int value, LerpAnimation anim) {
+        void AnimationFinished(Point cell, int value, EaseAnimation anim) {
             if (gameState == State.WaitSwap2) {
                 gameState = State.Idle;
             }
@@ -296,8 +296,11 @@ namespace Game {
                 DestroyStreak(CheckStreak(xIndex2, yIndex2));
 
                 //Move jewels down
-                Movedown();
-                //OnFall()
+                Dictionary <Point,int> result = Movedown();
+                if (OnFall != null) {
+                    OnFall(result);
+                }
+                //TODO SWITCH STATE
                 
                 //Generate new Jewels
                 GenerateJewels();
