@@ -202,7 +202,6 @@ namespace Game {
                     xIndex1 = xIndex1 < logicBoard.Length ? MousePosition.X / tileSize : -1;
                     yIndex1 = (MousePosition.Y / tileSize);
                     yIndex1 = yIndex1 < logicBoard[0].Length ? MousePosition.Y / tileSize : -1;
-
                 }
                 else if (LeftMousePressed && !twoSelected) {
                     xIndex2 = ((MousePosition.X) / tileSize);
@@ -355,8 +354,14 @@ namespace Game {
             } // X
 
             // Sink values down
+            //Save changes to buffer
+            Dictionary<Point, int> changeStorage = new Dictionary<Point, int>();
             foreach (KeyValuePair<Point, int> kvp in result) {
-                logicBoard[kvp.Key.X][kvp.Key.Y+kvp.Value] = logicBoard[kvp.Key.X][kvp.Key.Y];
+                changeStorage.Add(new Point(kvp.Key.X, kvp.Key.Y+kvp.Value), logicBoard[kvp.Key.X][kvp.Key.Y]);
+            }
+            //apply changes in buffer
+            foreach (KeyValuePair<Point, int> kvp in changeStorage) {
+                logicBoard[kvp.Key.X][kvp.Key.Y] = kvp.Value;
             }
             // Clear top values
             foreach (KeyValuePair<Point, int> kvp in result) {
