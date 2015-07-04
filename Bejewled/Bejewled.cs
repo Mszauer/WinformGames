@@ -328,6 +328,7 @@ namespace Game {
 
         Dictionary<Point,int> Movedown() {
             Dictionary<Point,int> result = new Dictionary<Point,int>();
+            // Build dictionary
             for (int x = logicBoard.Length - 1; x >= 0; x--) { // columns
                 int emptyY = 0;
                 for (int y = logicBoard[x].Length - 1; y >= 0; y--) { // rows
@@ -341,9 +342,20 @@ namespace Game {
                             break;
                         }
                         result.Add(new Point(x, y), emptyY);
-                    }
+                    } // Y
                 }
             } // X
+
+            // Sink values down
+            foreach (KeyValuePair<Point, int> kvp in result) {
+                logicBoard[kvp.Key.X][kvp.Key.Y+kvp.Value] = logicBoard[kvp.Key.X][kvp.Key.Y];
+            }
+            // Clear top values
+            foreach (KeyValuePair<Point, int> kvp in result) {
+                for (int y = 0; y < kvp.Value; y++) {
+                    logicBoard[kvp.Key.X][y] = -1;
+                }
+            }
             return result;
         }
 
