@@ -27,6 +27,8 @@ namespace Game {
         public FlipStyle Flip = FlipStyle.None;
         public enum AnchorPosition { TopLeft, Center, BottomMiddle }
         public AnchorPosition Anchor = AnchorPosition.TopLeft;
+        public enum PlaybackStyle { Single, Looping}
+        public PlaybackStyle Playback = PlaybackStyle.Looping;
 
         protected FlipBook() {
 
@@ -100,8 +102,12 @@ namespace Game {
             if (timeAccum >= updateRate) {
                 spriteIndex++;
                 if (spriteIndex >= subSprites.Count) {
-                    spriteIndex = 0;
-
+                    if (Playback == PlaybackStyle.Looping) {
+                        spriteIndex = 0;
+                    }
+                    else if (Playback == PlaybackStyle.Single){
+                        spriteIndex = subSprites.Count - 1;
+                    }
                 }
                 timeAccum -= updateRate;
             }

@@ -7,11 +7,14 @@ using Game;
 using System.Windows.Forms;
 using System.Drawing;
 
-
+//explode / remove cell
+//drop down
+//generate new
 namespace Game {
     class BejewledGraphics {
         List<LerpAnimation> lerp = null; 
         List<Sprite> icons = null;
+        FlipBook cellExplode = null;
         
         int [][] graphicsBoard = null;
         int tileSize = 0;
@@ -20,6 +23,9 @@ namespace Game {
 
         public BejewledGraphics(int tileSize,int xOffset, int yOffset) {
             lerp = new List<LerpAnimation>();
+            cellExplode = FlipBook.LoadCustom("Assets/explosion.txt");
+            cellExplode.Playback = FlipBook.PlaybackStyle.Single;
+            cellExplode.Anchor = FlipBook.AnchorPosition.Center;
             this.tileSize = tileSize;
             this.xOffset = xOffset;
             this.yOffset = yOffset;
@@ -45,10 +51,10 @@ namespace Game {
         }
 
         public void DoStreak(List<Point> removedCells){
-            /*List<Point> removeThis = new List<Point>(removedCells);
+            List<Point> removeThis = new List<Point>(removedCells);
             foreach (Point p in removedCells) {
                 graphicsBoard[p.X][p.Y] = -1;
-            }*/
+            }
         }
 
         public void DoSwap(Point a, Point b, LerpAnimation.FinishedAnimationCallback onDone, int aVal, int bVal) {
@@ -65,6 +71,10 @@ namespace Game {
 
         }
 
+        void ClearStreak(List<Point>){
+
+        }
+
         void OnFinished(Point cell, int value, LerpAnimation anim) {
             graphicsBoard[cell.X/tileSize][cell.Y/tileSize] = value;
             lerp.Remove(anim);
@@ -74,6 +84,7 @@ namespace Game {
             for (int i = lerp.Count - 1; i >= 0; i--) {
                 lerp[i].Update(dTime);
             }
+            cellExplode.Update(dTime);
         }
 
         public void Render(Graphics g) {
@@ -89,6 +100,7 @@ namespace Game {
             foreach (LerpAnimation l in lerp) {
                 icons[l.cellValue].Draw(g, new Point(l.currentPosition.X  + xOffset, l.currentPosition.Y + yOffset));
             }
+
         }
     }
 }
