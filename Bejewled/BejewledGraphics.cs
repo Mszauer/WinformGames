@@ -38,6 +38,10 @@ namespace Game {
             cellExplode.AnimationFinished += this.DoExplosionFinished;
         }
 
+        public void SetExplosionFinishedCallback(FlipBook.AnimationFinishedCallback Callback) {
+            cellExplode.AnimationFinished += Callback;
+        }
+
         public void Initialize(int[][] board) {
             //Create graphic board
             graphicsBoard = new int[board.Length][];

@@ -125,10 +125,13 @@ namespace Game {
                         spriteIndex = subSprites.Count - 1;
                         if (!didFinish) {
                             if (AnimationFinished != null) {
+                                didFinish = true;                        
                                 AnimationFinished();
                             }
+                            else {
+                                didFinish = true;
+                            }
                         }
-                        didFinish = true;                        
                     }
                 }
                 timeAccum -= updateRate;

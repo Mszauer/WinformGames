@@ -15,7 +15,7 @@ namespace Game {
         public SwapCallback OnSwap = null;
         public delegate void DestroyCallBack(List<Point> streakPos);
         public DestroyCallBack OnDestroy = null;
-        enum State { Idle, WaitSwap1, WaitSwap2}
+        enum State { Idle, WaitSwap1, WaitSwap2,WaitDestroy1, WaitDestroy2}
         State gameState = State.Idle;
         int[][] undoBoard = null;
 
@@ -30,6 +30,10 @@ namespace Game {
                     undoBoard[x][y] = logicBoard[x][y];
                 }
             }
+        }
+
+        public void DoExplosion (){
+            AnimationFinished(default(Point), 0, null);
         }
 
         public void PerformUndo() {
@@ -172,6 +176,7 @@ namespace Game {
                 MousePosition = new Point(MousePosition.X, MousePosition.Y);
                 MousePosition.X = MousePosition.X - xOffset;
                 MousePosition.Y = MousePosition.Y - yOffset;
+                //board creates a streak by itself
                 for (int x = 0; x < logicBoard.Length; x++) {
                     for (int y = 0; y < logicBoard[x].Length; y++) {
                         DestroyStreak(CheckStreak(x, y));
@@ -247,32 +252,16 @@ namespace Game {
                         List<Point> streak = CheckStreak(xIndex1, yIndex1);
                         if (streak.Count >= 3) {
                             OnDestroy(streak);
+                            gameState = State.WaitDestroy1;
                         }
-                        streak = CheckStreak(xIndex2, yIndex2);
-                        if (streak.Count >= 3) {
-                            OnDestroy(streak);
+                        else {
+                            streak = CheckStreak(xIndex2, yIndex2);
+                            if (streak.Count >= 3) {
+                                OnDestroy(streak);
+                                gameState = State.WaitDestroy2;
+                            }
                         }
-
                     }
-
-                    //Destroy Row
-                    DestroyStreak(CheckStreak(xIndex1, yIndex1));
-                    DestroyStreak(CheckStreak(xIndex2, yIndex2));
-
-                    //Move jewels down
-                    for (int n = 0; n < logicBoard[0].Length; n++) {
-                        Movedown();
-
-                    }
-                    //Generate new Jewels
-                    GenerateJewels();
-
-                    //Deselect
-                    xIndex1 = xIndex2 = -1;
-                    yIndex1 = yIndex2 = -1;
-
-                    //Put into idle state
-                    gameState = State.Idle;
                 }
                 //not streak
                 else {
@@ -289,6 +278,37 @@ namespace Game {
                     xIndex1 = xIndex2 = -1;
                     yIndex1 = yIndex2 = -1;
                 }
+            }
+            else if (gameState == State.WaitDestroy1) {
+                List<Point> streak = CheckStreak(xIndex2, yIndex2);
+                if (streak.Count >= 3) {
+                    OnDestroy(streak);
+                    gameState = State.WaitDestroy2;
+                }
+                else {
+                    gameState = State.WaitDestroy2;
+                    AnimationFinished(default(Point), 0, null);
+                }
+            }
+            else if (gameState == State.WaitDestroy2) {
+                //Destroy Row
+                DestroyStreak(CheckStreak(xIndex1, yIndex1));
+                DestroyStreak(CheckStreak(xIndex2, yIndex2));
+
+                //Move jewels down
+                for (int n = 0; n < logicBoard[0].Length; n++) {
+                    Movedown();
+
+                }
+                //Generate new Jewels
+                GenerateJewels();
+
+                //Deselect
+                xIndex1 = xIndex2 = -1;
+                yIndex1 = yIndex2 = -1;
+
+                //Put into idle state
+                gameState = State.Idle;
             }
         }
         public void Reset(){
