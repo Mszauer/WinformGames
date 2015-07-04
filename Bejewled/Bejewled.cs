@@ -15,6 +15,8 @@ namespace Game {
         public SwapCallback OnSwap = null;
         public delegate void DestroyCallBack(List<Point> streakPos);
         public DestroyCallBack OnDestroy = null;
+        public delegate void FallCallback(Dictionary<Point, int> result);
+        public FallCallback OnFall = null;
         enum State { Idle, WaitSwap1, WaitSwap2,WaitDestroy1, WaitDestroy2}
         State gameState = State.Idle;
         int[][] undoBoard = null;
@@ -180,9 +182,7 @@ namespace Game {
                 for (int x = 0; x < logicBoard.Length; x++) {
                     for (int y = 0; y < logicBoard[x].Length; y++) {
                         DestroyStreak(CheckStreak(x, y));
-                        for (int n = 0; n < logicBoard[0].Length; n++) {
-                            Movedown();
-                        }
+                        Movedown();
                         GenerateJewels();
                     }
                 }
@@ -296,10 +296,9 @@ namespace Game {
                 DestroyStreak(CheckStreak(xIndex2, yIndex2));
 
                 //Move jewels down
-                for (int n = 0; n < logicBoard[0].Length; n++) {
-                    Movedown();
-
-                }
+                Movedown();
+                //OnFall()
+                
                 //Generate new Jewels
                 GenerateJewels();
 
@@ -327,19 +326,25 @@ namespace Game {
 
         
 
-        void Movedown() {
-            for (int x = logicBoard.Length - 1; x >= 0; x--) { // columns
-                for (int y = logicBoard[x].Length - 1; y >= 0; y--) { // rows
-                    if (logicBoard[x][y] == -1) {
-                        //Stores value, swaps value upwards
-                        int _value = logicBoard[x][y];
-                        if (y != 0) {
-                            logicBoard[x][y] = logicBoard[x][y - 1];
-                            logicBoard[x][y - 1] = _value;
-                        }
-                    }
-                }
-            }
+        Dictionary<Point,int> Movedown() {
+            Dictionary<Point,int> result = new Dictionary<Point,int>();
+            for (int n = 0; n < logicBoard[0].Length; n++) {
+                for (int x = logicBoard.Length - 1; x >= 0; x--) { // columns
+                    for (int y = logicBoard[x].Length - 1; y >= 0; y--) { // rows
+                        if (logicBoard[x][y] == -1) {
+                            //Stores value, swaps value upwards
+                            int _value = logicBoard[x][y];
+                            if (y != 0) {
+                                logicBoard[x][y] = logicBoard[x][y - 1];
+                                logicBoard[x][y - 1] = _value;
+                            }
+
+                         
+                        } // If !-1
+                    } // Y
+                } // X
+            } // N
+            return result;
         }
 
         void GenerateJewels() {
