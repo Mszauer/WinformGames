@@ -22,7 +22,7 @@ namespace Game {
         Image backBuffer = null;
         System.DateTime thisTime = default(System.DateTime);
         System.DateTime lastTime = default(System.DateTime);
-        float fixTimeStep = 1.0f / 30.0f;
+        float fixTimeStep = 1.0f / 60.0f;
 
         GameBase gameInstance = null;
 

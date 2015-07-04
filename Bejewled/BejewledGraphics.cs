@@ -24,7 +24,8 @@ namespace Game {
 
         public BejewledGraphics(int tileSize,int xOffset, int yOffset) {
             lerp = new List<LerpAnimation>();
-            cellExplode = FlipBook.LoadCustom("Assets/explosion.txt");
+            cellExplode = FlipBook.LoadCustom("Assets/explosion.txt",60f);
+            destroyPos = new List<Point>();
             cellExplode.Playback = FlipBook.PlaybackStyle.Single;
             cellExplode.Anchor = FlipBook.AnchorPosition.Center;
             this.tileSize = tileSize;
@@ -34,7 +35,7 @@ namespace Game {
             for (int i = 0; i < 8; i++) {
                 icons.Add(new Sprite("Assets/icon_" +i+".png"));
             }
-            
+            cellExplode.AnimationFinished += this.DoExplosionFinished;
         }
 
         public void Initialize(int[][] board) {
@@ -51,11 +52,11 @@ namespace Game {
             }
         }
 
-        public void DoStreak(List<Point> removedCells){
-            List<Point> removeThis = new List<Point>(removedCells);
-            foreach (Point p in removeThis) {
+        public void DoExplosionFinished(){            
+            foreach (Point p in destroyPos) {
                 graphicsBoard[p.X][p.Y] = -1;
             }
+            destroyPos = new List<Point>();
         }
 
         public void DoSwap(Point a, Point b, LerpAnimation.FinishedAnimationCallback onDone, int aVal, int bVal) {
@@ -72,7 +73,8 @@ namespace Game {
 
         }
 
-        void OnDestroy(List<Point> streak){
+        public void DoDestroy(List<Point> streak){
+            cellExplode.Reset();
             destroyPos = streak;
         }
 
@@ -102,7 +104,7 @@ namespace Game {
                 icons[l.cellValue].Draw(g, new Point(l.currentPosition.X  + xOffset, l.currentPosition.Y + yOffset));
             }
             foreach (Point p in destroyPos){
-                cellExplode.Render(g, new Point(p.X,p.Y));
+                cellExplode.Render(g, new Point(p.X*tileSize + xOffset + (int)(cellExplode.W/2f), p.Y*tileSize+yOffset + (int)(cellExplode.H/2f)));
 
             }
         }

@@ -11,6 +11,8 @@ using System.Xml;
 
 namespace Game {
     class FlipBook {
+        public delegate void AnimationFinishedCallback();
+        public AnimationFinishedCallback AnimationFinished = null;
         List<Rect> subSprites = null;
         Image spriteSheet = null;
         float timeAccum = 0;
@@ -23,12 +25,23 @@ namespace Game {
 
             }
         }
+        public float W {
+            get {
+                return subSprites[spriteIndex].W;
+            }
+        }
+        public float H {
+            get {
+                return subSprites[spriteIndex].H;
+            }
+        }
         public enum FlipStyle { None, Horizontal, Vertical, Both}
         public FlipStyle Flip = FlipStyle.None;
         public enum AnchorPosition { TopLeft, Center, BottomMiddle }
         public AnchorPosition Anchor = AnchorPosition.TopLeft;
-        public enum PlaybackStyle { Single, Looping}
-        public PlaybackStyle Playback = PlaybackStyle.Looping;
+        public enum PlaybackStyle { Single, Loop}
+        public PlaybackStyle Playback = PlaybackStyle.Loop;
+        bool didFinish = false;
 
         protected FlipBook() {
 
@@ -102,16 +115,29 @@ namespace Game {
             if (timeAccum >= updateRate) {
                 spriteIndex++;
                 if (spriteIndex >= subSprites.Count) {
-                    if (Playback == PlaybackStyle.Looping) {
+                    if (Playback == PlaybackStyle.Loop) {
                         spriteIndex = 0;
+                        if (AnimationFinished != null) {
+                            AnimationFinished();
+                        }
                     }
                     else if (Playback == PlaybackStyle.Single){
                         spriteIndex = subSprites.Count - 1;
+                        if (!didFinish) {
+                            if (AnimationFinished != null) {
+                                AnimationFinished();
+                            }
+                        }
+                        didFinish = true;                        
                     }
                 }
                 timeAccum -= updateRate;
             }
+        }
 
+        public void Reset() {
+            spriteIndex = 0;
+            didFinish = false;
         }
 
         public void Render(Graphics g, Point p) {

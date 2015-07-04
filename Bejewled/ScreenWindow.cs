@@ -31,8 +31,10 @@ namespace Game {
         public override void Initialize() {
             bejeweled.Initialize(8);
             graphics.Initialize(bejeweled.logicBoard);
-            bejeweled.OnStreak += graphics.DoStreak;
+            //bejeweled.OnStreak += graphics.DoStreak;
             bejeweled.OnSwap += graphics.DoSwap;
+            bejeweled.OnDestroy += graphics.DoDestroy;
+            
         }
 
         public override void Update(float deltaTime) {
