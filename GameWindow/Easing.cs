@@ -3,6 +3,7 @@ using System.Collections.Generic;
 
 namespace Game {
     public class Easing {
+        //All easing types http://easings.net/
         #region Equations
         // These methods are all public to enable reflection in GetCurrentValueCore.
 

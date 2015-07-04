@@ -18,7 +18,7 @@ namespace Game {
         public int cellValue = 0;
         public bool done = false;
         public float AnimationSpeed = 0.375f;
-        public enum FallStyle { Linear, Bounce };
+        public enum FallStyle { Linear, Bounce }; //Add style from here: http://easings.net/
         public FallStyle FallType = FallStyle.Linear;
 
         public EaseAnimation(int value, Point posStart, Point posEnd) {
@@ -36,18 +36,16 @@ namespace Game {
             if (time > AnimationSpeed) {
                 time =  AnimationSpeed;
                 done = true;
-                if (FallType == FallStyle.Linear) {
-                    currentPosition.X = (int)Easing.Linear(time, (float)startPos.X, (float)endPos.X, AnimationSpeed);
-                    currentPosition.Y = (int)Easing.Linear(time, (float)startPos.Y, (float)endPos.Y, AnimationSpeed);
-                }
-                else if (FallType == FallStyle.Bounce) {
-                    currentPosition.X = (int)Easing.BounceEaseOut(time, (float)startPos.X, (float)endPos.X, AnimationSpeed);
-                    currentPosition.Y = (int)Easing.BounceEaseOut(time, (float)startPos.Y, (float)endPos.Y, AnimationSpeed);
-                }
+                DoEasing();
                 if (OnFinished != null) {
                     OnFinished(currentPosition, cellValue, this);
                 }
             }
+            DoEasing();
+        }
+
+        //Easing types : http://easings.net/
+        void DoEasing() {
             if (FallType == FallStyle.Linear) {
                 currentPosition.X = (int)Easing.Linear(time, (float)startPos.X, (float)endPos.X, AnimationSpeed);
                 currentPosition.Y = (int)Easing.Linear(time, (float)startPos.Y, (float)endPos.Y, AnimationSpeed);
