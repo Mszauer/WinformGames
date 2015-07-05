@@ -1,4 +1,4 @@
-﻿#define UNDO
+﻿//#define UNDO
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,7 +20,7 @@ namespace Game {
             width = 800;
             height = 600;
 #endif
-            graphics = new BejewledGraphics(50,400,0); //tilesize,xOffset,yOffset
+            graphics = new BejewledGraphics(50,0,0); //tilesize,xOffset,yOffset
 #if UNDO
             bejeweled = new Bejewled(8, 50, 0, 0);// random seed, tilesize, xoffset, yoffset
 #else

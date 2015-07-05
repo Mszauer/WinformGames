@@ -1,4 +1,5 @@
-﻿//#define DROP
+﻿//#define DROP //tests edge cases
+#undef DEBUG
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,8 +11,7 @@ using System.Drawing;
 
 namespace Game {
     class Bejewled {
-        //public delegate void StreakCallback(List<Point> removedCells);
-        //public StreakCallback OnStreak = null;
+
         public delegate void SwapCallback(Point a, Point b, EaseAnimation.FinishedAnimationCallback finished, int aVal, int bVal);
         public SwapCallback OnSwap = null;
         public delegate void DestroyCallBack(List<Point> streakPos);
@@ -100,19 +100,15 @@ namespace Game {
             }
 
             //Assigns values to cells, if it's 3in a row it will reassign a new value
-            Dictionary<Point, int> spawn = new Dictionary<Point, int>();
             for (int col = 0; col < logicBoard.Length; col++) {
                 for (int row = 0; row < logicBoard[col].Length; row++) {
                     logicBoard[col][row] = r.Next(0, 8);
                     while (CheckStreak(col, row).Count > 0) {
                         logicBoard[col][row] = r.Next(0, 8);
                     }
-                    spawn.Add(new Point(col, row), logicBoard[col][row]);
                 }
             }
-            if (OnSpawn != null) {
-                OnSpawn(spawn);
-            }
+            
             //DEBUG SPAWN
 #if DROP
             logicBoard[0][0] = 0;
@@ -135,6 +131,16 @@ namespace Game {
             logicBoard[4][4] = 3;
             logicBoard[5][4] = 6;
 #endif
+            // Initial Spawn Animation
+            Dictionary<Point, int> spawn = new Dictionary<Point, int>();
+            for (int col = 0; col < logicBoard.Length; col++) {
+                for (int row = 0; row < logicBoard[col].Length; row++) {
+                    spawn.Add(new Point(col, row), logicBoard[col][row]);
+                }
+            }
+            if (OnSpawn != null) {
+                OnSpawn(spawn);
+            }
             //
             RecordUndo();
         }
@@ -213,15 +219,6 @@ namespace Game {
                 MousePosition = new Point(MousePosition.X, MousePosition.Y);
                 MousePosition.X = MousePosition.X - xOffset;
                 MousePosition.Y = MousePosition.Y - yOffset;
-                //board creates a streak by itself
-                /*for (int x = 0; x < logicBoard.Length; x++) {
-                    for (int y = 0; y < logicBoard[x].Length; y++) {
-                        DestroyStreak(CheckStreak(x, y));
-                        Movedown();
-                        GenerateJewels();
-                    }
-                }
-                 */
 
                 // if mouse is out of bounds
                 if (MousePosition.X < 0 || MousePosition.Y < 0) {
@@ -342,7 +339,8 @@ namespace Game {
             }
             else if (gameState == State.WaitFall1) {
                 //Generate new Jewels
-                GenerateJewels();
+                Dictionary<Point,int> spawn = GenerateJewels();
+                OnSpawn(spawn);
 
                 //Deselect
                 xIndex1 = xIndex2 = -1;
@@ -427,15 +425,18 @@ namespace Game {
             return result;
         }
 
-        void GenerateJewels() {
+        Dictionary<Point,int> GenerateJewels() {
+            Dictionary<Point, int> spawn = new Dictionary<Point, int>();
             for (int x = logicBoard.Length - 1; x >= 0; x--) { // columns
                 for (int y = logicBoard[x].Length - 1; y >= 0; y--) { // rows
-                        if (logicBoard[x][y] == -1) {
-                            logicBoard[x][y] = r.Next(0, 8);
-                        
+                    if (logicBoard[x][y] == -1) {
+                        logicBoard[x][y] = r.Next(0, 8);
+                        //Record spawned location and value
+                        spawn.Add(new Point(x, y), logicBoard[x][y]);
                     }
                 }
             }
+            return spawn;
         }
 
         void DestroyStreak(List<Point> locations) {
@@ -485,7 +486,7 @@ namespace Game {
                 g.DrawRectangle(p, new Rectangle(new Point(xIndex1 * tileSize +xOffset, yIndex1 * tileSize + yOffset), new Size(tileSize, tileSize)));
                 g.DrawRectangle(p, new Rectangle(new Point(xIndex2 * tileSize + xOffset, yIndex2 * tileSize +yOffset), new Size(tileSize, tileSize)));
             }
-        }
 #endif
+        }
     }
 }
