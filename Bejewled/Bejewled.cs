@@ -298,7 +298,7 @@ namespace Game {
                 //Move jewels down
                 Dictionary <Point,int> result = Movedown();
                 gameState = State.WaitFall1;
-                if (OnFall != null) {
+                if (OnFall != null && result.Count > 0) {
                     OnFall(result,AnimationFinished);
                 }
                 else {
