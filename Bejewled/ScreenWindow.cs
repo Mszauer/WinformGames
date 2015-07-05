@@ -49,6 +49,7 @@ namespace Game {
         public override void Update(float deltaTime) {
             graphics.Update(deltaTime);
             bejeweled.Update(deltaTime, LeftMousePressed, MousePosition);
+            mockRPG.Update(deltaTime);
 #if UNDO
             if (KeyPressed(Keys.U)) {
                 bejeweled.PerformUndo();

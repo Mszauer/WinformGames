@@ -14,6 +14,21 @@ namespace Game {
         Sprite navigation = null;
         Sprite healthBar = null;
         List<Sprite> healthColors = null;
+        int bgFrame = 0;
+        float health = 1f;
+        float timeAccum = 0f;
+        float walkFPS = 2f;
+        int healthIndexer {
+            get {
+                if (health < 0.25) {
+                    return 0;
+                }
+                else if (health < 0.5) {
+                    return 1;
+                }
+                return 2;
+            }
+        }
 
         public MetaRPG() {
             rpgBackGround = new List<Sprite>();
@@ -34,14 +49,23 @@ namespace Game {
         }
 
         public void Update(float dTime) {
-
+            timeAccum += dTime;
+            if (walkFPS < timeAccum) {
+                timeAccum = 0f;
+                bgFrame++;
+                if (bgFrame > rpgBackGround.Count - 1) {
+                    bgFrame = rpgBackGround.Count - 1;
+                }
+            }
         }
         public void Render(Graphics g) {
-            rpgBackGround[0].Draw(g, new Point(0, 0));
+            //Position the HUD
+            rpgBackGround[bgFrame].Draw(g, new Point(0, 0));
             portrait.Draw(g, new Point(355, 0));
             navigation.Draw(g, new Point(355, 141));
             healthBar.Draw(g, new Point(355, 124));
             //health colors
+            healthColors[healthIndexer].Draw_LeftScale(g, new Point(364, 127), 112f*health);
         }
     }
 }

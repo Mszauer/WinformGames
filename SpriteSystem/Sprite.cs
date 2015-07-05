@@ -25,7 +25,7 @@ namespace Game {
         public Sprite(string filepath) {
             spriteSheet = Image.FromFile(filepath);
         }
-
+        
         public void Draw(Graphics g, Point p) {
             g.DrawImage(spriteSheet, p.X, p.Y, spriteSheet.Width, spriteSheet.Height);
         }
@@ -51,6 +51,11 @@ namespace Game {
             Rect screenScaled = new Rect(new Point((int)(newScreenPos.Center.X - scaleW),(int)( newScreenPos.Center.Y - scaleH)),new Size((int)(scaleW*2f), (int)(scaleH*2f)));
             g.DrawImage(spriteSheet, screenScaled.Rectangle, new Rect(0,0,spriteSheet.Width,spriteSheet.Height).Rectangle, GraphicsUnit.Pixel);
         }
-
+        public void Draw_LeftScale(Graphics g, Point topLeft, float scalepercentage) {
+            Rect newScreenPos = new Rect(new Point(topLeft.X, topLeft.Y), new Size(spriteSheet.Width, spriteSheet.Height));
+            float scaleW = scalepercentage * (float)spriteSheet.Width;
+            Rect screenScaled = new Rect(topLeft, new Size((int)(scaleW), (int)(spriteSheet.Height)));
+            g.DrawImage(spriteSheet, screenScaled.Rectangle, new Rect(0, 0, spriteSheet.Width, spriteSheet.Height).Rectangle, GraphicsUnit.Pixel);
+        }
     }
 }
