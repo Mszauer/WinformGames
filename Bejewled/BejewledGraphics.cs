@@ -45,7 +45,8 @@ namespace Game {
                 Point endPos = new Point(kvp.Key.X * tileSize, (kvp.Key.Y + kvp.Value) * tileSize);
                 lerp.Add(new EaseAnimation(value, startPos, endPos));
                 lerp[lerp.Count - 1].FallType = EaseAnimation.FallStyle.Bounce;
-                lerp[lerp.Count-1].AnimationSpeed = 0.75f;
+                lerp[lerp.Count - 1].AnimationSpeed = 0.75f;
+                lerp[lerp.Count - 1].OnFinished = DoFinished;
                 graphicsBoard[kvp.Key.X][kvp.Key.Y] = -1;
             }
             lerp[lerp.Count - 1].OnFinished += finished;
@@ -78,11 +79,11 @@ namespace Game {
 
         public void DoSwap(Point a, Point b, EaseAnimation.FinishedAnimationCallback onDone, int aVal, int bVal) {
             lerp.Add(new EaseAnimation(aVal, new Point(a.X * tileSize, a.Y * tileSize), new Point(b.X * tileSize, b.Y * tileSize)));
-            lerp[lerp.Count - 1].OnFinished += OnFinished;
+            lerp[lerp.Count - 1].OnFinished += DoFinished;
             lerp[lerp.Count - 1].OnFinished += onDone;
 
             lerp.Add(new EaseAnimation(bVal, new Point(b.X * tileSize, b.Y * tileSize), new Point(a.X * tileSize, a.Y * tileSize)));
-            lerp[lerp.Count - 1].OnFinished += OnFinished;
+            lerp[lerp.Count - 1].OnFinished += DoFinished;
 
 
             graphicsBoard[a.X][a.Y] = -1;
@@ -95,7 +96,7 @@ namespace Game {
             destroyPos = streak;
         }
 
-        void OnFinished(Point cell, int value, EaseAnimation anim) {
+        void DoFinished(Point cell, int value, EaseAnimation anim) {
             graphicsBoard[cell.X/tileSize][cell.Y/tileSize] = value;
             lerp.Remove(anim);
         }
