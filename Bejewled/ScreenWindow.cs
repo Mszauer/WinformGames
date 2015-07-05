@@ -29,6 +29,7 @@ namespace Game {
         }
 
         public override void Initialize() {
+            bejeweled.OnSpawn += graphics.DoSpawn;
             bejeweled.Initialize(8);
             graphics.Initialize(bejeweled.logicBoard);
             //bejeweled.OnStreak += graphics.DoStreak;

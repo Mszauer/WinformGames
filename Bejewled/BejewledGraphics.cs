@@ -65,8 +65,17 @@ namespace Game {
             //Copy values from logical to graphical
             for (int x = 0; x < graphicsBoard.Length; x++) {
                 for (int y = 0; y < graphicsBoard[x].Length; y++) {
-                    graphicsBoard[x][y] = board[x][y];
+                    graphicsBoard[x][y] = -1;
                 }
+            }
+        }
+
+        public void DoSpawn(Dictionary<Point, int> spawnLoc) {
+            foreach (KeyValuePair<Point, int> kvp in spawnLoc) {
+                lerp.Add(new EaseAnimation(kvp.Value, new Point(kvp.Key.X*tileSize,kvp.Key.Y*tileSize), new Point(0,1)));
+                lerp[lerp.Count - 1].AnimationSpeed = 1.0f;
+                lerp[lerp.Count - 1].FallType = EaseAnimation.FallStyle.Scale;
+                lerp[lerp.Count - 1].OnFinished += DoFinished;
             }
         }
 
@@ -120,7 +129,12 @@ namespace Game {
             //Console.WriteLine("num lerp: " + lerp.Count);
             foreach (EaseAnimation l in lerp) {
                 if (l.cellValue >= 0) {
-                    icons[l.cellValue].Draw(g, new Point(l.currentPosition.X + xOffset, l.currentPosition.Y + yOffset));
+                    if (l.FallType == EaseAnimation.FallStyle.Scale) {
+                        icons[l.cellValue].Draw(g, new Point(l.currentPosition.X + xOffset, l.currentPosition.Y + yOffset), l.currentScale);                        
+                    }
+                    else {
+                        icons[l.cellValue].Draw(g, new Point(l.currentPosition.X + xOffset, l.currentPosition.Y + yOffset));
+                    }
                 }
             }
             foreach (Point p in destroyPos){

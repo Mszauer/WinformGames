@@ -1,4 +1,4 @@
-﻿#define DROP
+﻿//#define DROP
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,9 +16,11 @@ namespace Game {
         public SwapCallback OnSwap = null;
         public delegate void DestroyCallBack(List<Point> streakPos);
         public DestroyCallBack OnDestroy = null;
+        public delegate void OnSpawnCallback(Dictionary<Point,int> spawnloc);
+        public OnSpawnCallback OnSpawn = null;
         public delegate void FallCallback(Dictionary<Point, int> result, EaseAnimation.FinishedAnimationCallback finished);
         public FallCallback OnFall = null;
-        enum State { Idle, WaitSwap1, WaitSwap2,WaitDestroy1, WaitDestroy2,WaitFall1}
+        enum State { Idle, WaitSwap1, WaitSwap2,WaitDestroy1, WaitDestroy2,WaitFall1, WaitSpawn}
         State gameState = State.Idle;
         int[][] undoBoard = null;
 
@@ -98,13 +100,18 @@ namespace Game {
             }
 
             //Assigns values to cells, if it's 3in a row it will reassign a new value
+            Dictionary<Point, int> spawn = new Dictionary<Point, int>();
             for (int col = 0; col < logicBoard.Length; col++) {
                 for (int row = 0; row < logicBoard[col].Length; row++) {
                     logicBoard[col][row] = r.Next(0, 8);
                     while (CheckStreak(col, row).Count > 0) {
                         logicBoard[col][row] = r.Next(0, 8);
                     }
+                    spawn.Add(new Point(col, row), logicBoard[col][row]);
                 }
+            }
+            if (OnSpawn != null) {
+                OnSpawn(spawn);
             }
             //DEBUG SPAWN
 #if DROP

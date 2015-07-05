@@ -18,10 +18,16 @@ namespace Game {
         public int cellValue = 0;
         public bool done = false;
         public float AnimationSpeed = 0.375f;
-        public enum FallStyle { Linear, Bounce }; //Add style from here: http://easings.net/
+        public enum FallStyle { Linear, Bounce, Scale }; //Add style from here: http://easings.net/
         public FallStyle FallType = FallStyle.Linear;
+        public float startScale = 0f;
+        public float endScale = 1f;
+        public float currentScale = 0f;
 
         public EaseAnimation(int value, Point posStart, Point posEnd) {
+            startScale = posEnd.X;
+            endScale = posEnd.Y;
+            currentScale = startScale;
             cellValue = value;
             startPos = new Point(posStart.X, posStart.Y);
             endPos = new Point(posEnd.X, posEnd.Y);
@@ -53,6 +59,9 @@ namespace Game {
             else if (FallType == FallStyle.Bounce) {
                 currentPosition.X = (int)Easing.BounceEaseOut(time, (float)startPos.X, (float)endPos.X, AnimationSpeed);
                 currentPosition.Y = (int)Easing.BounceEaseOut(time, (float)startPos.Y, (float)endPos.Y, AnimationSpeed);
+            }
+            else if (FallType == FallStyle.Scale) {
+                currentScale = Easing.BounceEaseOut(time, startScale, endScale, AnimationSpeed);
             }
         }
     }
