@@ -100,7 +100,7 @@ namespace Game {
             graphicsBoard[cell.X/tileSize][cell.Y/tileSize] = value;
             lerp.Remove(anim);
         }
-
+        
         public void Update(float dTime){
             for (int i = lerp.Count - 1; i >= 0; i--) {
                 lerp[i].Update(dTime);
@@ -125,7 +125,6 @@ namespace Game {
             }
             foreach (Point p in destroyPos){
                 cellExplode.Render(g, new Point(p.X*tileSize + xOffset + (int)(cellExplode.W/2f), p.Y*tileSize+yOffset + (int)(cellExplode.H/2f)));
-
             }
         }
     }

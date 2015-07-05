@@ -42,5 +42,15 @@ namespace Game {
             g.DrawImage(spriteSheet, screen.Rectangle, texture.Rectangle, GraphicsUnit.Pixel);
         }
 
+        public void Draw(Graphics g, Point topLeft, float scalepercentage) {
+            Rect newScreenPos = new Rect(new Point(topLeft.X,topLeft.Y), new Size(spriteSheet.Width, spriteSheet.Height));
+            float halfW = (float)spriteSheet.Width/2f;
+            float halfH = (float)spriteSheet.Height/2f;
+            float scaleW =  scalepercentage * halfW;
+            float scaleH = scalepercentage * halfH;
+            Rect screenScaled = new Rect(new Point((int)(newScreenPos.Center.X - scaleW),(int)( newScreenPos.Center.Y - scaleH)),new Size((int)(scaleW*2f), (int)(scaleH*2f)));
+            g.DrawImage(spriteSheet, screenScaled.Rectangle, new Rect(0,0,spriteSheet.Width,spriteSheet.Height).Rectangle, GraphicsUnit.Pixel);
+        }
+
     }
 }
