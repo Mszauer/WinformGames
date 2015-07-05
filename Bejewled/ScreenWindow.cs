@@ -12,19 +12,24 @@ namespace Game {
     class ScreenWindow : GameBase {
         Bejewled bejeweled = null;
         BejewledGraphics graphics = null;
+        Sprite background = null;
+        Sprite mockBattle = null;
         public ScreenWindow() {
+            this.clearColor = Brushes.Black;
+            background = new Sprite("Assets/BackGround.png");
+            mockBattle = new Sprite("Assets/battle_mockup.png");
             width = 400;
             height = 600;
             
 #if DEBUG
-            width = 800;
-            height = 600;
+            width = 485;
+            height = 705;
 #endif
-            graphics = new BejewledGraphics(50,0,0); //tilesize,xOffset,yOffset
+            graphics = new BejewledGraphics(60,3,223); //tilesize,xOffset,yOffset
 #if UNDO
-            bejeweled = new Bejewled(8, 50, 0, 0);// random seed, tilesize, xoffset, yoffset
+            bejeweled = new Bejewled(8, 60, 3, 223);// random seed, tilesize, xoffset, yoffset
 #else
-            bejeweled = new Bejewled(Guid.NewGuid().GetHashCode());
+            bejeweled = new Bejewled(Guid.NewGuid().GetHashCode(),60,3,223);
 #endif
         }
 
@@ -56,6 +61,8 @@ namespace Game {
         
 
         public override void Render(Graphics g) {
+            mockBattle.Draw(g, new Point(0, 0));
+            background.Draw(g,new Point(0,220));
             bejeweled.Render(g);
             graphics.Render(g);
         }

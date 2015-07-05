@@ -50,7 +50,7 @@ namespace Game {
         }
 
         public int[][] logicBoard = null;
-        int tileSize = 50;
+        int tileSize = 60;
         Random r = null;
         int xOffset = 0;
         int yOffset = 0;

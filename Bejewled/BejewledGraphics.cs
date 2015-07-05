@@ -73,7 +73,7 @@ namespace Game {
         public void DoSpawn(Dictionary<Point, int> spawnLoc) {
             foreach (KeyValuePair<Point, int> kvp in spawnLoc) {
                 lerp.Add(new EaseAnimation(kvp.Value, new Point(kvp.Key.X*tileSize,kvp.Key.Y*tileSize), new Point(0,1)));
-                lerp[lerp.Count - 1].AnimationSpeed = 1.0f;
+                lerp[lerp.Count - 1].AnimationSpeed = 0.75f;
                 lerp[lerp.Count - 1].FallType = EaseAnimation.FallStyle.Scale;
                 lerp[lerp.Count - 1].OnFinished += DoFinished;
             }
