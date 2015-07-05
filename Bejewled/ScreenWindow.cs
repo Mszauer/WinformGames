@@ -42,6 +42,7 @@ namespace Game {
             //bejeweled.OnStreak += graphics.DoStreak;
             bejeweled.OnSwap += graphics.DoSwap;
             bejeweled.OnDestroy += graphics.DoDestroy;
+            bejeweled.OnDestroy += mockRPG.DoVisualAttack;
             graphics.SetExplosionFinishedCallback(bejeweled.TriggerAnimFinished);
             bejeweled.OnFall += graphics.DoFall;
             graphics.SetExplosionFinishedCallback(mockRPG.DoAttack);

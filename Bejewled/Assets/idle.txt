@@ -1,0 +1,9 @@
+@IDLE
+R 6 6 308 39
+R 3 56 312 71
+@ Tool Data
+I Assets/hand_anim.png
+O 62 62 True True
+G 0 0 255
+S 255 0 0
+P 0 False False False False
