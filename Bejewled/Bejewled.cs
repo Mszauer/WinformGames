@@ -108,6 +108,9 @@ namespace Game {
             }
             //DEBUG SPAWN
 #if DROP
+            logicBoard[0][0] = 0;
+            logicBoard[2][6] = 0;
+            logicBoard[5][7] = 0;
             logicBoard[5][5] = 4;
             logicBoard[3][5] = 1;
             logicBoard[4][0] = 6;
@@ -353,7 +356,7 @@ namespace Game {
                 }
                 if (xIndex1 > -1 && yIndex1 > -1) {
                     gameState = State.WaitDestroy2;
-                    TriggerAnimFinished();
+                    OnDestroy(CheckStreak(xIndex1, yIndex1));                
                 }
                 else {
                     gameState = State.Idle;
