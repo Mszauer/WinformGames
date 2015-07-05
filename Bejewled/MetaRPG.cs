@@ -10,6 +10,7 @@ using System.Drawing;
 namespace Game {
     class MetaRPG {
         List<Sprite> rpgBackGround = null;
+        List<Sprite> enemies = null;
         Sprite portrait = null;
         Sprite navigation = null;
         Sprite healthBar = null;
@@ -31,6 +32,7 @@ namespace Game {
         }
 
         public MetaRPG() {
+            enemies = new List<Sprite>();
             rpgBackGround = new List<Sprite>();
             healthColors = new List<Sprite>();
         }
@@ -39,6 +41,9 @@ namespace Game {
             for (int  i = 1 ; i < 24 ; i++){ //23 is the number of backgrounds
                 Sprite bg = new Sprite("Assets/w_" + i + ".png");
                 rpgBackGround.Add(bg);
+            }
+            for (int i = 1; i < 7; i++) {
+                enemies.Add(new Sprite("Assets/e" + i + ".png"));
             }
             portrait = new Sprite("Assets/portrait.png");
             navigation = new Sprite("Assets/navigation.png");
@@ -66,6 +71,12 @@ namespace Game {
             healthBar.Draw(g, new Point(355, 124));
             //health colors
             healthColors[healthIndexer].Draw_LeftScale(g, new Point(364, 127), 112f*health);
+            if (bgFrame % 5 == 0) {
+                enemies[bgFrame/5].Draw(g, new Point(354/2 - (int)(enemies[bgFrame/5].W/2), 220 - (int)enemies[bgFrame/5].H));
+            }
+            else if (bgFrame == rpgBackGround.Count - 1) {
+                enemies[enemies.Count-1].Draw(g, new Point(354/2-((int)enemies[enemies.Count-1].W/2), 220 - (int)enemies[enemies.Count-1].H));
+            }
         }
     }
 }
