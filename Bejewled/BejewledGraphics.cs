@@ -15,27 +15,33 @@ namespace Game {
         List<EaseAnimation> lerp = null; 
         List<Sprite> icons = null;
         List<Point> destroyPos = null;
-        FlipBook cellExplode = null;
+        FlipBook explosionAnim = null;
+        FlipBook selectionAnim = null;
         
         int [][] graphicsBoard = null;
         int tileSize = 0;
         int xOffset = 0;
         int yOffset = 0;
+        Point selection = default(Point);
 
         public BejewledGraphics(int tileSize,int xOffset, int yOffset) {
             lerp = new List<EaseAnimation>();
-            cellExplode = FlipBook.LoadCustom("Assets/explosion.txt",60f);
             destroyPos = new List<Point>();
-            cellExplode.Playback = FlipBook.PlaybackStyle.Single;
-            cellExplode.Anchor = FlipBook.AnchorPosition.Center;
+            icons = new List<Sprite>();
+            explosionAnim = FlipBook.LoadCustom("Assets/explosion.txt",60f);
+            selectionAnim = FlipBook.LoadCustom("Assets/sparkles.txt");
+
+            selectionAnim.Playback = FlipBook.PlaybackStyle.Loop;
+            explosionAnim.Playback = FlipBook.PlaybackStyle.Single;
+            selectionAnim.Anchor = FlipBook.AnchorPosition.TopLeft;
+            explosionAnim.Anchor = FlipBook.AnchorPosition.Center;
             this.tileSize = tileSize;
             this.xOffset = xOffset;
             this.yOffset = yOffset;
-            icons = new List<Sprite>();
             for (int i = 0; i < 8; i++) {
                 icons.Add(new Sprite("Assets/icon_" +i+".png"));
             }
-            cellExplode.AnimationFinished += this.DoExplosionFinished;
+            explosionAnim.AnimationFinished += this.DoExplosionFinished;
         }
 
         public void DoFall(Dictionary<Point, int> result, EaseAnimation.FinishedAnimationCallback finished) {
@@ -53,7 +59,7 @@ namespace Game {
         }
 
         public void SetExplosionFinishedCallback(FlipBook.AnimationFinishedCallback Callback) {
-            cellExplode.AnimationFinished += Callback;
+            explosionAnim.AnimationFinished += Callback;
         }
 
         public void Initialize(int[][] board) {
@@ -100,8 +106,13 @@ namespace Game {
 
         }
 
+        public void DoSelection(int xIndex, int yIndex){
+            selection = new Point(xIndex*tileSize, yIndex*tileSize);
+        }
+
+
         public void DoDestroy(List<Point> streak){
-            cellExplode.Reset();
+            explosionAnim.Reset();
             destroyPos = streak;
         }
 
@@ -114,10 +125,12 @@ namespace Game {
             for (int i = lerp.Count - 1; i >= 0; i--) {
                 lerp[i].Update(dTime);
             }
-            cellExplode.Update(dTime);
+            explosionAnim.Update(dTime);
+            selectionAnim.Update(dTime);
         }
 
         public void Render(Graphics g) {
+            //Draw Icons
             for (int x = 0; x < graphicsBoard.Length; x++) {
                 for (int y = 0; y < graphicsBoard[x].Length; y++) {
                     int index = graphicsBoard[x][y];
@@ -126,6 +139,7 @@ namespace Game {
                     }
                 }
             }
+            //Animations for spawn
             //Console.WriteLine("num lerp: " + lerp.Count);
             foreach (EaseAnimation l in lerp) {
                 if (l.cellValue >= 0) {
@@ -137,9 +151,15 @@ namespace Game {
                     }
                 }
             }
+            // Animation for destroy
             foreach (Point p in destroyPos){
-                cellExplode.Render(g, new Point(p.X*tileSize + xOffset + (int)(cellExplode.W/2f), p.Y*tileSize+yOffset + (int)(cellExplode.H/2f)));
+                explosionAnim.Render(g, new Point(p.X*tileSize + xOffset + (int)(explosionAnim.W/2f)-2, p.Y*tileSize+yOffset + (int)(explosionAnim.H/2f-4)));
             }
+            //Anim for selection
+            selectionAnim.Render(g, new Point(selection.X + xOffset +3, selection.Y +yOffset+ 2));
+            selectionAnim.Render(g, new Point(selection.X + xOffset +15, selection.Y + yOffset+30));
+            selectionAnim.Render(g, new Point(selection.X + xOffset +34, selection.Y + yOffset+12));
+
         }
     }
 }

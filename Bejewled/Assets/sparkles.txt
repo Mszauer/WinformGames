@@ -1,0 +1,27 @@
+@ Image size: 128x256
+@ Tile count 4x4, skip last one
+@Row1
+R 0 0 32 32
+R 32 0 32 32
+R 64 0 32 32
+R 96 0 32 32
+@Row2
+R 0 32 32 32
+R 32 32 32 32
+R 64 32 32 32
+R 96 32 32 32
+@Row3
+R 0 64 32 32
+R 32 64 32 32
+R 64 64 32 32
+R 96 64 32 32
+@Row3
+R 0 96 32 32
+R 32 96 32 32
+R 64 96 32 32
+@Tool Data
+I Assets/sparkles.png
+O 32 32 True True
+G 0 0 255
+S 255 0 0
+P 0 False False False False

@@ -20,40 +20,18 @@ namespace Game {
         public OnSpawnCallback OnSpawn = null;
         public delegate void FallCallback(Dictionary<Point, int> result, EaseAnimation.FinishedAnimationCallback finished);
         public FallCallback OnFall = null;
+        public delegate void OnSelectionCallback(int xIndex, int yIndex);
+        public OnSelectionCallback OnSelection = null;
         enum State { Idle, WaitSwap1, WaitSwap2,WaitDestroy1, WaitDestroy2,WaitFall1, WaitSpawn}
         State gameState = State.Idle;
+
         int[][] undoBoard = null;
-
-        public void RecordUndo() {
-            undoBoard = new int[logicBoard.Length][];
-            for (int i = 0; i < logicBoard.Length; ++i) {
-                undoBoard[i] = new int[logicBoard[i].Length];
-            }
-
-            for (int x = 0; x < logicBoard.Length; ++x) {
-                for (int y = 0; y < logicBoard[x].Length; ++y) {
-                    undoBoard[x][y] = logicBoard[x][y];
-                }
-            }
-        }
-
-        public void TriggerAnimFinished (){
-            AnimationFinished(default(Point), 0, null);
-        }
-
-        public void PerformUndo() {
-            for (int x = 0; x < logicBoard.Length; ++x) {
-                for (int y = 0; y < logicBoard[x].Length; ++y) {
-                    logicBoard[x][y] = undoBoard[x][y];
-                }
-            }
-        }
-
         public int[][] logicBoard = null;
         int tileSize = 60;
         Random r = null;
         int xOffset = 0;
         int yOffset = 0;
+
 #if DEBUG
         Brush[] debugJewels = new Brush[] { Brushes.Black, Brushes.Orange, Brushes.Purple, Brushes.Red, Brushes.Yellow, Brushes.Blue, Brushes.Green, Brushes.BurlyWood };
 #endif
@@ -81,6 +59,27 @@ namespace Game {
         bool hasSelection {
             get {
                 return oneSelected || twoSelected;
+            }
+        }
+
+        public void RecordUndo() {
+            undoBoard = new int[logicBoard.Length][];
+            for (int i = 0; i < logicBoard.Length; ++i) {
+                undoBoard[i] = new int[logicBoard[i].Length];
+            }
+
+            for (int x = 0; x < logicBoard.Length; ++x) {
+                for (int y = 0; y < logicBoard[x].Length; ++y) {
+                    undoBoard[x][y] = logicBoard[x][y];
+                }
+            }
+        }
+
+        public void PerformUndo() {
+            for (int x = 0; x < logicBoard.Length; ++x) {
+                for (int y = 0; y < logicBoard[x].Length; ++y) {
+                    logicBoard[x][y] = undoBoard[x][y];
+                }
             }
         }
 
@@ -143,6 +142,13 @@ namespace Game {
             }
             //
             RecordUndo();
+            if (OnSelection != null) {
+                OnSelection(-2, -1);
+            }
+        }
+
+        public void TriggerAnimFinished() {
+            AnimationFinished(default(Point), 0, null);
         }
 
         List<Point> CheckStreak(int col, int row) {
@@ -234,12 +240,14 @@ namespace Game {
                     xIndex1 = xIndex1 < logicBoard.Length ? MousePosition.X / tileSize : -1;
                     yIndex1 = (MousePosition.Y / tileSize);
                     yIndex1 = yIndex1 < logicBoard[0].Length ? MousePosition.Y / tileSize : -1;
+                    OnSelection(xIndex1, yIndex1);
                 }
                 else if (LeftMousePressed && !twoSelected) {
                     xIndex2 = ((MousePosition.X) / tileSize);
                     xIndex2 = xIndex1 < logicBoard.Length ? MousePosition.X / tileSize : -1;
                     yIndex2 = (MousePosition.Y / tileSize);
                     yIndex2 = yIndex2 < logicBoard[0].Length ? MousePosition.Y / tileSize : -1;
+                    
 
                     //checks to see if its a valid move
                     if (SelectionNeighbors()) {
@@ -248,6 +256,7 @@ namespace Game {
                         RecordUndo();
                         //visual swap
                         OnSwap(new Point(xIndex1, yIndex1), new Point(xIndex2, yIndex2), AnimationFinished, logicBoard[xIndex1][yIndex1], logicBoard[xIndex2][yIndex2]);
+                        OnSelection(-2, -1);
                         //logical swap
                         int _value = logicBoard[xIndex1][yIndex1];
                         logicBoard[xIndex1][yIndex1] = logicBoard[xIndex2][yIndex2];
@@ -263,6 +272,7 @@ namespace Game {
                         yIndex1 = yIndex2;
                         xIndex2 = -1;
                         yIndex2 = -1;
+                        OnSelection(xIndex1, yIndex1);
                     }
 
                 }
@@ -299,6 +309,7 @@ namespace Game {
                 else {
                     //Visual Swap
                     if (OnSwap != null) {
+                        OnSelection(-2, -1);
                         OnSwap(new Point(xIndex1, yIndex1), new Point(xIndex2, yIndex2), AnimationFinished, logicBoard[xIndex1][yIndex1], logicBoard[xIndex2][yIndex2]);
                     }
                     //  swap back to original
@@ -309,6 +320,7 @@ namespace Game {
                     gameState = State.WaitSwap2;
                     xIndex1 = xIndex2 = -1;
                     yIndex1 = yIndex2 = -1;
+                    OnSelection(-2, -1);
                 }
             }
             else if (gameState == State.WaitDestroy1) {
@@ -345,6 +357,7 @@ namespace Game {
                 //Deselect
                 xIndex1 = xIndex2 = -1;
                 yIndex1 = yIndex2 = -1;
+                OnSelection(-2, -1);
 
                 //check for streak
                 for (int x = 0; x < logicBoard.Length; x++) {
@@ -382,9 +395,6 @@ namespace Game {
                 }
             }
         }
-            
-
-        
 
         Dictionary<Point,int> Movedown() {
             Dictionary<Point,int> result = new Dictionary<Point,int>();
