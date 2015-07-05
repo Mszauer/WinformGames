@@ -118,7 +118,9 @@ namespace Game {
             }
             //Console.WriteLine("num lerp: " + lerp.Count);
             foreach (EaseAnimation l in lerp) {
+                if (l.cellValue >= 0) {
                     icons[l.cellValue].Draw(g, new Point(l.currentPosition.X + xOffset, l.currentPosition.Y + yOffset));
+                }
             }
             foreach (Point p in destroyPos){
                 cellExplode.Render(g, new Point(p.X*tileSize + xOffset + (int)(cellExplode.W/2f), p.Y*tileSize+yOffset + (int)(cellExplode.H/2f)));

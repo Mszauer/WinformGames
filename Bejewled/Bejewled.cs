@@ -1,4 +1,5 @@
-﻿using System;
+﻿#define DROP
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -52,7 +53,7 @@ namespace Game {
         int xOffset = 0;
         int yOffset = 0;
 #if DEBUG
-        Brush[] debugJewels = new Brush[] { Brushes.Red, Brushes.Salmon, Brushes.Teal, Brushes.Black, Brushes.White, Brushes.Purple, Brushes.Green, Brushes.Blue };
+        Brush[] debugJewels = new Brush[] { Brushes.Black, Brushes.Orange, Brushes.Purple, Brushes.Red, Brushes.Yellow, Brushes.Blue, Brushes.Green, Brushes.BurlyWood };
 #endif
 
         int xIndex1 = -1;
@@ -105,10 +106,34 @@ namespace Game {
                     }
                 }
             }
+            //DEBUG SPAWN
+#if DROP
+            logicBoard[5][5] = 4;
+            logicBoard[3][5] = 1;
+            logicBoard[4][0] = 6;
+            logicBoard[2][1] = 5;
+            logicBoard[3][1] = 1;
+            logicBoard[4][1] = 3;
+            logicBoard[2][2] = 6;
+            logicBoard[3][2] = 5;
+            logicBoard[4][2] = 5;
+            logicBoard[5][2] = 4;
+            logicBoard[3][3] = 1;
+            logicBoard[4][3] = 3;
+            logicBoard[5][3] = 4;
+            logicBoard[3][4] = 6;
+            logicBoard[4][4] = 3;
+            logicBoard[5][4] = 6;
+#endif
+            //
             RecordUndo();
         }
 
         List<Point> CheckStreak(int col, int row) {
+            if (row == -1 && col == -1) {
+                return new List<Point>();
+            }
+
             if (logicBoard[col][row] == -1) {
                 return new List<Point>() ;
             }
@@ -313,8 +338,28 @@ namespace Game {
                 xIndex1 = xIndex2 = -1;
                 yIndex1 = yIndex2 = -1;
 
-                //Put into idle state
-                gameState = State.Idle;
+                //check for streak
+                for (int x = 0; x < logicBoard.Length; x++) {
+                    for (int y = 0; y < logicBoard[x].Length; y++) {
+                        if (CheckStreak(x, y).Count >= 3) {
+                            xIndex1 = x;
+                            yIndex1 = y;
+                            break;
+                        }
+                    }
+                    if (xIndex1 > -1 && yIndex1 > -1) {
+                        break;
+                    }
+                }
+                if (xIndex1 > -1 && yIndex1 > -1) {
+                    gameState = State.WaitDestroy2;
+                    TriggerAnimFinished();
+                }
+                else {
+                    gameState = State.Idle;
+                }
+
+                
             }
         }
         public void Reset(){
