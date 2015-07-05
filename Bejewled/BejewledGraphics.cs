@@ -30,11 +30,15 @@ namespace Game {
             icons = new List<Sprite>();
             explosionAnim = FlipBook.LoadCustom("Assets/explosion.txt",60f);
             selectionAnim = FlipBook.LoadCustom("Assets/sparkles.txt");
-
+            
             selectionAnim.Playback = FlipBook.PlaybackStyle.Loop;
             explosionAnim.Playback = FlipBook.PlaybackStyle.Single;
             selectionAnim.Anchor = FlipBook.AnchorPosition.TopLeft;
             explosionAnim.Anchor = FlipBook.AnchorPosition.Center;
+
+            for (int i = 0; i < 180; i++) {
+                explosionAnim.Update(1.0f / 30f);
+            }
             this.tileSize = tileSize;
             this.xOffset = xOffset;
             this.yOffset = yOffset;

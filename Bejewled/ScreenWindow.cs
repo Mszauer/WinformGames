@@ -44,6 +44,7 @@ namespace Game {
             bejeweled.OnDestroy += graphics.DoDestroy;
             graphics.SetExplosionFinishedCallback(bejeweled.TriggerAnimFinished);
             bejeweled.OnFall += graphics.DoFall;
+            graphics.SetExplosionFinishedCallback(mockRPG.DoAttack);
         }
 
         public override void Update(float deltaTime) {

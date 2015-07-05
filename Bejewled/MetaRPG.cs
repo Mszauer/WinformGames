@@ -16,15 +16,27 @@ namespace Game {
         Sprite healthBar = null;
         List<Sprite> healthColors = null;
         int bgFrame = 0;
-        float health = 1f;
-        float timeAccum = 0f;
-        float walkFPS = 2f;
-        int healthIndexer {
+        float playerHealth = 1f;
+        float enemyHealth = 1f;
+        int enemyHealthIndexer {
             get {
-                if (health < 0.25) {
+                if (enemyHealth < 0.25) {
                     return 0;
                 }
-                else if (health < 0.5) {
+                else if (enemyHealth < 0.5) {
+                    return 1;
+                }
+                return 2;
+            }
+        }
+        float timeAccum = 0f;
+        float walkFPS = 2f;
+        int playerHealthIndexer {
+            get {
+                if (playerHealth < 0.25) {
+                    return 0;
+                }
+                else if (playerHealth < 0.5) {
                     return 1;
                 }
                 return 2;
@@ -54,13 +66,25 @@ namespace Game {
         }
 
         public void Update(float dTime) {
-            timeAccum += dTime;
+            if (enemyHealth <= 0) {
+                timeAccum += dTime;
+            }
             if (walkFPS < timeAccum) {
                 timeAccum = 0f;
                 bgFrame++;
+                if (bgFrame % 5 == 0 || bgFrame == rpgBackGround.Count-1) {
+                    enemyHealth = 1;
+                }
                 if (bgFrame > rpgBackGround.Count - 1) {
                     bgFrame = rpgBackGround.Count - 1;
                 }
+            }
+
+        }
+        public void DoAttack() {
+            enemyHealth -= 0.15f;
+            if (enemyHealth < 0) {
+                enemyHealth = 0;
             }
         }
         public void Render(Graphics g) {
@@ -70,12 +94,21 @@ namespace Game {
             navigation.Draw(g, new Point(355, 141));
             healthBar.Draw(g, new Point(355, 124));
             //health colors
-            healthColors[healthIndexer].Draw_LeftScale(g, new Point(364, 127), 112f*health);
-            if (bgFrame % 5 == 0) {
-                enemies[bgFrame/5].Draw(g, new Point(354/2 - (int)(enemies[bgFrame/5].W/2), 220 - (int)enemies[bgFrame/5].H));
-            }
-            else if (bgFrame == rpgBackGround.Count - 1) {
-                enemies[enemies.Count-1].Draw(g, new Point(354/2-((int)enemies[enemies.Count-1].W/2), 220 - (int)enemies[enemies.Count-1].H));
+            healthColors[playerHealthIndexer].Draw_LeftScale(g, new Point(364, 127), 112f*playerHealth);
+            //Enemy Health
+            if (enemyHealth > 0) {
+                if (bgFrame % 5 == 0) {
+
+                    enemies[bgFrame / 5].Draw(g, new Point(354 / 2 - (int)(enemies[bgFrame / 5].W / 2), 220 - (int)enemies[bgFrame / 5].H));
+                    healthBar.Draw(g, new Point(113, 197));
+                    healthColors[enemyHealthIndexer].Draw_LeftScale(g, new Point(122, 200), 112f * enemyHealth);
+                }
+
+                else if (bgFrame == rpgBackGround.Count - 1) {
+                    enemies[enemies.Count - 1].Draw(g, new Point(354 / 2 - ((int)enemies[enemies.Count - 1].W / 2), 220 - (int)enemies[enemies.Count - 1].H));
+                    healthBar.Draw(g, new Point(113, 197));
+                    healthColors[enemyHealthIndexer].Draw_LeftScale(g, new Point(122, 200), 112f * enemyHealth);
+                }
             }
         }
     }

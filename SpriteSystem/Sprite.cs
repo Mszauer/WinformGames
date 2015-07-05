@@ -52,10 +52,10 @@ namespace Game {
             g.DrawImage(spriteSheet, screenScaled.Rectangle, new Rect(0,0,spriteSheet.Width,spriteSheet.Height).Rectangle, GraphicsUnit.Pixel);
         }
         public void Draw_LeftScale(Graphics g, Point topLeft, float scalepercentage) {
-            Rect newScreenPos = new Rect(new Point(topLeft.X, topLeft.Y), new Size(spriteSheet.Width, spriteSheet.Height));
-            float scaleW = scalepercentage * (float)spriteSheet.Width;
+            Rect newScreenPos = new Rect(new Point(topLeft.X, topLeft.Y), new Size(1, spriteSheet.Height));
+            float scaleW = scalepercentage * 1f;
             Rect screenScaled = new Rect(topLeft, new Size((int)(scaleW), (int)(spriteSheet.Height)));
-            g.DrawImage(spriteSheet, screenScaled.Rectangle, new Rect(0, 0, spriteSheet.Width, spriteSheet.Height).Rectangle, GraphicsUnit.Pixel);
+            g.DrawImage(spriteSheet, screenScaled.Rectangle, new Rect(1, 0, 1, spriteSheet.Height).Rectangle, GraphicsUnit.Pixel);
         }
     }
 }
