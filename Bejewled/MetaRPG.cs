@@ -81,8 +81,9 @@ namespace Game {
             }
 
         }
-        public void DoAttack() {
-            enemyHealth -= 0.15f;
+        public void DoAttack(int type) {
+            Console.WriteLine(type);
+            enemyHealth -= 0.2f;
             if (enemyHealth < 0) {
                 enemyHealth = 0;
             }

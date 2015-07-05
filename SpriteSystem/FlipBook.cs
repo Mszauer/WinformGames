@@ -11,13 +11,14 @@ using System.Xml;
 
 namespace Game {
     class FlipBook {
-        public delegate void AnimationFinishedCallback();
+        public delegate void AnimationFinishedCallback(int data);
         public AnimationFinishedCallback AnimationFinished = null;
         List<Rect> subSprites = null;
         Image spriteSheet = null;
         float timeAccum = 0;
         float updateRate = 0;
         int spriteIndex = 0;
+        int extraData = 0;
         public Size spriteSize {
             get {
                 return new Size((Int32)subSprites[spriteIndex].W,
@@ -118,7 +119,7 @@ namespace Game {
                     if (Playback == PlaybackStyle.Loop) {
                         spriteIndex = 0;
                         if (AnimationFinished != null) {
-                            AnimationFinished();
+                            AnimationFinished(extraData);
                         }
                     }
                     else if (Playback == PlaybackStyle.Single){
@@ -126,7 +127,7 @@ namespace Game {
                         if (!didFinish) {
                             if (AnimationFinished != null) {
                                 didFinish = true;                        
-                                AnimationFinished();
+                                AnimationFinished(extraData);
                             }
                             else {
                                 didFinish = true;
@@ -138,7 +139,8 @@ namespace Game {
             }
         }
 
-        public void Reset() {
+        public void Reset(int ed) {
+            extraData = ed;
             spriteIndex = 0;
             didFinish = false;
         }

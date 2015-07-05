@@ -14,7 +14,7 @@ namespace Game {
 
         public delegate void SwapCallback(Point a, Point b, EaseAnimation.FinishedAnimationCallback finished, int aVal, int bVal);
         public SwapCallback OnSwap = null;
-        public delegate void DestroyCallBack(List<Point> streakPos);
+        public delegate void DestroyCallBack(List<Point> streakPos, int type);
         public DestroyCallBack OnDestroy = null;
         public delegate void OnSpawnCallback(Dictionary<Point,int> spawnloc);
         public OnSpawnCallback OnSpawn = null;
@@ -147,8 +147,8 @@ namespace Game {
             }
         }
 
-        public void TriggerAnimFinished() {
-            AnimationFinished(default(Point), 0, null);
+        public void TriggerAnimFinished(int type) {
+            AnimationFinished(default(Point), type, null);
         }
 
         List<Point> CheckStreak(int col, int row) {
@@ -293,13 +293,13 @@ namespace Game {
                     if (OnDestroy != null) {
                         List<Point> streak = CheckStreak(xIndex1, yIndex1);
                         if (streak.Count >= 3) {
-                            OnDestroy(streak);
+                            OnDestroy(streak, logicBoard[xIndex1][yIndex1]);
                             gameState = State.WaitDestroy1;
                         }
                         else {
                             streak = CheckStreak(xIndex2, yIndex2);
                             if (streak.Count >= 3) {
-                                OnDestroy(streak);
+                                OnDestroy(streak, logicBoard[xIndex1][yIndex1]);
                                 gameState = State.WaitDestroy2;
                             }
                         }
@@ -326,7 +326,7 @@ namespace Game {
             else if (gameState == State.WaitDestroy1) {
                 List<Point> streak = CheckStreak(xIndex2, yIndex2);
                 if (streak.Count >= 3) {
-                    OnDestroy(streak);
+                    OnDestroy(streak, logicBoard[xIndex2][yIndex2]);
                     gameState = State.WaitDestroy2;
                 }
                 else {
@@ -374,7 +374,7 @@ namespace Game {
                 }
                 if (xIndex1 > -1 && yIndex1 > -1) {
                     gameState = State.WaitDestroy2;
-                    OnDestroy(CheckStreak(xIndex1, yIndex1));                
+                    OnDestroy(CheckStreak(xIndex1, yIndex1), logicBoard[xIndex1][yIndex1]);                
                 }
                 else {
                     gameState = State.Idle;

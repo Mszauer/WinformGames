@@ -89,7 +89,7 @@ namespace Game {
             }
         }
 
-        public void DoExplosionFinished(){            
+        public void DoExplosionFinished(int ed){            
             foreach (Point p in destroyPos) {
                 graphicsBoard[p.X][p.Y] = -1;
             }
@@ -115,8 +115,8 @@ namespace Game {
         }
 
 
-        public void DoDestroy(List<Point> streak){
-            explosionAnim.Reset();
+        public void DoDestroy(List<Point> streak, int value){
+            explosionAnim.Reset(value);
             destroyPos = streak;
         }
 
