@@ -13,13 +13,13 @@ namespace Game {
         Bejewled bejeweled = null;
         BejewledGraphics graphics = null;
         Sprite background = null;
-        Sprite mockBattle = null;
+        MetaRPG mockRPG = null;
         public ScreenWindow() {
+            mockRPG = new MetaRPG();
             this.clearColor = Brushes.Black;
-            background = new Sprite("Assets/BackGround.png");
-            mockBattle = new Sprite("Assets/battle_mockup.png");
-            width = 400;
-            height = 600;
+            background = new Sprite("Assets/background.png");
+            width = 485;
+            height = 705;
             
 #if DEBUG
             width = 485;
@@ -34,6 +34,7 @@ namespace Game {
         }
 
         public override void Initialize() {
+            mockRPG.Initialize();
             bejeweled.OnSpawn += graphics.DoSpawn;
             bejeweled.OnSelection += graphics.DoSelection;
             bejeweled.Initialize(8);
@@ -62,8 +63,8 @@ namespace Game {
         
 
         public override void Render(Graphics g) {
-            mockBattle.Draw(g, new Point(0, 0));
-            background.Draw(g,new Point(0,220));
+            mockRPG.Render(g);
+            background.Draw(g, new Point(0,220));
             bejeweled.Render(g);
             graphics.Render(g);
         }

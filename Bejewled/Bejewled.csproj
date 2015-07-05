@@ -65,6 +65,7 @@
     <Compile Include="EaseAnimation.cs" />
     <Compile Include="Bejewled.cs" />
     <Compile Include="BejewledGraphics.cs" />
+    <Compile Include="MetaRPG.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ScreenWindow.cs" />
