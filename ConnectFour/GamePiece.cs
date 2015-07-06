@@ -22,7 +22,6 @@ namespace Game {
         }
         public void Initialize() {
             //TODO
-            r = new Rect()
         }
         public void Update(float deltaTime) {
 
