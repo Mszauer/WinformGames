@@ -22,6 +22,7 @@ namespace Game {
         Sprite win = null;
         public ScreenWindow() {
             mockRPG = new MetaRPG();
+            this.WindowIcon = new Icon("Assets/icon.ico");
             this.clearColor = Brushes.Black;
             background = new Sprite("Assets/background.png");
             gameOverNoHealth = new Sprite("Assets/gameover_no_health.png");
