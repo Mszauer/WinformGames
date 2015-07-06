@@ -22,6 +22,9 @@ namespace Game {
         public FallCallback OnFall = null;
         public delegate void OnSelectionCallback(int xIndex, int yIndex);
         public OnSelectionCallback OnSelection = null;
+        public delegate void OnNoMovesCallback();
+        public OnNoMovesCallback OnNoMoves = null;
+        
         enum State { Idle, WaitSwap1, WaitSwap2,WaitDestroy1, WaitDestroy2,WaitFall1, WaitSpawn}
         State gameState = State.Idle;
 
@@ -222,6 +225,7 @@ namespace Game {
 
         public void Update(float deltaTime, bool LeftMousePressed,Point MousePosition) {
             if (gameState == State.Idle) {
+                
                 MousePosition = new Point(MousePosition.X, MousePosition.Y);
                 MousePosition.X = MousePosition.X - xOffset;
                 MousePosition.Y = MousePosition.Y - yOffset;
@@ -277,6 +281,24 @@ namespace Game {
 
                 }
             } //end idle
+            /*else {
+                bool noMoves = true;
+                for (int x = 0; x < logicBoard.Length; x++) {
+                    for (int y = 0; y < logicBoard[x].Length; y++) {
+                        if (CheckStreak(x, y).Count >= 3) {
+                            noMoves = false;
+                            break;
+                        }
+                    }
+                    if (!noMoves) {
+                        break;
+                    }
+                }
+                if (noMoves) {
+                    OnNoMoves();
+                    return;
+                }
+            }*/
         }
 
         void AnimationFinished(Point cell, int value, EaseAnimation anim) {

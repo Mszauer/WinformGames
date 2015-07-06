@@ -9,6 +9,10 @@ using System.Drawing;
 
 namespace Game {
     class MetaRPG {
+        public delegate void OnDeathCallBack();
+        public OnDeathCallBack OnDeath = null;
+        public delegate void OnWinCallback();
+        public OnWinCallback OnWin = null;
         List<Sprite> rpgBackGround = null;
         List<Sprite> enemies = null;
         List<Sprite> minimap = null;
@@ -18,10 +22,14 @@ namespace Game {
         List<Sprite> healthColors = null;
         FlipBook attack = null;
         FlipBook idle = null;
+        Random r = null;
         int bgFrame = 0;
         float playerHealth = 1f;
         float enemyHealth = 1f;
         float attackTimer = 0f;
+        float enemyTimer = 0f;
+        float shakeTimer = 0f;
+        float attackInterval = 3.0f;
         int enemyHealthIndexer {
             get {
                 if (enemyHealth < 0.25) {
@@ -52,6 +60,7 @@ namespace Game {
             enemies = new List<Sprite>();
             rpgBackGround = new List<Sprite>();
             healthColors = new List<Sprite>();
+            r = new Random();
         }
 
         public void Initialize() {
@@ -78,7 +87,7 @@ namespace Game {
         }
 
         public void DoVisualAttack(List<Point> streakPos, int type) {
-            if (type != 3 && type != 7) {
+            if (type != 3) {
                 attackTimer = 1.0f;
             }
         }
@@ -87,6 +96,22 @@ namespace Game {
             idle.Update(dTime);
             attack.Update(dTime);
             attackTimer -= dTime;
+            shakeTimer -= dTime;
+            if (shakeTimer < 0) {
+                shakeTimer = 0;
+            }
+            if (enemyHealth > 0) {
+                enemyTimer += dTime;
+            }
+            else {
+                enemyTimer = 0;
+            }
+            if (enemyTimer > attackInterval) {
+                enemyTimer = 0;
+                playerHealth -= 0.05f;
+                shakeTimer = 0.5f;
+            }
+            
             if (attackTimer < 0) {
                 attackTimer = 0;
             }
@@ -103,18 +128,23 @@ namespace Game {
                     bgFrame = rpgBackGround.Count - 1;
                 }
             }
+            if (playerHealth <= 0) {
+                OnDeath();
+            }
 
         }
         public void DoAttack(int type) {
-            Console.WriteLine(type);
-            if (type != 3 && type != 7) {
+            if (type != 3) {
                 enemyHealth -= 0.26f;
+#if DEBUG
+                enemyHealth -= 1.0f;
+#endif
             }
             else if (type == 3) {
                 playerHealth += 0.2f;
-            }
-            else if (type == 7) {
-
+                if (playerHealth >= 1f) {
+                    playerHealth = 1f;
+                }
             }
             if (enemyHealth <= 0) {
                 enemyHealth = 0;
@@ -122,7 +152,12 @@ namespace Game {
         }
         public void Render(Graphics g) {
             //Position the HUD
-            rpgBackGround[bgFrame].Draw(g, new Point(0, 0));
+            if (shakeTimer > 0) {
+                rpgBackGround[bgFrame].Draw(g, new Point(r.Next(-2,3), r.Next(-2,3)));
+            }
+            else {
+                rpgBackGround[bgFrame].Draw(g, new Point(0, 0));
+            }
             portrait.Draw(g, new Point(355, 0));
             minimapBG.Draw(g, new Point(355, 143));
             minimap[bgFrame].Draw(g, new Point(375, 154));
@@ -143,6 +178,11 @@ namespace Game {
                     enemies[enemies.Count - 1].Draw(g, new Point(354 / 2 - ((int)enemies[enemies.Count - 1].W / 2), 220 - (int)enemies[enemies.Count - 1].H));
                     healthBar.Draw(g, new Point(113, 197));
                     healthColors[enemyHealthIndexer].Draw_LeftScale(g, new Point(122, 200), 112f * enemyHealth);
+                }
+            }
+            else {
+                if (bgFrame == rpgBackGround.Count - 1) {
+                    OnWin();
                 }
             }
             //idle or attack
