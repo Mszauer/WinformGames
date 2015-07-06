@@ -9,21 +9,25 @@ using System.Drawing;
 
 namespace Game {
     class ConnectBase : GameBase{
-        Board gameBoard = null;
+        LogicBoard gameBoard = null;
+        GamePiece piece = null;
+        List<GamePiece> pieces = null;
 
         public ConnectBase() {
             title = "Connect Four";
             width = 400;
             height = 600;
 
-            gameBoard = new Board();
-
+            gameBoard = new LogicBoard(50,0,0);
+            piece = new GamePiece(50,0,0);
+            pieces = new List<GamePiece>();
         }
         public override void Initialize() {
             gameBoard.Initialize();
+            gameBoard.OnPlace += piece.DoPlace;
         }
         public override void Update(float deltaTime) {
-        
+            gameBoard.Update(deltaTime, LeftMousePressed, MousePosition);
         }
         public override void Render(Graphics g) {
             gameBoard.Render(g);

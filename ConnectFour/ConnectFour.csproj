@@ -48,7 +48,7 @@
     </Compile>
     <Compile Include="Board.cs" />
     <Compile Include="ConnectBase.cs" />
-    <Compile Include="GamePieces.cs" />
+    <Compile Include="GamePiece.cs" />
     <Compile Include="Easing.cs" />
     <Compile Include="FlipBook.cs" />
     <Compile Include="GameBase.cs" />
