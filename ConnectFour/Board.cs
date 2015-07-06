@@ -9,11 +9,9 @@ using System.Drawing;
 
 namespace Game {
     class LogicBoard {
-        public delegate void OnPlaceCallBack (int xIndexer, int yIndexer);
-        public OnPlaceCallBack OnPlace = null;
-        enum BoardState { Idle, Place}
+        enum BoardState { Idle, Place }
         BoardState CurrentBoardState = BoardState.Idle;
-        List<Brush> cellColors = new List<Brush>() {Brushes.Black, Brushes.Red,Brushes.Blue};
+        List<Brush> cellColors = new List<Brush>() { Brushes.Black, Brushes.Red, Brushes.Blue };
         int[][] logicBoard = null;
         int tileSize = 0;
         int xIndexer = 0;
@@ -33,28 +31,56 @@ namespace Game {
                 logicBoard[i] = new int[8];
             }
 
-            
-
         }
-        public void Update(float deltaTime,bool LeftMousePressed, Point MousePosition) {
+        public void Update(float deltaTime, bool LeftMousePressed, Point MousePosition) {
             if (CurrentBoardState == BoardState.Idle) {
                 if (LeftMousePressed) {
                     //Get the x/y indexers
                     xIndexer = MousePosition.X / tileSize;
                     xIndexer = xIndexer < logicBoard.Length ? (MousePosition.X / tileSize) : -1;
-                    yIndexer = MousePosition.Y / tileSize;
-                    yIndexer = yIndexer < logicBoard[0].Length ? (MousePosition.Y / tileSize) : -1;
+                    Console.WriteLine("x Indexer: " + xIndexer);
+                    yIndexer = YPosition(xIndexer);
+                    Console.WriteLine("yIndexer: " + yIndexer);
                     //Set cell values of clicked to 1
-                    if (logicBoard[xIndexer][yIndexer] >= 0) {
+                    if (yIndexer >= 0 && logicBoard[xIndexer][yIndexer] >= 0) {
                         logicBoard[xIndexer][yIndexer] = 1;
+                        //Check if 4 in a row
+                        //if 4 win
+                        //AI takes turn
+                        //Check if 4 in a row
+                        // if 4 lose
                     }
-                    //pieces.Add(new Rect(new Point(xIndexer * tileSize, yIndexer * tileSize), new Size(tileSize, tileSize)));
-                    //CurrentBoardState = BoardState.Place;
                 }
             }
+            else if (CurrentBoardState == BoardState.Place) {
 
+            }
         }
 
+        int YPosition(int x) { // x is column
+            Console.WriteLine("YPosition calculated");
+            int yCount = 0;
+            for (int y = 0; y < logicBoard[x].Length; y++) {
+                Console.WriteLine("logicBoard[" + x + "][" + y + "] == 1:" + (logicBoard[x][y] == 1));
+                if (logicBoard[x][y] == 1) {
+                    break;
+                }
+                yCount++;
+            }
+            return yCount - 1;
+        }
+
+        bool CheckStreak(Point p) {
+            //side to side
+            for (int i = 0; i < 5; i++) {
+
+            }
+                //Up and Down
+                //Upwards Diag
+                //Downwards diag
+
+                return false;
+        }
 
         public void Render(Graphics g) {
             //visually draw logic board
