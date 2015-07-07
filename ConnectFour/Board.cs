@@ -18,13 +18,15 @@ namespace Game {
         int yIndexer = 0;
         float xOffset = 0f;
         float yOffset = 0f;
+        int boardSize = 0;
 
         public LogicBoard(int tileSize, float xOffset, float yOffset) {
             this.tileSize = tileSize;
             this.xOffset = xOffset;
             this.yOffset = yOffset;
         }
-        public void Initialize(int boardSize) {
+        public void Initialize(int size) {
+            this.boardSize = size;
             //initialize logic board,default values of 0
             logicBoard = new int[boardSize][];
             for (int i = 0; i < logicBoard.Length; i++) {
@@ -33,8 +35,14 @@ namespace Game {
 
         }
         public void Update(float deltaTime, bool LeftMousePressed, Point MousePosition, bool reset) {
+            MousePosition = new Point(MousePosition.X, MousePosition.Y);
             if (CurrentBoardState == BoardState.Idle) {
                 if (LeftMousePressed) {
+                    if (!WithinGameBoundry(MousePosition)) {
+                        return;
+                    }
+                    MousePosition.X -= (int)xOffset;
+                    MousePosition.Y -= (int)yOffset;
                     //Get the x/y indexers
                     xIndexer = MousePosition.X / tileSize;
                     xIndexer = xIndexer < logicBoard.Length ? (MousePosition.X / tileSize) : -1;
@@ -68,7 +76,14 @@ namespace Game {
             }
         }
 
-        int YPosition(int x) { 
+        bool WithinGameBoundry(Point MousePosition) {
+            if (MousePosition.X >= xOffset && MousePosition.Y >= yOffset && MousePosition.X <= xOffset + boardSize * tileSize && MousePosition.Y <= yOffset + boardSize * tileSize) {
+                return true;
+            }
+            return false;
+        }
+
+        int YPosition(int x) {
             int yCount = 0;
             //Checks to see if it's a move within bounds
             if (x >= 0 && x <= logicBoard.Length) {
@@ -89,7 +104,7 @@ namespace Game {
 
         bool CheckStreak(Point p) {
             //side to side
-            int left = StreakCounter(p, new Point(-1, 0)); 
+            int left = StreakCounter(p, new Point(-1, 0));
             int right = StreakCounter(p, new Point(1, 0));
             int horizontal = left + right + 1;
             //Up and Down
@@ -119,7 +134,7 @@ namespace Game {
                         streak++;
                     }
                 }
-            //Do until no longer a streak and within bounds
+                //Do until no longer a streak and within bounds
             } while (pos.X >= 0 && pos.Y >= 0 && pos.X < logicBoard.Length && pos.Y < logicBoard[pos.X].Length && logicBoard[pos.X][pos.Y] == value);
 
             return streak;
@@ -131,7 +146,7 @@ namespace Game {
                 for (int col = 0; col < logicBoard.Length; col++) {
                     g.DrawLine(p, new Point(col * tileSize + (int)xOffset, (int)yOffset), new Point(col * tileSize + (int)xOffset, logicBoard.Length * tileSize + (int)yOffset));
                     for (int row = 0; row < logicBoard[col].Length; row++) {
-                        g.DrawLine(p, new Point((int)xOffset, row * tileSize + (int)yOffset), new Point(row*tileSize + (int)xOffset, row * tileSize + (int)yOffset));
+                        g.DrawLine(p, new Point((int)xOffset, row * tileSize + (int)yOffset), new Point(row * tileSize + (int)xOffset, row * tileSize + (int)yOffset));
                     }
                 }
             }
