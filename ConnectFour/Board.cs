@@ -41,16 +41,21 @@ namespace Game {
                     Console.WriteLine("x Indexer: " + xIndexer);
                     yIndexer = YPosition(xIndexer);
                     Console.WriteLine("yIndexer: " + yIndexer);
-                    //Set cell values of clicked to 1
-                    if (yIndexer >= 0 && logicBoard[xIndexer][yIndexer] >= 0) {
-                        logicBoard[xIndexer][yIndexer] = 1;
-                        if (CheckStreak(new Point(xIndexer,yIndexer))) {
-                            Console.WriteLine("4 in a row");
+                    //Checks to see if it's within boundries
+                    if (xIndexer >= 0 && xIndexer <= logicBoard.Length) {
+                        //Set cell values of clicked to 1
+                        if (yIndexer >= 0 && logicBoard[xIndexer][yIndexer] >= 0) {
+                            logicBoard[xIndexer][yIndexer] = 1;
+                            //Checks to see if 4 in a row
+                            if (CheckStreak(new Point(xIndexer, yIndexer))) {
+                                //win
+                                Console.WriteLine("4 in a row");
+                            }
+                            //if 4 win
+                            //AI takes turn
+                            //Check if 4 in a row
+                            // if 4 lose
                         }
-                        //if 4 win
-                        //AI takes turn
-                        //Check if 4 in a row
-                        // if 4 lose
                     }
                 }
             }
@@ -65,17 +70,21 @@ namespace Game {
 
         int YPosition(int x) { 
             int yCount = 0;
-            // loop through Y unil it reaches a fille cell
-            for (int y = 0; y < logicBoard[x].Length; y++) {
-                // if filled break
-                if (logicBoard[x][y] == 1) {
-                    break;
+            //Checks to see if it's a move within bounds
+            if (x >= 0 && x <= logicBoard.Length) {
+                // loop through Y unil it reaches a fille cell
+                for (int y = 0; y < logicBoard[x].Length; y++) {
+                    // if filled break
+                    if (logicBoard[x][y] == 1) {
+                        break;
+                    }
+                    //if not filled counter++
+                    yCount++;
                 }
-                //if not filled counter++
-                yCount++;
+                //return index
+                return yCount - 1;
             }
-            //return index
-            return yCount - 1;
+            return yCount;
         }
 
         bool CheckStreak(Point p) {
