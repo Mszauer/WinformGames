@@ -24,15 +24,15 @@ namespace Game {
             this.xOffset = xOffset;
             this.yOffset = yOffset;
         }
-        public void Initialize() {
+        public void Initialize(int boardSize) {
             //initialize logic board,default values of 0
-            logicBoard = new int[8][];
+            logicBoard = new int[boardSize][];
             for (int i = 0; i < logicBoard.Length; i++) {
-                logicBoard[i] = new int[8];
+                logicBoard[i] = new int[boardSize];
             }
 
         }
-        public void Update(float deltaTime, bool LeftMousePressed, Point MousePosition) {
+        public void Update(float deltaTime, bool LeftMousePressed, Point MousePosition, bool reset) {
             if (CurrentBoardState == BoardState.Idle) {
                 if (LeftMousePressed) {
                     //Get the x/y indexers
@@ -44,7 +44,9 @@ namespace Game {
                     //Set cell values of clicked to 1
                     if (yIndexer >= 0 && logicBoard[xIndexer][yIndexer] >= 0) {
                         logicBoard[xIndexer][yIndexer] = 1;
-                        //Check if 4 in a row
+                        if (CheckStreak(new Point(xIndexer,yIndexer))) {
+                            Console.WriteLine("4 in a row");
+                        }
                         //if 4 win
                         //AI takes turn
                         //Check if 4 in a row
@@ -52,34 +54,66 @@ namespace Game {
                     }
                 }
             }
-            else if (CurrentBoardState == BoardState.Place) {
-
+            if (reset) {
+                for (int x = 0; x < logicBoard.Length; x++) {
+                    for (int y = 0; y < logicBoard[x].Length; y++) {
+                        logicBoard[x][y] = 0;
+                    }
+                }
             }
         }
 
-        int YPosition(int x) { // x is column
-            Console.WriteLine("YPosition calculated");
+        int YPosition(int x) { 
             int yCount = 0;
+            // loop through Y unil it reaches a fille cell
             for (int y = 0; y < logicBoard[x].Length; y++) {
-                Console.WriteLine("logicBoard[" + x + "][" + y + "] == 1:" + (logicBoard[x][y] == 1));
+                // if filled break
                 if (logicBoard[x][y] == 1) {
                     break;
                 }
+                //if not filled counter++
                 yCount++;
             }
+            //return index
             return yCount - 1;
         }
 
         bool CheckStreak(Point p) {
             //side to side
-            for (int i = 0; i < 5; i++) {
+            int left = StreakCounter(p, new Point(-1, 0)); 
+            int right = StreakCounter(p, new Point(1, 0));
+            int horizontal = left + right + 1;
+            //Up and Down
+            int vertical = StreakCounter(p, new Point(0, 1)) + StreakCounter(p, new Point(0, -1)) + 1; //Did math inline
+            //Upwards Diag
+            int diag1 = StreakCounter(p, new Point(1, 1)) + StreakCounter(p, new Point(-1, -1)) + 1;
+            //Downwards diag
+            int diag2 = StreakCounter(p, new Point(1, -1)) + StreakCounter(p, new Point(-1, 1)) + 1;
 
-            }
-                //Up and Down
-                //Upwards Diag
-                //Downwards diag
+            return horizontal >= 4 || vertical >= 4 || diag1 >= 4 || diag2 >= 4; //inline return true or false
+        }
 
-                return false;
+        int StreakCounter(Point pos, Point posDiff) {
+            //Store original value and create counter
+            int value = logicBoard[pos.X][pos.Y];
+            int streak = 0;
+            //DOWHILE
+            do {
+                //Change x/y pos based on input
+                pos.X += posDiff.X;
+                pos.Y += posDiff.Y;
+                //Checks bounds
+                if (pos.X >= 0 && pos.Y >= 0 && pos.X < logicBoard.Length && pos.Y < logicBoard[pos.X].Length) {
+                    //Check to see if they are a streak
+                    if (logicBoard[pos.X][pos.Y] == value) {
+                        //increase counter
+                        streak++;
+                    }
+                }
+            //Do until no longer a streak and within bounds
+            } while (pos.X >= 0 && pos.Y >= 0 && pos.X < logicBoard.Length && pos.Y < logicBoard[pos.X].Length && logicBoard[pos.X][pos.Y] == value);
+
+            return streak;
         }
 
         public void Render(Graphics g) {
@@ -88,7 +122,7 @@ namespace Game {
                 for (int col = 0; col < logicBoard.Length; col++) {
                     g.DrawLine(p, new Point(col * tileSize + (int)xOffset, (int)yOffset), new Point(col * tileSize + (int)xOffset, logicBoard.Length * tileSize + (int)yOffset));
                     for (int row = 0; row < logicBoard[col].Length; row++) {
-                        g.DrawLine(p, new Point((int)xOffset, row * tileSize + (int)yOffset), new Point(400 + (int)xOffset, row * tileSize + (int)yOffset));
+                        g.DrawLine(p, new Point((int)xOffset, row * tileSize + (int)yOffset), new Point(row*tileSize + (int)xOffset, row * tileSize + (int)yOffset));
                     }
                 }
             }

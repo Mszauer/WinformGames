@@ -19,10 +19,10 @@ namespace Game {
             gameBoard = new LogicBoard(50,0,0); // tile size, xOffset, yOffset
         }
         public override void Initialize() {
-            gameBoard.Initialize();
+            gameBoard.Initialize(4); // board size x*x
         }
         public override void Update(float deltaTime) {
-            gameBoard.Update(deltaTime, LeftMousePressed, MousePosition);
+            gameBoard.Update(deltaTime, LeftMousePressed, MousePosition, KeyPressed(Keys.R));
         }
         public override void Render(Graphics g) {
             gameBoard.Render(g);
