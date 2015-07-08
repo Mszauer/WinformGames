@@ -11,6 +11,7 @@ namespace Game {
     class LogicBoard {
         enum BoardState { Player_Turn, Player_Anim, Ai_Turn, Ai_Anim, Lost, Draw, Won }
         BoardState CurrentBoardState = BoardState.Player_Turn;
+        //elipse instead of rect
         Rect lerp = null;
         Rect lerp2 = null;
         List<Brush> cellColors = new List<Brush>() { Brushes.BlanchedAlmond, Brushes.Red, Brushes.Yellow };
