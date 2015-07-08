@@ -9,8 +9,9 @@ using System.Drawing;
 
 namespace Game {
     class LogicBoard {
-        enum BoardState { Idle, Place }
-        BoardState CurrentBoardState = BoardState.Idle;
+        enum BoardState { Player_Turn, Player_Anim, Ai_Turn, Ai_Anim, Lost, Draw, Won }
+        BoardState CurrentBoardState = BoardState.Player_Turn;
+        Rect lerp = null;
         List<Brush> cellColors = new List<Brush>() { Brushes.Black, Brushes.Red, Brushes.Blue };
         int[][] logicBoard = null;
         int tileSize = 0;
@@ -19,14 +20,16 @@ namespace Game {
         float xOffset = 0f;
         float yOffset = 0f;
         int boardSize = 0;
+        float timeAccum = 0;
 
         public LogicBoard(int tileSize, float xOffset, float yOffset) {
+            lerp = new Rect(new Point(tileSize * -1, tileSize * -1), new Size(tileSize, tileSize));
             this.tileSize = tileSize;
             this.xOffset = xOffset;
             this.yOffset = yOffset;
         }
         public void Initialize(int size) {
-            this.boardSize = size;
+            this.boardSize = size; // size of the grid x*x
             //initialize logic board,default values of 0
             logicBoard = new int[boardSize][];
             for (int i = 0; i < logicBoard.Length; i++) {
@@ -34,13 +37,53 @@ namespace Game {
             }
 
         }
-        public void Update(float deltaTime, bool LeftMousePressed, Point MousePosition, bool reset) {
+        public void Update(float deltaTime, bool LeftMousePressed, Point MousePosition, bool reset, bool forceAI) {
             MousePosition = new Point(MousePosition.X, MousePosition.Y);
-            if (CurrentBoardState == BoardState.Idle) {
+
+            /*
+            if (state == PLAYER_TURN) {
+                Get mouse
+                Make sure mouse is in bounds
+                Record click
+                Set target to -1
+                lerpTimer = 1.0f;
+                state = PLAYER_ANIMATE
+            }
+            else if (state = PLAYER_ANIMATE) {
+               lerpTimer -= deltaTime;
+               if (lerpTimer < 0.0f) {
+                   lerpTimer = 0.0f;
+                   Find the target that was set to -1, and set it to 1
+                   state = AI_TURN;
+               }
+               tempPos = Lerp(start, end, 1.0f - lerpTimer);
+            }
+            else if (state == AI_TURN) {
+                DO AI Turn
+                Set target to -1
+                lerpTimer = 1.0f;
+                state = AI_ANIMATE;
+            }
+            else if (state == AI_ANIMATE) {
+                lerpTimer -= deltaTime;
+               if (lerpTimer < 0.0f) {
+                   lerpTimer = 0.0f;
+                   Find the target that was set to -2, and set it to 2
+                   state = PLAYER_TURN;
+               }
+               tempPos = Lerp(start, end, 1.0f - lerpTimer);
+            }
+            
+            */
+
+
+            if (CurrentBoardState == BoardState.Player_Turn) {
                 if (LeftMousePressed) {
                     if (!WithinGameBoundry(MousePosition)) {
                         return;
                     }
+                    CurrentBoardState = BoardState.Player_Anim;
+                    //transform mouse position into valid index
                     MousePosition.X -= (int)xOffset;
                     MousePosition.Y -= (int)yOffset;
                     //Get the x/y indexers
@@ -51,28 +94,145 @@ namespace Game {
                     Console.WriteLine("yIndexer: " + yIndexer);
                     //Checks to see if it's within boundries
                     if (xIndexer >= 0 && xIndexer <= logicBoard.Length) {
+                        lerp.X = xIndexer * tileSize;
+                        lerp.Y = yIndexer * tileSize;
                         //Set cell values of clicked to 1
                         if (yIndexer >= 0 && logicBoard[xIndexer][yIndexer] >= 0) {
-                            logicBoard[xIndexer][yIndexer] = 1;
-                            //Checks to see if 4 in a row
-                            if (CheckStreak(new Point(xIndexer, yIndexer))) {
-                                //win
-                                Console.WriteLine("4 in a row");
-                            }
-                            //if 4 win
-                            //AI takes turn
-                            //Check if 4 in a row
-                            // if 4 lose
+                            logicBoard[xIndexer][yIndexer] = -1;
+
                         }
+                    }
+                    timeAccum = 1.0f;
+                }
+            }
+            else if (CurrentBoardState == BoardState.Player_Anim) {
+                timeAccum -= deltaTime;
+
+                if (timeAccum > 0) {
+                    Point lerpanim = lerpAnimation(new Point(xIndexer * tileSize, 0), new Point(xIndexer * tileSize, yIndexer * tileSize), 1.0f - timeAccum);
+                    lerp.X = lerpanim.X;
+                    lerp.Y = lerpanim.Y;
+                }
+                else {
+                    CurrentBoardState = BoardState.Ai_Turn;
+                    logicBoard[xIndexer][yIndexer] = 1;
+                    //Checks to see if 4 in a row
+                    if (CheckStreak(new Point(xIndexer, yIndexer))) {
+                        //player win
+                        CurrentBoardState = BoardState.Won;
+                    }
+                    if (IsDraw()) {
+                        CurrentBoardState = BoardState.Draw;
+                    }
+
+                }
+            }
+            else if (CurrentBoardState == BoardState.Ai_Turn) {
+                AITurn();
+                //Check if 4 in a row
+                timeAccum = 0.0f;
+                CurrentBoardState = BoardState.Ai_Anim;
+                timeAccum = 1.0f;
+            }
+            else if (CurrentBoardState == BoardState.Ai_Anim) {
+                timeAccum -= deltaTime;
+
+                if (timeAccum > 0) {
+                    Point lerpanim = lerpAnimation(new Point(xIndexer * tileSize, 0), new Point(xIndexer * tileSize, yIndexer * tileSize), 1.0f - timeAccum);
+                    lerp.X = lerpanim.X;
+                    lerp.Y = lerpanim.Y;
+                }
+                else {
+                    CurrentBoardState = BoardState.Player_Turn;
+                    logicBoard[xIndexer][yIndexer] = 2;
+                    //Checks to see if 4 in a row
+                    if (CheckStreak(new Point(xIndexer, yIndexer))) {
+                        //player win
+                        CurrentBoardState = BoardState.Won;
+                        return;
+                    }
+                    if (IsDraw()) {
+                        CurrentBoardState = BoardState.Draw;
+                        return;
                     }
                 }
             }
+            else if (CurrentBoardState == BoardState.Draw) {
+                //write out draw
+                if (LeftMousePressed || reset) {
+                    Reset();
+                }
+            }
+            else if (CurrentBoardState == BoardState.Lost) {
+                //write out lost
+                if (LeftMousePressed || reset) {
+                    Reset();
+                }
+            }
+            else if (CurrentBoardState == BoardState.Won) {
+                //write out won
+                if (LeftMousePressed || reset) {
+                    Reset();
+                }
+            }
+#if DEBUG
             if (reset) {
-                for (int x = 0; x < logicBoard.Length; x++) {
-                    for (int y = 0; y < logicBoard[x].Length; y++) {
-                        logicBoard[x][y] = 0;
+                Reset();
+            }
+
+            if (forceAI) {
+                AITurn();
+                if (CheckStreak(new Point(xIndexer, yIndexer))) {
+                    //ai win
+                    Console.WriteLine("4 in a row");
+                }
+            }
+#endif
+        }
+
+        void Reset() {
+            for (int x = 0; x < logicBoard.Length; x++) {
+                for (int y = 0; y < logicBoard[x].Length; y++) {
+                    logicBoard[x][y] = 0;
+                }
+            }
+        }
+
+        bool IsDraw() {
+            int fullCells = 0;
+            for (int x = 0; x < logicBoard.Length; x++) {
+                for (int y = 0; y < logicBoard[x].Length; y++) {
+                    if (logicBoard[x][y] > 0) {
+                        fullCells++;
                     }
                 }
+            }
+            if (fullCells == boardSize * boardSize) {
+                return true;
+            }
+            return false;
+        }
+
+        Point lerpAnimation(Point startPos, Point endPos, float dTime) {
+            float time = 0;
+            time += dTime;
+            Point currentPosition = new Point(startPos.X + (int)xOffset, startPos.Y + (int)yOffset);
+            currentPosition.X = (int)Easing.BounceEaseOut(time, (float)startPos.X + xOffset, (float)endPos.X + xOffset, 1.0f);
+            currentPosition.Y = (int)Easing.BounceEaseOut(time, (float)startPos.Y + yOffset, (float)endPos.Y + yOffset, 1.0f);
+            return currentPosition;
+        }
+
+        void AITurn() {
+            Random r = new Random();
+            xIndexer = r.Next(0, boardSize);
+            yIndexer = YPosition(xIndexer);
+            while (yIndexer == -1 && !IsDraw()) {
+                xIndexer = r.Next(0, boardSize);
+                yIndexer = YPosition(xIndexer);
+            }
+            // Can still potentially be -1, if IsDraw was true
+            if (yIndexer != -1) {
+                logicBoard[xIndexer][yIndexer] = -2;
             }
         }
 
@@ -90,7 +250,7 @@ namespace Game {
                 // loop through Y unil it reaches a fille cell
                 for (int y = 0; y < logicBoard[x].Length; y++) {
                     // if filled break
-                    if (logicBoard[x][y] == 1) {
+                    if (logicBoard[x][y] > 0) {
                         break;
                     }
                     //if not filled counter++
@@ -159,6 +319,7 @@ namespace Game {
                     }
                 }
             }
+            g.FillRectangle(Brushes.Green, lerp.Rectangle);
         }
     }
 }

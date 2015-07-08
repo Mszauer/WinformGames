@@ -27,8 +27,8 @@ namespace Game {
         public override void Update(float deltaTime) {
             //TODO
             //UPDATE ONLY IF MOUSECLICK IS IN THE BOUNDRIES OF ONE INSTANCE
-            gameBoard.Update(deltaTime, LeftMousePressed, MousePosition, KeyPressed(Keys.R));
-            gameBoard2.Update(deltaTime, LeftMousePressed, MousePosition, KeyPressed(Keys.R));
+            gameBoard.Update(deltaTime, LeftMousePressed, MousePosition, KeyPressed(Keys.R), KeyPressed(Keys.D));
+            gameBoard2.Update(deltaTime, LeftMousePressed, MousePosition, KeyPressed(Keys.R), KeyPressed(Keys.D));
         }
         public override void Render(Graphics g) {
             gameBoard.Render(g);
