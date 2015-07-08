@@ -94,8 +94,8 @@ namespace Game {
                     Console.WriteLine("yIndexer: " + yIndexer);
                     //Checks to see if it's within boundries
                     if (xIndexer >= 0 && xIndexer <= logicBoard.Length) {
-                        lerp.X = xIndexer * tileSize;
-                        lerp.Y = yIndexer * tileSize;
+                        lerp.X = xIndexer * tileSize + xOffset;
+                        lerp.Y = yIndexer * tileSize + yOffset;
                         //Set cell values of clicked to 1
                         if (yIndexer >= 0 && logicBoard[xIndexer][yIndexer] >= 0) {
                             logicBoard[xIndexer][yIndexer] = -1;
