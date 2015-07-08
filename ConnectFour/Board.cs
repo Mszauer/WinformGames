@@ -12,7 +12,9 @@ namespace Game {
         enum BoardState { Player_Turn, Player_Anim, Ai_Turn, Ai_Anim, Lost, Draw, Won }
         BoardState CurrentBoardState = BoardState.Player_Turn;
         Rect lerp = null;
-        List<Brush> cellColors = new List<Brush>() { Brushes.Black, Brushes.Red, Brushes.Blue };
+        Rect lerp2 = null;
+        List<Brush> cellColors = new List<Brush>() { Brushes.BlanchedAlmond, Brushes.Red, Brushes.Yellow };
+        Sprite visualBoard = null;
         int[][] logicBoard = null;
         int tileSize = 0;
         int xIndexer = 0;
@@ -24,6 +26,7 @@ namespace Game {
 
         public LogicBoard(int tileSize, float xOffset, float yOffset) {
             lerp = new Rect(new Point(tileSize * -1, tileSize * -1), new Size(tileSize, tileSize));
+            lerp2 = new Rect(new Point(tileSize * -1, tileSize * -1), new Size(tileSize, tileSize));
             this.tileSize = tileSize;
             this.xOffset = xOffset;
             this.yOffset = yOffset;
@@ -35,47 +38,12 @@ namespace Game {
             for (int i = 0; i < logicBoard.Length; i++) {
                 logicBoard[i] = new int[boardSize];
             }
+            //set up sprite
+            visualBoard = new Sprite("Assets/board.png");
 
         }
         public void Update(float deltaTime, bool LeftMousePressed, Point MousePosition, bool reset, bool forceAI) {
             MousePosition = new Point(MousePosition.X, MousePosition.Y);
-
-            /*
-            if (state == PLAYER_TURN) {
-                Get mouse
-                Make sure mouse is in bounds
-                Record click
-                Set target to -1
-                lerpTimer = 1.0f;
-                state = PLAYER_ANIMATE
-            }
-            else if (state = PLAYER_ANIMATE) {
-               lerpTimer -= deltaTime;
-               if (lerpTimer < 0.0f) {
-                   lerpTimer = 0.0f;
-                   Find the target that was set to -1, and set it to 1
-                   state = AI_TURN;
-               }
-               tempPos = Lerp(start, end, 1.0f - lerpTimer);
-            }
-            else if (state == AI_TURN) {
-                DO AI Turn
-                Set target to -1
-                lerpTimer = 1.0f;
-                state = AI_ANIMATE;
-            }
-            else if (state == AI_ANIMATE) {
-                lerpTimer -= deltaTime;
-               if (lerpTimer < 0.0f) {
-                   lerpTimer = 0.0f;
-                   Find the target that was set to -2, and set it to 2
-                   state = PLAYER_TURN;
-               }
-               tempPos = Lerp(start, end, 1.0f - lerpTimer);
-            }
-            
-            */
-
 
             if (CurrentBoardState == BoardState.Player_Turn) {
                 if (LeftMousePressed) {
@@ -114,6 +82,8 @@ namespace Game {
                     lerp.Y = lerpanim.Y;
                 }
                 else {
+                    lerp.X = tileSize * -1;
+                    lerp.Y = tileSize * -1;
                     CurrentBoardState = BoardState.Ai_Turn;
                     logicBoard[xIndexer][yIndexer] = 1;
                     //Checks to see if 4 in a row
@@ -139,10 +109,12 @@ namespace Game {
 
                 if (timeAccum > 0) {
                     Point lerpanim = lerpAnimation(new Point(xIndexer * tileSize, 0), new Point(xIndexer * tileSize, yIndexer * tileSize), 1.0f - timeAccum);
-                    lerp.X = lerpanim.X;
-                    lerp.Y = lerpanim.Y;
+                    lerp2.X = lerpanim.X;
+                    lerp2.Y = lerpanim.Y;
                 }
                 else {
+                    lerp2.X = tileSize * -1;
+                    lerp2.Y = tileSize * -1;
                     CurrentBoardState = BoardState.Player_Turn;
                     logicBoard[xIndexer][yIndexer] = 2;
                     //Checks to see if 4 in a row
@@ -158,21 +130,24 @@ namespace Game {
                 }
             }
             else if (CurrentBoardState == BoardState.Draw) {
-                //write out draw
+                Console.WriteLine("Draw");
                 if (LeftMousePressed || reset) {
                     Reset();
+                    CurrentBoardState = BoardState.Player_Turn;
                 }
             }
             else if (CurrentBoardState == BoardState.Lost) {
-                //write out lost
+                Console.WriteLine("Lost");
                 if (LeftMousePressed || reset) {
                     Reset();
+                    CurrentBoardState = BoardState.Player_Turn;
                 }
             }
             else if (CurrentBoardState == BoardState.Won) {
-                //write out won
+                Console.WriteLine("Won");
                 if (LeftMousePressed || reset) {
                     Reset();
+                    CurrentBoardState = BoardState.Player_Turn;
                 }
             }
 #if DEBUG
@@ -310,6 +285,7 @@ namespace Game {
                     }
                 }
             }
+
             //Fills cells with color depending on value
             for (int col = 0; col < logicBoard.Length; col++) {
                 for (int row = 0; row < logicBoard[col].Length; row++) {
@@ -319,7 +295,33 @@ namespace Game {
                     }
                 }
             }
-            g.FillRectangle(Brushes.Green, lerp.Rectangle);
+
+            //fall animation
+            g.FillRectangle(Brushes.Red, lerp.Rectangle);
+            g.FillRectangle(Brushes.Yellow, lerp2.Rectangle);
+            //Draw the visual board
+            for (int x = 0; x < logicBoard.Length; x++) {
+                for (int y = 0; y < logicBoard[x].Length; y++) {
+                    visualBoard.Draw(g, new Point(x * tileSize + (int)xOffset, y * tileSize + (int)yOffset), 1.0f);
+                }
+            }
+            //Write out win/lose/draw
+            if (CurrentBoardState == BoardState.Won) {
+                g.DrawString("You have Won!", new Font("Purisia", 20, FontStyle.Bold), Brushes.Black, new Point(logicBoard.Length * tileSize / 2 + (int)xOffset - 100, (int)yOffset + 50)); //draw in the middle of screen offsetted a bit
+                g.DrawString("You have Won!", new Font("Purisia", 20, FontStyle.Bold), Brushes.DarkViolet, new Point(logicBoard.Length * tileSize / 2 + (int)xOffset - 101, (int)yOffset + 49)); //dropshadow
+                g.DrawString("Click to Play Again", new Font("Purisia", 20, FontStyle.Bold), Brushes.Black, new Point(logicBoard.Length * tileSize / 2 + (int)xOffset - 101, (int)yOffset + 100));
+                g.DrawString("Click to Play Again", new Font("Purisia", 20, FontStyle.Bold), Brushes.DarkViolet, new Point(logicBoard.Length * tileSize / 2 + (int)xOffset - 101, (int)yOffset + 99));
+            } if (CurrentBoardState == BoardState.Lost) {
+                g.DrawString("You have Lost!", new Font("Purisia", 20, FontStyle.Bold), Brushes.Black, new Point(logicBoard.Length * tileSize / 2 + (int)xOffset - 100, (int)yOffset + 50)); //draw in the middle of screen offsetted a bit
+                g.DrawString("You have Lost!", new Font("Purisia", 20, FontStyle.Bold), Brushes.DarkViolet, new Point(logicBoard.Length * tileSize / 2 + (int)xOffset - 101, (int)yOffset + 49)); //dropshadow
+                g.DrawString("Click to Play Again", new Font("Purisia", 20, FontStyle.Bold), Brushes.Black, new Point(logicBoard.Length * tileSize / 2 + (int)xOffset - 101, (int)yOffset + 100));
+                g.DrawString("Click to Play Again", new Font("Purisia", 20, FontStyle.Bold), Brushes.DarkViolet, new Point(logicBoard.Length * tileSize / 2 + (int)xOffset - 101, (int)yOffset + 99));
+            } if (CurrentBoardState == BoardState.Draw) {
+                g.DrawString("You have a Draw!", new Font("Purisia", 20, FontStyle.Bold), Brushes.Black, new Point(logicBoard.Length * tileSize / 2 + (int)xOffset - 100, (int)yOffset + 50)); //draw in the middle of screen offsetted a bit
+                g.DrawString("You have a Draw!", new Font("Purisia", 20, FontStyle.Bold), Brushes.DarkViolet, new Point(logicBoard.Length * tileSize / 2 + (int)xOffset - 101, (int)yOffset + 49)); //dropshadow
+                g.DrawString("Click to Play Again", new Font("Purisia", 20, FontStyle.Bold), Brushes.Black, new Point(logicBoard.Length * tileSize / 2 + (int)xOffset - 101, (int)yOffset + 100));
+                g.DrawString("Click to Play Again", new Font("Purisia", 20, FontStyle.Bold), Brushes.DarkViolet, new Point(logicBoard.Length * tileSize / 2 + (int)xOffset - 101, (int)yOffset + 99));
+            }
         }
     }
 }
