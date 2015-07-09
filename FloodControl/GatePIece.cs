@@ -7,7 +7,7 @@ using Game;
 using System.Windows.Forms;
 using System.Drawing;
 
-namespace FloodControl {
+namespace Game {
     class GatePiece {
         public static string[] Types = {"Left, Right", "Top,Bottom",
                                       "Left,Top", "Top,Right","Right,Bottom",
