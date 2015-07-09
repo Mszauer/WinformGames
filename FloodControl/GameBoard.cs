@@ -83,6 +83,44 @@ namespace Game {
                     }
                 }
             }
+        }//end new pieces
+        public void ResetWater() {
+            for (int y = 0; y < BoardHeight; y++) {
+                for (int x = 0; x < gates.Length; x++) {
+                    gates[x][y].RemoveSuffix("W");
+                }
+            }
+        }
+        public void FillPiece(int x, int y) {
+            gates[x][y].AddSuffix("W");
+        }
+        public void PropagateWater(int x, int y, string fromDirection) {
+            if (y >= 0 && y < BoardHeight && x >= 0 && x < BoardWidth) {
+                if (gates[x][y].HasConnection(fromDirection) && !gates[x][y].GetSuffix.Contains("W")) {
+                    FillPiece(x, y);
+                    WaterTracker.Add(new Point(x, y));
+                    foreach (string end in gates[x][y].GetOtherEnds(fromDirection)) {
+                        //determine where opening is, find next opening
+                        switch (end) {
+                            case "Left": PropagateWater(x - 1, y, "Right");
+                                break;
+                            case "Right": PropagateWater(x + 1, y, "Left");
+                                break;
+                            case "Top": PropagateWater(x, y - 1, "Bottom");
+                                break;
+                            case "Bottom": PropagateWater(x, y + 1, "Top");
+                                break;
+                        }//end switch
+                    }//end foreach
+                }//end if loop
+            }//end y loop
+        }//end propagate
+        public List<Point> GetWaterChain(int y) {
+            //calls once for each row
+            //once filled calls move water for next square
+            WaterTracker.Clear();
+            PropagateWater(0, y, "Left");
+            return WaterTracker;
         }
     }
 }

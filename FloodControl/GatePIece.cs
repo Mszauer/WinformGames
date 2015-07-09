@@ -28,7 +28,7 @@ namespace Game {
                 return pieceType;
             }
         }
-        public string GetSuffic {
+        public string GetSuffix {
             get {
                 return pieceSuffix;
             }
