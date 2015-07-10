@@ -23,9 +23,9 @@ namespace Game {
         public FloodWindow() {
             width = 800;
             height = 600;
-            titleScreenSprite = new Sprite("Assets/title.png");
-            gameSprites = new Sprite("Assets/game_sprites.png");
-            gameBg = new Sprite("assets/game_bg.png");
+            titleScreenSprite = new Sprite("Assets/TitleScreen.png");
+            gameSprites = new Sprite("Assets/Tile_Sheet.png");
+            gameBg = new Sprite("Assets/Background.png");
             Initialize();
         }
         public override void Initialize() {

@@ -9,6 +9,7 @@ using System.Drawing;
 
 namespace Game {
     class GameBoard {
+        public Dictionary<Point, FallingPiece> fallingPieces = new Dictionary<Point, FallingPiece>();
         Random r = new Random();
         public int BoardWidth = 0;
         public int BoardHeight = 0;
@@ -20,7 +21,24 @@ namespace Game {
             BoardHeight = height;
             BoardWidth = width;
             //Generate board
+           
             ClearBoard();
+        }
+        public bool ArePiecesAnimation() {
+            return fallingPieces.Count == 0;
+        }
+        private void UpdateAnimatedPieces0(float dTime) {
+            Queue<Point> remove = new Queue<Point>();
+            foreach (Point key in fallingPieces.Keys) {
+                fallingPieces[key].UpdatePiece(dTime);
+
+                if (fallingPieces[key].VerticalOffset == 0) {
+                    remove.Enqueue(key);
+                }
+            }
+            while (remove.Count > 0) {
+                fallingPieces.Remove(remove.Dequeue());
+            }
         }
         public void ClearBoard(){
             //create board

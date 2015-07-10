@@ -59,9 +59,8 @@
     <Compile Include="..\SpriteSystem\Sprite.cs">
       <Link>Sprite.cs</Link>
     </Compile>
-    <Compile Include="FloodWindow.cs">
-      <SubType>Form</SubType>
-    </Compile>
+    <Compile Include="FallingPiece.cs" />
+    <Compile Include="FloodWindow.cs" />
     <Compile Include="GameBoard.cs" />
     <Compile Include="GatePiece.cs" />
     <Compile Include="Program.cs" />
