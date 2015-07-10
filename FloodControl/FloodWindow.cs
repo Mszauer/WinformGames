@@ -8,7 +8,7 @@ using System.Windows.Forms;
 using System.Drawing;
 
 namespace Game {
-    class FloodWindow : GameWindow {
+    class FloodWindow : GameBase {
         GameBoard gameBoard;
         GatePiece pipe;
         Point gameBoardDisplayOrigin = new Point(70, 89);
@@ -20,9 +20,9 @@ namespace Game {
         Sprite gameSprites = null;
         Sprite gameBg = null;
 
-        public void FloodWindow() {
-            Width = 800;
-            Height = 600;
+        public FloodWindow() {
+            width = 800;
+            height = 600;
             titleScreenSprite = new Sprite("Assets/title.png");
             gameSprites = new Sprite("Assets/game_sprites.png");
             gameBg = new Sprite("assets/game_bg.png");
@@ -31,7 +31,7 @@ namespace Game {
         public override void Initialize() {
             gameBoard = new GameBoard();
         }
-        public override void Update(float dTime, bool LeftMousePressed, bool RightMousePressed, bool KeyPressed) {
+        public override void Update(float dTime) {
             switch (gameState) {
                 case GameStates.TitleScreen:
                     if (KeyPressed(Keys.Space)) {
@@ -81,12 +81,12 @@ namespace Game {
                 }
             }
         }
-        void Render(Graphics g) {
+        public override void Render(Graphics g) {
             if (gameState == GameStates.TitleScreen){
-                titleScreenSprite.Draw(g,0,0,Width,Height);
+                titleScreenSprite.Draw(g,0,0,width,height);
             }
             else if (gameState == GameStates.Playing){
-                gameBg.Draw(g,0,0,Width,Height);
+                gameBg.Draw(g,0,0,width,height);
                 for (int x = 0 ; x < gameBoard.BoardWidth ; x++){
                     for (int y=0; y < gameBoard.BoardHeight ; y++){
                         int pixelX = gameBoardDisplayOrigin.X + (x*GatePiece.W);
@@ -94,7 +94,7 @@ namespace Game {
 
                         Rect screen = new Rect(pixelX,pixelY,GatePiece.W,GatePiece.H);
                         Rect texture = gameBoard.GetSubSprite(x,y);
-                        Rect empty = ; //todo
+                        Rect empty = new Rect(1,247,40,40);
 
                         //draw empty cell, background for game piece
                         gameSprites.Draw(g,screen,empty);
@@ -102,7 +102,7 @@ namespace Game {
                         gameSprites.Draw(g,screen,texture);
                     }//end y
                 }// end x
-                g.DrawString("Score: " + System.Convert.ToString(playerScore),new Font("Purisa", 20),Brushes.White,new Point(Width/2 - 75,50));
+                g.DrawString("Score: " + System.Convert.ToString(playerScore),new Font("Purisa", 20),Brushes.White,new Point(width/2 - 75,50));
             }//end playing
         }
     }

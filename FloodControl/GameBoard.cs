@@ -39,7 +39,7 @@ namespace Game {
             return gates[x][y].SubSprite();
         }
         public string GetType(int x, int y){
-            return gates[x][y].GetType;
+            return gates[x][y].GetSquare;
         }
         public void SetType(int x, int y, string pieceName){
             gates[x][y].SetPiece(pieceName);

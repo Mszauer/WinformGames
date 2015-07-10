@@ -23,7 +23,7 @@ namespace Game {
         private const int texturePaddingX = 1;
         private string pieceType = "";
         private string pieceSuffix = "";
-        public string GetType {
+        public string GetSquare {
             get {
                 return pieceType;
             }
