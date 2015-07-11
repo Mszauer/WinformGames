@@ -18,7 +18,7 @@ namespace Game {
         
 
         public void UpdatePiece(float dTime) {
-            VerticalOffset = Math.Max(0, VerticalOffset - fallRate * (int)dTime);
+            VerticalOffset = Math.Max(0, (int)((float)VerticalOffset - fallRate * dTime));
         }
     }
 }
