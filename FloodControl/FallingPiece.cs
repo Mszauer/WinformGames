@@ -10,7 +10,7 @@ using System.Drawing;
 namespace Game {
     class FallingPiece : GatePiece{
         public int VerticalOffset;
-        public static int fallRate = 5;
+        public static int fallRate = 50;
 
         public FallingPiece(string pieceType,int verticalOffset) : base(pieceType) {
         VerticalOffset = verticalOffset;

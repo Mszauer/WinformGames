@@ -13,13 +13,14 @@ namespace Game {
         GatePiece pipe;
         Point gameBoardDisplayOrigin = new Point(70, 89);
         int playerScore = 0;
-        enum GameStates { TitleScreen, Playing }
+        enum GameStates { TitleScreen, Playing, GameOver}
         GameStates gameState = GameStates.TitleScreen;
         Rectangle EmptyPiece = new Rectangle(1, 247, 40, 40);
         Sprite titleScreenSprite = null;
         Sprite gameSprites = null;
         Sprite gameBg = null;
-
+        Point gameOverLocation = new Point(200, 260);
+        float gameOverTimer = 0;
         public FloodWindow() {
             width = 800;
             height = 600;
@@ -53,6 +54,12 @@ namespace Game {
                             CheckScoringChain(gameBoard.GetWaterChain(y));
                         }
                         gameBoard.GenerateNewPieces(true);
+                    }
+                    break;
+                case GameStates.GameOver:
+                    gameOverTimer -= dTime;
+                    if (gameOverTimer <= 0) {
+                        gameState = GameStates.TitleScreen;
                     }
                     break;
             }
@@ -107,7 +114,10 @@ namespace Game {
             if (gameState == GameStates.TitleScreen){
                 titleScreenSprite.Draw(g,0,0,width,height);
             }
-            else if (gameState == GameStates.Playing){
+            else if (gameState == GameStates.Playing || gameState == GameStates.GameOver){
+                if (gameState == GameStates.GameOver) {
+                    g.DrawString("GAME OVER", new Font("Purisia", 20), Brushes.Red, gameOverLocation);
+                }
                 gameBg.Draw(g,0,0,width,height);
                 for (int x = 0 ; x < gameBoard.BoardWidth ; x++){
                     for (int y=0; y < gameBoard.BoardHeight ; y++){

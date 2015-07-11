@@ -118,6 +118,7 @@ namespace Game {
             }
         }
         public void FillPiece(int x, int y) {
+            //doesn't always work
             gates[x][y].AddSuffix("W");
         }
         public void PropagateWater(int x, int y, string fromDirection) {
@@ -132,6 +133,7 @@ namespace Game {
                                 break;
                             case "Right": PropagateWater(x + 1, y, "Left");
                                 break;
+                                //doesn't take into account hooked pieces?
                             case "Top": PropagateWater(x, y - 1, "Bottom");
                                 break;
                             case "Bottom": PropagateWater(x, y + 1, "Top");
