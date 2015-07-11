@@ -42,13 +42,18 @@ namespace Game {
                     }
                     break;
                 case GameStates.Playing:
-                    DoLeftMouseUp(LeftMousePressed,RightMousePressed);
-
-                    gameBoard.ResetWater();
-                    for (int y = 0; y < gameBoard.BoardHeight; y++) {
-                        CheckScoringChain(gameBoard.GetWaterChain(y));
+                    if (gameBoard.ArePiecesAnimating()) {
+                        gameBoard.UpdateAnimatedPieces(dTime);
                     }
-                    gameBoard.GenerateNewPieces(true);
+                    else {
+                        DoLeftMouseUp(LeftMousePressed, RightMousePressed);
+
+                        gameBoard.ResetWater();
+                        for (int y = 0; y < gameBoard.BoardHeight; y++) {
+                            CheckScoringChain(gameBoard.GetWaterChain(y));
+                        }
+                        gameBoard.GenerateNewPieces(true);
+                    }
                     break;
             }
         }
@@ -65,6 +70,23 @@ namespace Game {
                     }
                 }
             }
+        }
+        private void DrawEmptyPiece(Graphics g, int pixelX, int pixelY) {
+            Rect empty = new Rect(1, 247, 40, 40);
+            Rect screen = new Rect(pixelX, pixelY, GatePiece.W, GatePiece.H);
+            gameSprites.Draw(g, screen, empty);
+        }
+        private void DrawStandardPiece(Graphics g, int x, int y, int pixelX, int pixelY) {
+            Rect screen = new Rect(pixelX, pixelY, GatePiece.W, GatePiece.H);
+            Rect texture = gameBoard.GetSubSprite(x, y);
+            gameSprites.Draw(g, screen, texture);
+        }
+        private void DrawFallingPiece(Graphics g, int pixelX, int pixelY, Point position) {
+            pixelY -= gameBoard.fallingPieces[position].VerticalOffset;
+
+            Rect screen = new Rect(pixelX, pixelY, GatePiece.W, GatePiece.H);
+            Rect texture = gameBoard.GetSubSprite(position.X,position.Y);
+            gameSprites.Draw(g, screen, texture);
         }
         private void DoLeftMouseUp(bool LeftMousePressed, bool RightMousePressed) {
             if (!LeftMousePressed && !RightMousePressed) {
@@ -92,14 +114,15 @@ namespace Game {
                         int pixelX = gameBoardDisplayOrigin.X + (x*GatePiece.W);
                         int pixelY = gameBoardDisplayOrigin.Y + (y*GatePiece.H);
 
-                        Rect screen = new Rect(pixelX,pixelY,GatePiece.W,GatePiece.H);
-                        Rect texture = gameBoard.GetSubSprite(x,y);
-                        Rect empty = new Rect(1,247,40,40);
+                        DrawEmptyPiece(g, pixelX, pixelY);
+                        Point position = new Point(x, y);
 
-                        //draw empty cell, background for game piece
-                        gameSprites.Draw(g,screen,empty);
-                        //draw actual cell
-                        gameSprites.Draw(g,screen,texture);
+                        if (gameBoard.fallingPieces.ContainsKey(position)) {
+                            DrawFallingPiece(g, pixelX, pixelY, position);
+                        }
+                        else {
+                            DrawStandardPiece(g, x, y, pixelX, pixelY);
+                        }
                     }//end y
                 }// end x
                 g.DrawString("Score: " + System.Convert.ToString(playerScore),new Font("Purisa", 20),Brushes.White,new Point(width/2 - 75,50));

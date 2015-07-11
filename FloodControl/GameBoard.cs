@@ -27,7 +27,7 @@ namespace Game {
         public bool ArePiecesAnimation() {
             return fallingPieces.Count == 0;
         }
-        private void UpdateAnimatedPieces0(float dTime) {
+        public void UpdateAnimatedPieces(float dTime) {
             Queue<Point> remove = new Queue<Point>();
             foreach (Point key in fallingPieces.Keys) {
                 fallingPieces[key].UpdatePiece(dTime);
@@ -77,11 +77,18 @@ namespace Game {
                     SetType(x,y,GetType(x,dropAmt));
                     //set moved down to empty/null
                     SetType(x,dropAmt, "Empty");
+                    AddFallingPiece(x, y, GetType(x, y),GatePiece.H *(y-dropAmt));
                     //breaks loop if not empty
                     dropAmt = -1;
                 }
                 dropAmt--;
             }
+        }
+        public void AddFallingPiece(int x, int y, string PieceName, int VerticalOffset) {
+            fallingPieces[new Point(x, y)] = new FallingPiece(PieceName, VerticalOffset);
+        }
+        public bool ArePiecesAnimating() {
+            return fallingPieces.Count != 0;
         }
         public void GenerateNewPieces(bool dropSquares) {
             if (dropSquares) {
@@ -98,6 +105,7 @@ namespace Game {
                 for (int x = 0; x < gates.Length; x++) {
                     if (GetType(x,y) == "Empty") {
                         RandomPiece(x, y);
+                        AddFallingPiece(x, y, GetType(x, y), GatePiece.H * BoardHeight);
                     }
                 }
             }
