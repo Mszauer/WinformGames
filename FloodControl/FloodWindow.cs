@@ -21,6 +21,12 @@ namespace Game {
         Sprite gameBg = null;
         Point gameOverLocation = new Point(200, 260);
         float gameOverTimer = 0;
+        const float MaxFloodCounter = 100.0f;
+        float floodCount = 0.0f;
+        float timeSinceLastFloodIncease = 0.0f;
+        float timeBetweenFloodIncreases = 1.0f;
+        float floodIncreaseAmount = 0.5f;
+
         public FloodWindow() {
             width = 800;
             height = 600;
@@ -55,6 +61,8 @@ namespace Game {
                         }
                         gameBoard.GenerateNewPieces(true);
                     }
+                    timeSinceLastFloodIncease += dTime;
+
                     break;
                 case GameStates.GameOver:
                     gameOverTimer -= dTime;
