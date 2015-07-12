@@ -13,8 +13,10 @@ namespace Game {
                                       "Left,Top", "Top,Right","Right,Bottom",
                                       "Bottom,Left", "Empty"};
          */
-        public enum Types { LeftRight,TopBottom,LeftTop,TopRight,RightBottom,BottomLeft,Empty}
+        public enum Types { LeftRight, TopBottom, LeftTop, TopRight, RightBottom, BottomLeft, Empty }
         public Types Type = Types.Empty;
+        public enum Ends { Left, Right, Bottom, Top, Empty }
+        //public Ends Opening = Ends.Empty;
         public const int H = 40;
         public const int W = 40;
         public const int MaxIndex = 5;
@@ -51,13 +53,13 @@ namespace Game {
         public void SetPiece(bool filled) {
             SetPiece(Type, filled);
         }
-        public void AddSuffix(string suffix) {
+        /*public void AddSuffix(string suffix) {
             //if piece already contains suffix do nothing, else change suffix
             if (!pieceSuffix.Contains(suffix)) {
                 pieceSuffix += suffix;
             }
         }
-        /* turn it to false
+         turn it to false
         public void RemoveSuffix(string suffix) {
             //removes passed in suffix
             pieceSuffix = pieceSuffix.Replace(suffix, "");
@@ -66,13 +68,13 @@ namespace Game {
             // takes in a piecetype, and rotates the openings (also depends if clockwise or not) 
             // IE openings that open left/right get switched to top/bottom
             switch (Type) {
-                case Type = Types.LeftRight:
+                case Types.LeftRight:
                     Type = Types.TopBottom;
                     break;
-                case Type = Types.TopBottom:
+                case Types.TopBottom:
                     Type = Types.LeftRight;
                     break;
-                case Type = Types.LeftTop:
+                case Types.LeftTop:
                     if (Clockwise) {
                         Type = Types.TopRight;
                     }
@@ -80,7 +82,7 @@ namespace Game {
                         Type = Types.BottomLeft; ;
                     }
                     break;
-                case Type = Types.TopRight:
+                case Types.TopRight:
                     if (Clockwise) {
                         Type = Types.RightBottom;
                     }
@@ -88,7 +90,7 @@ namespace Game {
                         Type = Types.LeftTop;
                     }
                     break;
-                case Type = Types.RightBottom:
+                case Types.RightBottom:
                     if (Clockwise) {
                         Type = Types.BottomLeft;
                     }
@@ -96,7 +98,7 @@ namespace Game {
                         Type = Types.TopRight;
                     }
                     break;
-                case Type = Types.BottomLeft:
+                case Types.BottomLeft:
                     if (Clockwise) {
                         Type = Types.LeftTop;
                     }
@@ -104,27 +106,121 @@ namespace Game {
                         Type = Types.RightBottom;
                     }
                     break;
-                case Type = Types.Empty:
+                case Types.Empty:
                     break;
             }//end switch
         }//end rotate piece
-        public string[] GetOtherEnds(string startingEnd) {
-            //create a list and loop through it
-            List<string> opposites = new List<string>();
-            foreach (string end in pieceType.Split(',')) {
-                //returns a list of openings for this piece
-                //does not return opening passed into here
-                if (end != startingEnd) {
-                    opposites.Add(end);
+
+        public Ends[] GetOtherEnds(Ends startingEnd) {
+            List<Ends> result = new List<Ends>();
+
+            // Basically, this returns an array with the connections in the piece
+            // So if the piece is top left, this should return Top and Left
+            // But it should NOT return whatever startingEnd is.
+
+            if (Type == Types.LeftRight) { // Type is LeftRight, so try to add Left and Right
+                if (startingEnd != Ends.Left) { // If the startingEnd arg is not left
+                    result.Add(Ends.Left); // Add Left
+                }
+                if (startingEnd != Ends.Right) { // If the starting End arg is not right
+                    result.Add(Ends.Right); // Add Right
                 }
             }
-            //convert to an array because the end types is also an array
-            return opposites.ToArray();
+            if (Type == Types.TopBottom) {
+                if (startingEnd != Ends.Top) {
+                    result.Add(Ends.Top);
+                }
+                if (startingEnd != Ends.Bottom) {
+                    result.Add(Ends.Bottom);
+                }
+            }
+
+            if (Type == Types.LeftTop) {
+                if (startingEnd != Ends.Left) {
+                    result.Add(Ends.Left);
+                }
+                if (startingEnd != Ends.Top) {
+                    result.Add(Ends.Top);
+                }
+            }
+            if (Type == Types.TopRight) {
+                if (startingEnd != Ends.Top) {
+                    result.Add(Ends.Top);
+                }
+                if (startingEnd != Ends.Right) {
+                    result.Add(Ends.Right);
+                }
+            }
+            if (Type == Types.RightBottom) {
+                if (startingEnd != Ends.Right) {
+                    result.Add(Ends.Right);
+                }
+                if (startingEnd != Ends.Bottom) {
+                    result.Add(Ends.Bottom);
+                }
+            }
+            if (Type == Types.BottomLeft) {
+                if (startingEnd != Ends.Bottom) {
+                    result.Add(Ends.Bottom);
+                } // Not else
+                if (startingEnd != Ends.Left) {
+                    result.Add(Ends.Left);
+                }
+            }
+
+            return result.ToArray();
         }
-        public bool HasConnection(string direction){
-            //checks to see if openings match
-            return pieceType.Contains(direction);
+
+        public bool HasConnection(Ends direction) {
+
+            if (Type == Types.LeftRight && (direction == Ends.Left || direction == Ends.Right)) {
+                return true;
+            }
+            if (Type == Types.TopBottom && (direction == Ends.Top || direction == Ends.Bottom)) {
+                return true;
+            }
+            if (Type == Types.LeftTop && (direction == Ends.Left || direction == Ends.Top)) {
+                return true;
+            }
+            if (Type == Types.TopRight && (direction == Ends.Top || direction == Ends.Right)) {
+                return true;
+            }
+            if (Type == Types.RightBottom && (direction == Ends.Right || direction == Ends.Bottom)) {
+                return true;
+            }
+            if (Type == BottomLeft && (direction == Ends.Bottom || direction == Ends.Left)) {
+                return true;
+            }
+            return false;
+
         }
+
+        private int IndexOf(Types type) {
+            if (type == Types.LeftRight) {
+                return 0;
+            }
+            else if (type == Types.TopBottom) {
+                return 1;
+            }
+            else if (type == Types.LeftTop) {
+                return 2;
+            }
+            else if (type == Types.TopRight) {
+                return 3;
+            }
+            else if (type == Types.RightBottom) {
+                return 4;
+            }
+            else if (type == Types.BottomLeft) {
+                return 5;
+            }
+            else if (type == Types.Empty) {
+                return 6;
+            }
+
+            return -1; // Default
+        }
+
         public Rect SubSprite() {
             //returns part of spritesheet to draw
             int x = textureOffsetX;
@@ -135,7 +231,7 @@ namespace Game {
                 x += W + texturePaddingX;
             }
             //matches index of type and multiplies it by H+padding
-            y += Array.IndexOf(Types, pieceType) * (H + texturePaddingY);
+            y += IndexOf(Type) * (H + texturePaddingY);
             return new Rect(x, y, W, H);
         }
     }//end class
