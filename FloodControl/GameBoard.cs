@@ -46,7 +46,7 @@ namespace Game {
             for (int col = 0 ; col < gates.Length ; ++col){
                gates[col] = new GatePiece[BoardHeight];
                 for (int row = 0 ; row < gates[col].Length ; row++){
-                    gates[col][row] = new GatePiece("Empty");
+                    gates[col][row] = new GatePiece(Empty);
                 }
             }
         }
@@ -113,17 +113,16 @@ namespace Game {
         public void ResetWater() {
             for (int y = 0; y < BoardHeight; y++) {
                 for (int x = 0; x < gates.Length; x++) {
-                    gates[x][y].RemoveSuffix("W");
+                    gates[x][y].IsFilled = false;
                 }
             }
         }
         public void FillPiece(int x, int y) {
-            //doesn't always work
-            gates[x][y].AddSuffix("W");
+            gates[x][y].IsFilled = true;
         }
         public void PropagateWater(int x, int y, string fromDirection) {
             if (y >= 0 && y < BoardHeight && x >= 0 && x < BoardWidth) {
-                if (gates[x][y].HasConnection(fromDirection) && !gates[x][y].GetSuffix.Contains("W")) {
+                if (gates[x][y].HasConnection(fromDirection) && !gates[x][y].IsFilled) {
                     FillPiece(x, y);
                     WaterTracker.Add(new Point(x, y));
                     foreach (string end in gates[x][y].GetOtherEnds(fromDirection)) {

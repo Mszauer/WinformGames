@@ -12,7 +12,7 @@ namespace Game {
         public int VerticalOffset;
         public static int fallRate = 50;
 
-        public FallingPiece(string pieceType,int verticalOffset) : base(pieceType) {
+        public FallingPiece(Types pieceType,int verticalOffset) : base(pieceType) {
         VerticalOffset = verticalOffset;
         }
         
