@@ -46,7 +46,7 @@ namespace Game {
             for (int col = 0 ; col < gates.Length ; ++col){
                gates[col] = new GatePiece[BoardHeight];
                 for (int row = 0 ; row < gates[col].Length ; row++){
-                    gates[col][row] = new GatePiece(Empty);
+                    gates[col][row] = new GatePiece(GatePiece.Types.Empty, false);
                 }
             }
         }
@@ -56,27 +56,27 @@ namespace Game {
         public Rect GetSubSprite(int x, int y){
             return gates[x][y].SubSprite();
         }
-        public string GetType(int x, int y){
-            return gates[x][y].GetSquare;
+        public GatePiece.Types GetType(int x, int y){
+            return gates[x][y].Type;
         }
-        public void SetType(int x, int y, string pieceName){
-            gates[x][y].SetPiece(pieceName);
+        public void SetType(int x, int y, GatePiece.Types pieceType){
+            gates[x][y].SetPiece(pieceType, false);
         }
-        public bool HasConnector(int x, int y, string direction){
+        public bool HasConnector(int x, int y, GatePiece.Ends direction){
             return gates[x][y].HasConnection(direction);
         }
         public void RandomPiece(int x, int y){
-            gates[x][y].SetPiece(GatePiece.Types[r.Next(0,GatePiece.MaxIndex+1)]);
+            gates[x][y].SetPiece(GatePiece.RandomInt(r.Next(0,GatePiece.MaxIndex)),false);
         }
         public void DropDown (int x, int y){
             //Get amount to move down
             int dropAmt = y-1;
             while (dropAmt >=0){
                 //if piece isn't null / empty then move down
-                if (GetType(x,dropAmt) != "Empty"){
+                if (GetType(x,dropAmt) != GatePiece.Types.Empty){
                     SetType(x,y,GetType(x,dropAmt));
                     //set moved down to empty/null
-                    SetType(x,dropAmt, "Empty");
+                    SetType(x, dropAmt, GatePiece.Types.Empty);
                     AddFallingPiece(x, y, GetType(x, y),GatePiece.H *(y-dropAmt));
                     //breaks loop if not empty
                     dropAmt = -1;
@@ -84,8 +84,8 @@ namespace Game {
                 dropAmt--;
             }
         }
-        public void AddFallingPiece(int x, int y, string PieceName, int VerticalOffset) {
-            fallingPieces[new Point(x, y)] = new FallingPiece(PieceName, VerticalOffset);
+        public void AddFallingPiece(int x, int y, GatePiece.Types PieceType, int VerticalOffset) {
+            fallingPieces[new Point(x, y)] = new FallingPiece(PieceType, VerticalOffset);
         }
         public bool ArePiecesAnimating() {
             return fallingPieces.Count != 0;
@@ -94,7 +94,7 @@ namespace Game {
             if (dropSquares) {
                 for (int x = 0; x < gates.Length; x++) {
                     for (int y = gates[x].Length - 1; y >= 0; y--) {
-                        if (GetType(x, y) == "Empty") {
+                        if (GetType(x, y) == GatePiece.Types.Empty) {
                             DropDown(x, y);
                         }
                     }
@@ -103,7 +103,7 @@ namespace Game {
 
             for (int y = 0; y < BoardHeight; y++) {
                 for (int x = 0; x < gates.Length; x++) {
-                    if (GetType(x,y) == "Empty") {
+                    if (GetType(x,y) == GatePiece.Types.Empty) {
                         RandomPiece(x, y);
                         AddFallingPiece(x, y, GetType(x, y), GatePiece.H * BoardHeight);
                     }
@@ -120,22 +120,21 @@ namespace Game {
         public void FillPiece(int x, int y) {
             gates[x][y].IsFilled = true;
         }
-        public void PropagateWater(int x, int y, string fromDirection) {
+        public void PropagateWater(int x, int y, GatePiece.Ends fromDirection) {
             if (y >= 0 && y < BoardHeight && x >= 0 && x < BoardWidth) {
                 if (gates[x][y].HasConnection(fromDirection) && !gates[x][y].IsFilled) {
                     FillPiece(x, y);
                     WaterTracker.Add(new Point(x, y));
-                    foreach (string end in gates[x][y].GetOtherEnds(fromDirection)) {
+                    foreach (GatePiece.Ends end in gates[x][y].GetOtherEnds(fromDirection)) {
                         //determine where opening is, find next opening
                         switch (end) {
-                            case "Left": PropagateWater(x - 1, y, "Right");
+                            case GatePiece.Ends.Left: PropagateWater(x - 1, y, GatePiece.Ends.Right);
                                 break;
-                            case "Right": PropagateWater(x + 1, y, "Left");
+                            case GatePiece.Ends.Right: PropagateWater(x + 1, y, GatePiece.Ends.Left);
                                 break;
-                                //doesn't take into account hooked pieces?
-                            case "Top": PropagateWater(x, y - 1, "Bottom");
+                            case GatePiece.Ends.Top: PropagateWater(x, y - 1, GatePiece.Ends.Bottom);
                                 break;
-                            case "Bottom": PropagateWater(x, y + 1, "Top");
+                            case GatePiece.Ends.Bottom: PropagateWater(x, y + 1, GatePiece.Ends.Top);
                                 break;
                         }//end switch
                     }//end foreach
@@ -146,7 +145,7 @@ namespace Game {
             //calls once for each row
             //once filled calls move water for next square
             WaterTracker.Clear();
-            PropagateWater(0, y, "Left");
+            PropagateWater(0, y, GatePiece.Ends.Left);
             return WaterTracker;
         }
     }

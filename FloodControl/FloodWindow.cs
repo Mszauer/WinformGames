@@ -105,7 +105,7 @@ namespace Game {
                         floodCount = 0.0f;
                     }
                     foreach (Point ScoringSquare in WaterChain) {
-                        gameBoard.SetType(ScoringSquare.X, ScoringSquare.Y, "Empty")
+                        gameBoard.SetType(ScoringSquare.X, ScoringSquare.Y, GatePiece.Types.Empty);
                     }
                     if (linesCompletedThisLevel >= 10) {
                         StartNewLevel();

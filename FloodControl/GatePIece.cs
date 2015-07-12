@@ -64,6 +64,28 @@ namespace Game {
             //removes passed in suffix
             pieceSuffix = pieceSuffix.Replace(suffix, "");
         }*/
+        public static Types RandomInt(int index) {
+            if (index == 0) {
+                return Types.LeftRight;
+            }
+            else if (index == 1) {
+                return Types.TopBottom;
+            }
+            else if (index == 2) {
+                return Types.LeftTop;
+            }
+            else if (index == 3) {
+                return Types.TopRight;
+            }
+            else if (index == 4) {
+                return Types.RightBottom;
+            }
+            else if (index == 5) {
+                return Types.BottomLeft;
+            }
+            return Types.Empty;
+        }
+
         public void RotatePiece(bool Clockwise) {
             // takes in a piecetype, and rotates the openings (also depends if clockwise or not) 
             // IE openings that open left/right get switched to top/bottom
@@ -188,7 +210,7 @@ namespace Game {
             if (Type == Types.RightBottom && (direction == Ends.Right || direction == Ends.Bottom)) {
                 return true;
             }
-            if (Type == BottomLeft && (direction == Ends.Bottom || direction == Ends.Left)) {
+            if (Type == Types.BottomLeft && (direction == Ends.Bottom || direction == Ends.Left)) {
                 return true;
             }
             return false;
