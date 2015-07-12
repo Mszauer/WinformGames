@@ -9,7 +9,7 @@ using System.Drawing;
 
 namespace Game {
     class GatePiece {
-        public static string[] Types = {"Left, Right", "Top,Bottom",
+        public static string[] Types = {"Left,Right", "Top,Bottom",
                                       "Left,Top", "Top,Right","Right,Bottom",
                                       "Bottom,Left", "Empty"};
 
