@@ -23,9 +23,13 @@ namespace Game {
         float gameOverTimer = 0;
         const float MaxFloodCounter = 100.0f;
         float floodCount = 0.0f;
-        float timeSinceLastFloodIncease = 0.0f;
+        float timeSinceLastFloodIncrease = 0.0f;
         float timeBetweenFloodIncreases = 1.0f;
         float floodIncreaseAmount = 0.5f;
+        const int MaxWaterHeight = 244;
+        const int WaterWidth = 297;
+        Point waterOverlayStart = new Point(85, 245);
+        Point waterPosition = new Point(478, 338);
 
         public FloodWindow() {
             width = 800;
@@ -61,7 +65,15 @@ namespace Game {
                         }
                         gameBoard.GenerateNewPieces(true);
                     }
-                    timeSinceLastFloodIncease += dTime;
+                    timeSinceLastFloodIncrease += dTime;
+                    if (timeSinceLastFloodIncrease >= timeBetweenFloodIncreases) {
+                        floodCount += floodIncreaseAmount;
+                        timeSinceLastFloodIncrease = 0.0f;
+                        if (floodCount >= MaxFloodCounter) {
+                            gameOverTimer = 8.0f;
+                            gameState = GameStates.GameOver;
+                        }
+                    }
 
                     break;
                 case GameStates.GameOver:
@@ -80,11 +92,25 @@ namespace Game {
                 Point LastPipe = WaterChain[WaterChain.Count - 1];
                 if (LastPipe.X == gameBoard.BoardWidth - 1) {
                     playerScore += DetermineScore(WaterChain.Count);
+                    //Clamp floodCount to 0 and max flood counter
+                    if ((floodCount - (DetermineScore(WaterChain.Count) / 10) > MaxFloodCounter)) {
+                        floodCount = 100.0f;
+                    }
+                    else if ((floodCount - (DetermineScore(WaterChain.Count) / 10) < 0.0f)) {
+                        floodCount = 0.0f;
+                    }
                     foreach (Point ScoringSquare in WaterChain) {
                         gameBoard.SetType(ScoringSquare.X, ScoringSquare.Y, "Empty");
                     }
                 }
             }
+        }
+        private void Draw(Graphics g) {
+            int waterHeight = (int)(MaxWaterHeight * (floodCount / 100));
+            Rect screen = new Rect(waterPosition.X, waterPosition.Y + (MaxWaterHeight - waterHeight), WaterWidth, waterHeight);
+            Rect texture = new Rect(waterOverlayStart.X, waterOverlayStart.Y + (MaxWaterHeight - waterHeight), WaterWidth, waterHeight);
+
+            gameSprites.Draw(g, screen, texture);
         }
         private void DrawEmptyPiece(Graphics g, int pixelX, int pixelY) {
             Rect empty = new Rect(1, 247, 40, 40);
@@ -143,6 +169,7 @@ namespace Game {
                         }
                     }//end y
                 }// end x
+                Draw(g);
                 g.DrawString("Score: " + System.Convert.ToString(playerScore),new Font("Purisa", 20),Brushes.White,new Point(width/2 - 75,50));
             }//end playing
         }
