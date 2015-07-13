@@ -76,29 +76,29 @@ namespace Game {
             this.yOffset = yOffset;
         }
 
-        public Point Neighbor(Directions direction) {
+        public Point GetNeighborIndex(Directions direction) {
             if (yIndexer % 2 == 0) {//even row
                 switch (direction) {
                     case Directions.NorthEast:
-                        return new Point((int)xIndexer + 1, (int)yIndexer - 1);
-                    case Directions.NorthWest:
                         return new Point((int)xIndexer, (int)yIndexer - 1);
+                    case Directions.NorthWest:
+                        return new Point((int)xIndexer-1, (int)yIndexer - 1);
                     case Directions.East:
                         return new Point((int)xIndexer + 1, (int)yIndexer);
                     case Directions.West:
                         return new Point((int)xIndexer - 1, (int)yIndexer);
                     case Directions.SouthEast:
-                        return new Point((int)xIndexer + 1, (int)yIndexer + 1);
-                    case Directions.SouthWest:
                         return new Point((int)xIndexer, (int)yIndexer + 1);
+                    case Directions.SouthWest:
+                        return new Point((int)xIndexer-1, (int)yIndexer + 1);
                 }
             }
             else {
                 switch (direction) { //odd row
                     case Directions.NorthEast:
-                        return new Point((int)xIndexer, (int)yIndexer - 1);
+                        return new Point((int)xIndexer+1, (int)yIndexer - 1);
                     case Directions.NorthWest:
-                        return new Point((int)xIndexer - 1, (int)yIndexer - 1);
+                        return new Point((int)xIndexer , (int)yIndexer - 1);
                     case Directions.East:
                         return new Point((int)xIndexer + 1, (int)yIndexer);
                     case Directions.West:
@@ -106,19 +106,19 @@ namespace Game {
                     case Directions.SouthEast:
                         return new Point((int)xIndexer + 1, (int)yIndexer + 1);
                     case Directions.SouthWest:
-                        return new Point((int)xIndexer - 1, (int)yIndexer + 1);
+                        return new Point((int)xIndexer , (int)yIndexer + 1);
                 }
             }
             return new Point(-1, -1);
         }
-        public List<Point> Neighbors() {
+        public List<Point> GetNeighborIndixes() {
             List<Point> result = new List<Point>();
-            result.Add(Neighbor(Directions.NorthWest));
-            result.Add(Neighbor(Directions.NorthEast));
-            result.Add(Neighbor(Directions.East));
-            result.Add(Neighbor(Directions.West));
-            result.Add(Neighbor(Directions.SouthEast));
-            result.Add(Neighbor(Directions.SouthWest));
+            result.Add(GetNeighborIndex(Directions.NorthWest));
+            result.Add(GetNeighborIndex(Directions.NorthEast));
+            result.Add(GetNeighborIndex(Directions.East));
+            result.Add(GetNeighborIndex(Directions.West));
+            result.Add(GetNeighborIndex(Directions.SouthEast));
+            result.Add(GetNeighborIndex(Directions.SouthWest));
             return result;
         }
         public static Point TileAt(Point worldCoordinate, float radius) {
