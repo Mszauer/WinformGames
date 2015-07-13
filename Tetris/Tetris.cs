@@ -209,6 +209,18 @@ namespace Game {
             }
             else if (currentState == GameState.over) {
                 isGameOver = true;
+                if (KeyPressed(Keys.R)) {
+                    for (int x = board.Length-1; x >= 0; x-- ){
+                        for(int y = board[x].Length-1; y >= 0 ; y--){
+                            board[x][y] = 0;
+                        }
+                    }
+                    isGameOver = false;
+                    Initialize();
+                    //initialize?
+                    currentState = GameState.update;
+
+                }
             }
             else if (currentState == GameState.update) {
                 if (KeyPressed(Keys.Up)) {
@@ -454,6 +466,8 @@ namespace Game {
             if (isGameOver) {
                 g.DrawString("Game Over ", new Font("Purisa", 50), Brushes.Black, new Point(boardSize.Width * size / 2 - 102, boardSize.Height * size / 2+2));
                 g.DrawString("Game Over ", new Font("Purisa", 50), Brushes.White, new Point(boardSize.Width * size / 2 - 100, boardSize.Height * size / 2));
+                g.DrawString("Press R to Replay", new Font("Purisa", 30), Brushes.Black, new Point(boardSize.Width * size / 2 - 87, boardSize.Height * size / 2 + 100));
+                g.DrawString("Press R to Replay", new Font("Purisa", 30), Brushes.White, new Point(boardSize.Width * size / 2 - 85, boardSize.Height * size / 2 + 100));
             }
         }
 
