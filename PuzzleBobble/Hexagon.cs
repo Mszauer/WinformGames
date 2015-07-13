@@ -16,6 +16,8 @@ namespace Game {
         private float h = 0f;
         private float rowH = 0f;
         private float radius = 0f;
+        float xOffset = 0f;
+        float yOffset = 0f;
         public float W {
             get {
                 return w;
@@ -51,15 +53,15 @@ namespace Game {
         Point Origin {
             get {
                 //sets x to 0 or halfW(an offset) based on if Y is divisble by 2
-                int x = (int)(xIndexer * w) + (int)((yIndexer % 2 == 1) ? halfW : 0);
-                int y = (int)(yIndexer * rowH);
+                int x = (int)(xIndexer * w + xOffset) + (int)((yIndexer % 2 == 1) ? halfW : 0);
+                int y = (int)(yIndexer * rowH + yOffset);
                 return new Point(x, y);
             }
         }
         Point Center {
             get {
-                int x = (int)(xIndexer * W + halfW) + (int)((yIndexer % 2 == 1) ? halfW : 0);
-                int y = (int)(yIndexer*rowH +rowH/2);
+                int x = (int)(xIndexer * W + halfW + xOffset) + (int)((yIndexer % 2 == 1) ? halfW : 0);
+                int y = (int)(yIndexer*rowH +rowH/2+yOffset);
                 return new Point(x, y);
             }
         }
@@ -68,8 +70,10 @@ namespace Game {
         //end member variables
 
 
-        public Hexagon(float radius) {
+        public Hexagon(float radius,float xOffset = 0, float yOffset = 0) {
             Radius = radius;
+            this.xOffset = xOffset;
+            this.yOffset = yOffset;
         }
 
         public Point Neighbor(Directions direction) {
@@ -107,7 +111,7 @@ namespace Game {
             }
             return new Point(-1, -1);
         }
-        public List<Point> Neighbores() {
+        public List<Point> Neighbors() {
             List<Point> result = new List<Point>();
             result.Add(Neighbor(Directions.NorthWest));
             result.Add(Neighbor(Directions.NorthEast));

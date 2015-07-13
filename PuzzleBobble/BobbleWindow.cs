@@ -11,23 +11,24 @@ namespace Game {
     class BobbleWindow : GameBase {
         List<Hexagon> Hexagons = null;
         int[][] board = null;
-        float hexRadius = 20.0f; // set radius of hexagons
-        int boardSize = 5;
+        float hexRadius = 20.0f; // set size of hexagons
+        int boardWidth = 5; // # of hexagons on x axis
+        int boardHeight = 5; // # of hexagons on y axis
 
         public BobbleWindow() {
             width = 400;
             height = 600;
             //set up board
-            board = new int[boardSize][];
+            board = new int[boardWidth][];
             for (int i = 0; i < board.Length; i++) {
-                board[i] = new int[boardSize];
+                board[i] = new int[boardHeight];
             }
         }
         public override void Initialize() {
             Hexagons = new List<Hexagon>();
             for (int x = 0; x < board.Length; x++) {
                 for (int y = 0; y < board[x].Length; y++) {
-                    Hexagon H = new Hexagon(hexRadius);
+                    Hexagon H = new Hexagon(hexRadius,50f,50f);
                     H.xIndexer = x;
                     H.yIndexer = y;
                     Hexagons.Add(H);
