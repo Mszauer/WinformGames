@@ -13,7 +13,7 @@ namespace Game {
         Random r = new Random();
         public int BoardWidth = 0;
         public int BoardHeight = 0;
-        private GatePiece[][] gates = null;
+        public GatePiece[][] gates = null;
         private List<Point> WaterTracker = new List<Point>();
 
         public GameBoard(int width = 8, int height = 10){

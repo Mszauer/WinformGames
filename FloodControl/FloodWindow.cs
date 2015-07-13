@@ -94,7 +94,7 @@ namespace Game {
         private void CheckScoringChain(List<Point> WaterChain) {
             if (WaterChain.Count > 0) {
                 Point LastPipe = WaterChain[WaterChain.Count - 1];
-                if (LastPipe.X == gameBoard.BoardWidth - 1) {
+                if (LastPipe.X == gameBoard.BoardWidth - 1 && gameBoard.HasConnector(LastPipe.X, LastPipe.Y, GatePiece.Ends.Right)) {
                     playerScore += DetermineScore(WaterChain.Count);
                     linesCompletedThisLevel++;
                     //Clamp floodCount to 0 and max flood counter
@@ -126,8 +126,7 @@ namespace Game {
             int waterHeight = (int)(MaxWaterHeight * (floodCount / 100));
             Rect screen = new Rect(waterPosition.X, waterPosition.Y + (MaxWaterHeight - waterHeight), WaterWidth, waterHeight);
             Rect texture = new Rect(waterOverlayStart.X, waterOverlayStart.Y + (MaxWaterHeight - waterHeight), WaterWidth, waterHeight);
-
-            gameSprites.Draw(g, screen, texture);
+            gameBg.Draw(g, screen, texture);
         }
         private void DrawEmptyPiece(Graphics g, int pixelX, int pixelY) {
             Rect empty = new Rect(1, 247, 40, 40);
