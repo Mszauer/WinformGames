@@ -39,14 +39,14 @@ namespace Game {
             }
         }
         public float Radius {
-            get{
+            get {
                 return radius;
             }
-            set{
+            set {
                 radius = value;
-                h = 2f*radius;
+                h = 2f * radius;
                 rowH = 1.5f * radius;
-                halfW = (float)Math.Sqrt((radius*radius) - ((radius/2f)*(radius/2f)));
+                halfW = (float)Math.Sqrt((radius * radius) - ((radius / 2f) * (radius / 2f)));
                 w = 2f * halfW;
             }
         }
@@ -61,16 +61,15 @@ namespace Game {
         Point Center {
             get {
                 int x = (int)(xIndexer * W + halfW + xOffset) + (int)((yIndexer % 2 == 1) ? halfW : 0);
-                int y = (int)(yIndexer*rowH +rowH/2+yOffset);
+                int y = (int)(yIndexer * rowH + rowH / 2 + yOffset);
                 return new Point(x, y);
             }
         }
-        public enum Directions { NorthWest, NorthEast,East,SouthEast,SouthWest,West}
-        public Directions Direction = Directions.East;
+        public enum Directions { NorthWest, NorthEast, East, SouthEast, SouthWest, West }
         //end member variables
 
 
-        public Hexagon(float radius,float xOffset = 0, float yOffset = 0) {
+        public Hexagon(float radius, float xOffset = 0, float yOffset = 0) {
             Radius = radius;
             this.xOffset = xOffset;
             this.yOffset = yOffset;
@@ -82,7 +81,7 @@ namespace Game {
                     case Directions.NorthEast:
                         return new Point((int)xIndexer, (int)yIndexer - 1);
                     case Directions.NorthWest:
-                        return new Point((int)xIndexer-1, (int)yIndexer - 1);
+                        return new Point((int)xIndexer - 1, (int)yIndexer - 1);
                     case Directions.East:
                         return new Point((int)xIndexer + 1, (int)yIndexer);
                     case Directions.West:
@@ -90,15 +89,15 @@ namespace Game {
                     case Directions.SouthEast:
                         return new Point((int)xIndexer, (int)yIndexer + 1);
                     case Directions.SouthWest:
-                        return new Point((int)xIndexer-1, (int)yIndexer + 1);
+                        return new Point((int)xIndexer - 1, (int)yIndexer + 1);
                 }
             }
             else {
                 switch (direction) { //odd row
                     case Directions.NorthEast:
-                        return new Point((int)xIndexer+1, (int)yIndexer - 1);
+                        return new Point((int)xIndexer + 1, (int)yIndexer - 1);
                     case Directions.NorthWest:
-                        return new Point((int)xIndexer , (int)yIndexer - 1);
+                        return new Point((int)xIndexer, (int)yIndexer - 1);
                     case Directions.East:
                         return new Point((int)xIndexer + 1, (int)yIndexer);
                     case Directions.West:
@@ -106,7 +105,7 @@ namespace Game {
                     case Directions.SouthEast:
                         return new Point((int)xIndexer + 1, (int)yIndexer + 1);
                     case Directions.SouthWest:
-                        return new Point((int)xIndexer , (int)yIndexer + 1);
+                        return new Point((int)xIndexer, (int)yIndexer + 1);
                 }
             }
             return new Point(-1, -1);
@@ -121,7 +120,10 @@ namespace Game {
             result.Add(GetNeighborIndex(Directions.SouthWest));
             return result;
         }
-        public static Point TileAt(Point worldCoordinate, float radius) {
+        public static Point TileAt(Point worldCoordinate, float radius, float xOffset, float yOffset) {
+            //adjust for offset
+            worldCoordinate = new Point(worldCoordinate.X - (int)xOffset, worldCoordinate.Y - (int)yOffset);
+            
             //static function so no access to member variables
             float height = 2f * radius;
             float rowHeight = 1.5f * radius;
@@ -133,9 +135,9 @@ namespace Game {
             float slope = rise / halfWidth;
 
             // Next we find our position in a square grid. This grid allows us to divide the hex map into two types of tiles.
-            int X = (int)Math.Floor(worldCoordinate.X / width);
-            int Y = (int)Math.Floor(worldCoordinate.Y / rowHeight);
-            Point offset = new Point((int)(worldCoordinate.X - X * width), (int)(worldCoordinate.Y - Y * rowHeight));
+            int X = (int)Math.Floor((worldCoordinate.X) / width);
+            int Y = (int)Math.Floor((worldCoordinate.Y) / rowHeight);
+            Point offset = new Point((int)(worldCoordinate.X - X  * width), (int)(worldCoordinate.Y- Y  * rowHeight));
            
             /* Looking at the diagram for section A, we can see that two hexagons poke into the bottom of the square.
               We plug the offset’s X value into the equation for the line of the top of those hexes at the bottom. 
