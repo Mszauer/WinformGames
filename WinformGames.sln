@@ -29,6 +29,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FloodControl", "FloodContro
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PuzzleBobble", "PuzzleBobble\PuzzleBobble.csproj", "{C538BB6C-85D0-4550-966F-7FDB550F850E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Columns", "Columns\Columns.csproj", "{3E804620-97CB-4A5F-8873-33CAE6BCE667}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -87,6 +89,10 @@ Global
 		{C538BB6C-85D0-4550-966F-7FDB550F850E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C538BB6C-85D0-4550-966F-7FDB550F850E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C538BB6C-85D0-4550-966F-7FDB550F850E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3E804620-97CB-4A5F-8873-33CAE6BCE667}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3E804620-97CB-4A5F-8873-33CAE6BCE667}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3E804620-97CB-4A5F-8873-33CAE6BCE667}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3E804620-97CB-4A5F-8873-33CAE6BCE667}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
