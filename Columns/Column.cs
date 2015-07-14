@@ -22,23 +22,54 @@ namespace Game {
                 currentState = value;
             }
         }
-        public Rect AABB { //Axis Aligned Boundry Block
+        public Rect AABB { //Axis Aligned Boundry Blocks AKA visualization of boundry
             get {
+                //set min and max X/Y according to first rect in currentState
                 float minX = columnStates[currentState][0].X;
                 float minY = columnStates[currentState][0].Y;
                 float maxX = columnStates[currentState][0].X + columnStates[currentState][0].W;
                 float maxY = columnStates[currentState][0].Y + columnStates[currentState][0].H;
+                //Loop through each rect in currentState
+                foreach (Rect r in columnStates[currentState]) {
+                    //Adjust min/max X/Y accordingly
+                    if (r.X < minX) {
+                        minX = r.X;
+                    }
+                    if (r.Y < minY) {
+                        minY = r.Y;
+                    }
+                    if (r.X + r.W > maxX) {
+                        maxX = r.X + r.W;
+                    }
+                    if (r.Y + r.H > maxY) {
+                        maxY = r.Y + r.H;
+                    }
+                }//end foreach
+                return new Rect(new Point((int)minX, (int)minY), new Point((int)maxX, (int)maxY));
 
             }
         }
 
         public Column(int size) {
             tileSize = size;
-        }
-        public void Initialize() {
-            //create new list to use
             columnStates = new List<List<Rect>>();
+
         }
+
+        public List<Rect> ReturnRects() {
+            //Returns a list of new rects based on current rect displayed
+            List<Rect> returnShape = new List<Rect>();
+            for (int i = 0; i < columnStates[currentState].Count; i++) {
+                Rect r = new Rect();
+                r.X = columnStates[currentState][i].X + Position.X; //account for offset
+                r.Y = columnStates[currentState][i].Y + Position.Y;
+                r.W = columnStates[currentState][i].W;
+                r.H = columnStates[currentState][i].H;
+                returnShape.Add(r);
+            }
+            return returnShape;
+        }
+
         public void CreateColumn(int[][] rowcol) {
             //create Individual columns
             List<Rect> shape = new List<Rect>();
@@ -61,6 +92,18 @@ namespace Game {
             currentState++;
             if (currentState >= columnStates.Count) {
                 currentState = 0;
+            }
+        }
+        public void Render(Graphics g, Brush color) {
+#if DEBUG
+            //draw AABB 
+            using (Pen p = new Pen(Brushes.Green, 1.0f)) {
+                g.DrawRectangle(p, AABB.X+Position.X, AABB.Y+Position.Y,AABB.W,AABB.H);
+            }
+#endif
+            //Draw each rectangle in currentState while accounted for offset
+            for (int i = 0; i < columnStates[currentState].Count; i++) {
+                g.FillRectangle(color, (int)columnStates[currentState][i].X + Position.X, (int)columnStates[currentState][i].Y + Position.Y, (int)columnStates[currentState][i].W, (int)columnStates[currentState][i].H);
             }
         }
     }
