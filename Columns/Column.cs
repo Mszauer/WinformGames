@@ -93,8 +93,11 @@ namespace Game {
             if (currentState >= columnStates.Count) {
                 currentState = 0;
             }
+#if DEBUG
+            Console.WriteLine("ColumnState: "+currentState);
+#endif
         }
-        public void Render(Graphics g, Brush color) {
+        public void Render(Graphics g, List<Brush> color) {
 #if DEBUG
             //draw AABB 
             using (Pen p = new Pen(Brushes.Green, 1.0f)) {
@@ -103,7 +106,7 @@ namespace Game {
 #endif
             //Draw each rectangle in currentState while accounted for offset
             for (int i = 0; i < columnStates[currentState].Count; i++) {
-                g.FillRectangle(color, (int)columnStates[currentState][i].X + Position.X, (int)columnStates[currentState][i].Y + Position.Y, (int)columnStates[currentState][i].W, (int)columnStates[currentState][i].H);
+                g.FillRectangle(color[0], (int)columnStates[currentState][i].X + Position.X, (int)columnStates[currentState][i].Y + Position.Y, (int)columnStates[currentState][i].W, (int)columnStates[currentState][i].H);
             }
         }
     }
