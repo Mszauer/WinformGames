@@ -53,7 +53,8 @@ namespace Game {
 
         public List<Rect> ReturnRects() {
             //Returns a list of new rects based on current rect displayed
-            return position;
+            List<Rect>result = new List<Rect>(position);
+            return result;
         }
 
         public void CreateColumn(int one, int two, int three) {

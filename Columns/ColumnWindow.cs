@@ -68,8 +68,6 @@ namespace Game {
             columns.Add(jewelStack);
 
             jewelStack.CreateColumn(jewel1,jewel2,jewel3);
-            jewelStack.CreateColumn(jewel1,jewel2,jewel3);
-            jewelStack.CreateColumn(jewel1,jewel2,jewel3);
             jewelStack.Position = new Point((boardW-1) / 2 * tileSize + xOffset,yOffset);
             currentColumn = jewelStack;
         }
