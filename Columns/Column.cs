@@ -22,6 +22,8 @@ namespace Game {
                 currentState = value;
             }
         }
+
+        //FIX THIS TO GET CHECKBOUNDRY TO WORK
         public Rect AABB { //Axis Aligned Boundry Blocks AKA visualization of boundry
             get {
                 //set min and max X/Y according to first rect in currentState
@@ -77,6 +79,7 @@ namespace Game {
             for (int col = 0; col < rowcol.Length; col++) {
                 for (int row = 0; row < rowcol[col].Length; row++) {
                     //if value passed in >0 create a rect
+                    //broken, won't work if you pass in x, will work if you pass in 0,x,0
                     if (rowcol[row][col] > 0) {
                         //create a rect in pixel space
                         Rect r = new Rect(col * tileSize, row * tileSize, tileSize, tileSize);

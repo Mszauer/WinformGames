@@ -68,17 +68,17 @@ namespace Game {
             columns.Add(jewelStack);
 
             jewelStack.CreateColumn(new int[][]{
-                                    new int[] {0,jewel1,0},
-                                    new int[] {0,jewel2,0},
-                                    new int[] {0,jewel3,0}});
+                                    new int[] {jewel1},
+                                    new int[] {jewel2},
+                                    new int[] {jewel3}});
             jewelStack.CreateColumn(new int[][]{
-                                    new int[] {0,jewel3,0},
-                                    new int[] {0,jewel2,0},
-                                    new int[] {0,jewel1,0}});
+                                    new int[] {jewel3},
+                                    new int[] {jewel2},
+                                    new int[] {jewel1}});
             jewelStack.CreateColumn(new int[][]{
-                                    new int[] {0,jewel1,0},
-                                    new int[] {0,jewel3,0},
-                                    new int[] {0,jewel2,0}});
+                                    new int[] {jewel1},
+                                    new int[] {jewel3},
+                                    new int[] {jewel2}});
             jewelStack.Position = new Point((boardW-1) / 2 * tileSize + xOffset,yOffset);
             currentColumn = jewelStack;
         }
@@ -187,13 +187,15 @@ namespace Game {
         }
 
         void CheckBoundry() {
+            //this line is not executing properly, executes at column 1 not 0
             if (currentColumn.Position.X < xOffset) {
                 currentColumn.Position.X += xOffset;
             }
             if (currentColumn.Position.X + currentColumn.AABB.W + xOffset > boardW * tileSize + xOffset) {
                 currentColumn.Position.X = boardW * tileSize - xOffset - (int)currentColumn.AABB.W;
             }
-            if (currentColumn.Position.Y + yOffset + currentColumn.AABB.H > boardH * tileSize + yOffset) {
+            //same here, executes on row above lowest
+            if (currentColumn.Position.Y + yOffset + currentColumn.AABB.H > (boardH-1) * tileSize + yOffset) {
                 currentColumn.Position.Y = boardH * tileSize - (int)currentColumn.AABB.H - yOffset;
                 StampStack();
             }
