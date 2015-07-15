@@ -82,8 +82,9 @@ namespace Game {
             }
 #endif
             //Draw each rectangle in currentState while accounted for offset
+
             foreach (Rect r in position) {
-                g.FillRectangle(color[0], (int)Position.X, (int)Position.Y, (int)r.W, (int)r.H);
+                g.FillRectangle(color[0], (int)r.X+Position.X, (int)r.Y+Position.Y, (int)r.W, (int)r.H);
             }
 
         }
