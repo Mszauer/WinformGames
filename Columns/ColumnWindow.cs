@@ -35,7 +35,7 @@ namespace Game {
 #endif
 
 
-        public ColumnWindow(int w=8,int h=10, int xOffset = 0, int yOffset = 0) {
+        public ColumnWindow(int w=8,int h=10, int xOffset = 20, int yOffset = 20) {
             width = 400;
             height = 600;
             title = "Columns";
@@ -178,8 +178,8 @@ namespace Game {
             if (currentColumn.Position.X + currentColumn.AABB.W > (boardW) * tileSize + xOffset) {
                 currentColumn.Position.X = (boardW) * tileSize + xOffset - (int)currentColumn.AABB.W;
             }
-            if (currentColumn.Position.Y + currentColumn.AABB.H > (boardH - 1) * tileSize + yOffset) {
-                currentColumn.Position.Y = (boardH - 1) * tileSize + yOffset - (int)currentColumn.AABB.H;
+            if (currentColumn.Position.Y + currentColumn.AABB.H > (boardH) * tileSize + yOffset) {
+                currentColumn.Position.Y = (boardH) * tileSize + yOffset - (int)currentColumn.AABB.H;
                 StampStack();
             }
         }
