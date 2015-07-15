@@ -129,17 +129,36 @@ namespace Game {
             }
         }
 
-        public void MoveDown(float dTime) {
+        void MoveDown(float dTime) {
             moveAccum += dTime;
             sideAccum += dTime;
             if (sideAccum > 0.1f) {
                 if (KeyDown(Keys.Left)){
                     currentColumn.Position.X -= tileSize;
+                    CheckBoundry();
+                    if (CheckCollision()) {
+                        currentColumn.Position.X += tileSize;
+#if DEBUG
+                        Console.WriteLine("Adjusted Position");
+#endif
+                    }
+#if DEBUG
                     Console.WriteLine("Moved Left");
+#endif
+
                 }
                 if (KeyDown(Keys.Right)) {
                     currentColumn.Position.X += tileSize;
+                    CheckBoundry();
+                    if (CheckCollision()) {
+                        currentColumn.Position.Y -= tileSize;
+#if DEBUG
+                        Console.WriteLine("Adjusted Position");
+#endif
+                    }
+#if DEBUG
                     Console.WriteLine("Moved Right");
+#endif
                 }
                 sideAccum -= 0.1f;
             }
@@ -152,11 +171,37 @@ namespace Game {
 
             if (moveAccum > 1.0f) {
                 currentColumn.Position.Y += tileSize;
+                CheckBoundry();
                 moveAccum -= 1.0f / (float)currentSpeed;
             }
         }
 
-       
+        bool CheckCollision() {
+            foreach (Rect r in currentColumn.ReturnRects()) {
+                //need to fix going below 0
+                if (logicBoard[(int)(r.X-xOffset)/tileSize][(int)(r.Y-yOffset)/tileSize] > xOffset){
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        void CheckBoundry() {
+            if (currentColumn.Position.X < xOffset) {
+                currentColumn.Position.X += xOffset;
+            }
+            if (currentColumn.Position.X + currentColumn.AABB.W + xOffset > boardW * tileSize + xOffset) {
+                currentColumn.Position.X = boardW * tileSize - xOffset - (int)currentColumn.AABB.W;
+            }
+            if (currentColumn.Position.Y + yOffset + currentColumn.AABB.H > boardH * tileSize + yOffset) {
+                currentColumn.Position.Y = boardH * tileSize - (int)currentColumn.AABB.H - yOffset;
+                StampStack();
+            }
+        }
+
+        void StampStack() {
+
+        }
 
         public override void Render(Graphics g) {
             //draw logic board

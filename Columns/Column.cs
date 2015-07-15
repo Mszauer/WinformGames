@@ -99,6 +99,7 @@ namespace Game {
         }
         public void Render(Graphics g, List<Brush> color) {
 #if DEBUG
+            //Not working? Don't even need AABB probably
             //draw AABB 
             using (Pen p = new Pen(Brushes.Green, 1.0f)) {
                 g.DrawRectangle(p, AABB.X+Position.X, AABB.Y+Position.Y,AABB.W,AABB.H);
@@ -108,6 +109,7 @@ namespace Game {
             for (int i = 0; i < columnStates[currentState].Count; i++) {
                 g.FillRectangle(color[0], (int)columnStates[currentState][i].X + Position.X, (int)columnStates[currentState][i].Y + Position.Y, (int)columnStates[currentState][i].W, (int)columnStates[currentState][i].H);
             }
+
         }
     }
 }
