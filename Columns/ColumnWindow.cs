@@ -10,7 +10,6 @@ using System.Windows.Forms;
 namespace Game {
     class ColumnWindow : GameBase{
         Column currentColumn = null;
-        List<Column> columns = null;
         List<Brush> gems = null;
         List<Rect> currentJewels = null;
         int[][] logicBoard = null;
@@ -53,7 +52,6 @@ namespace Game {
                 logicBoard[i] = new int[boardH];
             }
             r = new Random();
-            columns = new List<Column>();
             
         }
         public override void Initialize() {
@@ -65,7 +63,6 @@ namespace Game {
             int jewel2 = r.Next(1, 5);
             int jewel3 = r.Next(1, 5);
             Column jewelStack = new Column(tileSize);
-            columns.Add(jewelStack);
 
             jewelStack.CreateColumn(jewel1,jewel2,jewel3);
             jewelStack.Position = new Point((boardW-1) / 2 * tileSize + xOffset,yOffset);
@@ -203,11 +200,7 @@ namespace Game {
                 g.DrawLine(p, new Point(xOffset + boardW * tileSize, yOffset), new Point(xOffset + boardW * tileSize, boardH * tileSize+yOffset));
             }//end using pen p
 
-            //Draw each jewel a different color (check value?)
-            foreach (Rect r in currentColumn.ReturnRects()) {
-                g.FillRectangle(Brushes.Red, r.Rectangle);
-
-            }//end foreach
+            currentColumn.Render(g, gems);
 
             /*color stamped values
             for(int col = 0 ; col < logicBoard.Length ; col++){
