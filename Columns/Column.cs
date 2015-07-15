@@ -53,7 +53,11 @@ namespace Game {
 
         public List<Rect> ReturnRects() {
             //Returns a list of new rects based on current rect displayed
-            List<Rect>result = new List<Rect>(position);
+            List<Rect>result = new List<Rect>();
+            foreach (Rect r in position) {
+                Rect x = new Rect(r.X + Position.X,r.Y + Position.Y,r.W,r.H);
+                result.Add(x);
+            }
             return result;
         }
 
