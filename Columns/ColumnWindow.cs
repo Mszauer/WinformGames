@@ -67,18 +67,9 @@ namespace Game {
             Column jewelStack = new Column(tileSize);
             columns.Add(jewelStack);
 
-            jewelStack.CreateColumn(new int[][]{
-                                    new int[] {0,jewel1,0},
-                                    new int[] {0,jewel2,0},
-                                    new int[] {0,jewel3,0}});
-            jewelStack.CreateColumn(new int[][]{
-                                    new int[] {0,jewel3,0},
-                                    new int[] {0,jewel2,0},
-                                    new int[] {0,jewel1,0}});
-            jewelStack.CreateColumn(new int[][]{
-                                    new int[] {0,jewel1,0},
-                                    new int[] {0,jewel3,0},
-                                    new int[] {0,jewel2,0}});
+            jewelStack.CreateColumn(jewel1,jewel2,jewel3);
+            jewelStack.CreateColumn(jewel1,jewel2,jewel3);
+            jewelStack.CreateColumn(jewel1,jewel2,jewel3);
             jewelStack.Position = new Point((boardW-1) / 2 * tileSize + xOffset,yOffset);
             currentColumn = jewelStack;
         }
@@ -136,6 +127,12 @@ namespace Game {
                 if (KeyDown(Keys.Left)){
                     currentColumn.Position.X -= tileSize;
                     CheckBoundry();
+                    if (CheckCollision()) {		
+                       currentColumn.Position.X += tileSize;		
+#if DEBUG		
+                       Console.WriteLine("Adjusted Position");		
+#endif		
+                    }
 #if DEBUG
                     Console.WriteLine("Moved Left");
 #endif
@@ -143,7 +140,12 @@ namespace Game {
                 }
                 if (KeyDown(Keys.Right)) {
                     currentColumn.Position.X += tileSize;
-                    CheckBoundry();
+                    CheckBoundry(); if (CheckCollision()) {
+                        currentColumn.Position.X += tileSize;
+#if DEBUG
+                        Console.WriteLine("Adjusted Position");
+#endif
+                    }
 #if DEBUG
                     Console.WriteLine("Moved Right");
 #endif
@@ -170,34 +172,16 @@ namespace Game {
         }
 
         void CheckBoundry() {
-            /*
             if (currentColumn.Position.X < xOffset) {
-                currentColumn.Position.X = xOffset; // This is your first mistake. You don't know where 
-                // if currentX is -7, and xOffset is 5, this will put the column at 2, not 5
-                // dont add, just assign
+                currentColumn.Position.X = xOffset;
             }
-
-            // This if check is broken in a few places. It takes the right side of the column, and adds xOffset
-            // to it, meaning an already world space variable is being moved again, further out. Yeah, get rid
-            // of that. This bit, (boardW * tileSize + xOffset) is fine the way it is.
-            if (currentColumn.Position.X + currentColumn.AABB.W > (boardW-1) * tileSize + xOffset) {
-
-                // Next up this is broken. the right side of the board is represented by the equasion in the above
-                // if statement. (boardW * tileSize + xOffset), should be an addition to move boardW * tileSize INTO
-                // world space. Subtracting the column width is fine.
-                currentColumn.Position.X = (boardW-1) * tileSize + xOffset - (int)currentColumn.AABB.W;
+            if (currentColumn.Position.X + currentColumn.AABB.W > (boardW) * tileSize + xOffset) {
+                currentColumn.Position.X = (boardW) * tileSize + xOffset - (int)currentColumn.AABB.W;
             }
-
-            // Like the above function, you are taking a world space variable and re-moving it into world space.
-            // Now, why is this boardH - 1 in the if statemtnt, but boardH in the body of the loop. Stay consistent
-            // if you are checking against something, offset to the thing youre checking. So the question is,
-            // should the if statement have (boardH -1) or BoardH??? And of course why?
-
             if (currentColumn.Position.Y + currentColumn.AABB.H > (boardH - 1) * tileSize + yOffset) {
                 currentColumn.Position.Y = (boardH - 1) * tileSize + yOffset - (int)currentColumn.AABB.H;
                 StampStack();
             }
-             * */
         }
 
         void StampStack() {

@@ -9,7 +9,7 @@ using System.Windows.Forms;
 
 namespace Game {
     class Column {
-        int tileSize = 0; //set from ColumnWindow tileSize
+        float tileSize = 0; //set from ColumnWindow tileSize
         List<List<Rect>> columnStates = null;
         public Point Position = default(Point); //gets set in ColumnWindow and accounts for offset
         //checks to see what order the column is in, and can set or return it
@@ -72,22 +72,15 @@ namespace Game {
             return returnShape;
         }
 
-        public void CreateColumn(int[][] rowcol) {
+        public void CreateColumn(int one, int two, int three) {
             //create Individual columns
             List<Rect> shape = new List<Rect>();
-            //loop through rows and columns passed in
-            for (int col = 0; col < rowcol.Length; col++) {
-                for (int row = 0; row < rowcol[col].Length; row++) {
-                    //if value passed in >0 create a rect
-                    //broken, won't work if you pass in x, will work if you pass in 0,x,0
-                    if (rowcol[row][col] > 0) {
-                        //create a rect in pixel space
-                        Rect r = new Rect(col * tileSize, row * tileSize, tileSize, tileSize);
-                        //add rect to shape (to form a shape)
-                        shape.Add(r);
-                    }//end if
-                }//end row
-            }//end col
+            Rect ichi = new Rect(0f,0f,tileSize,tileSize);
+            Rect ni = new Rect(0f, tileSize, tileSize, tileSize);
+            Rect san = new Rect(0f, tileSize*2, tileSize, tileSize);
+            shape.Add(ichi);
+            shape.Add(ni);
+            shape.Add(san);
             columnStates.Add(shape);
         }
         public void Switch() {
@@ -110,7 +103,7 @@ namespace Game {
 #endif
             //Draw each rectangle in currentState while accounted for offset
             for (int i = 0; i < columnStates[currentState].Count; i++) {
-                g.FillRectangle(color[0], (int)columnStates[currentState][i].X + Position.X, (int)columnStates[currentState][i].Y + Position.Y, (int)columnStates[currentState][i].W, (int)columnStates[currentState][i].H);
+                g.FillRectangle(color[0], (int)Position.X, (int)Position.Y, (int)columnStates[currentState][i].W, (int)columnStates[currentState][i].H);
             }
 
         }
