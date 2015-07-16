@@ -163,12 +163,19 @@ namespace Game {
         }
 
         bool CheckStackingCollision() {
+            //foreach?
+            foreach (Rect r in currentColumn.ReturnRects()) {
+                //check right
+                if ((int)(r.X + r.W) > logicBoard[((int)(r.X + r.W) / tileSize) + 1][(int)r.Y / tileSize]) {
+
+                }
+            }
             //Check below
             if (currentColumn.Position.Y + currentColumn.AABB.H > 0/*top of stack*/){
                 //return true;
             }
             //check left
-            if (currentColumn.Position.X < /*stack to the left*/0 ){
+            if (currentColumn.Position.X / tileSize < logicBoard[(currentColumn.Position.X / tileSize - 1)][currentColumn.Position.Y / tileSize]) {
                 //return true;
             }
             //check right
