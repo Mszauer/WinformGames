@@ -166,23 +166,10 @@ namespace Game {
             //foreach?
             foreach (Rect r in currentColumn.ReturnRects()) {
                 //check right
-                if ((int)(r.X + r.W) > logicBoard[((int)(r.X + r.W) / tileSize) + 1][(int)r.Y / tileSize]) {
-
+                if (logicBoard[(int)r.X / tileSize][(int)r.Y / tileSize] > 0) {
+                    return true;
                 }
             }
-            //Check below
-            if (currentColumn.Position.Y + currentColumn.AABB.H > 0/*top of stack*/){
-                //return true;
-            }
-            //check left
-            if (currentColumn.Position.X / tileSize < logicBoard[(currentColumn.Position.X / tileSize - 1)][currentColumn.Position.Y / tileSize]) {
-                //return true;
-            }
-            //check right
-            if (currentColumn.Position.X + currentColumn.AABB.W > /*stack to the right*/0){
-                //return true;
-            }
-            
             return false;
         }
 
@@ -200,15 +187,14 @@ namespace Game {
         }
 
         void StampStack() {
-            int index = 0;
             //copy values ontop logic board
-            foreach (Rect r in currentColumn.ReturnRects()) {
+            List<Rect> r = currentColumn.ReturnRects();
+            for (int i = 0 ; i < r.Count ; i++) {
 #if DEBUG
-                Console.WriteLine("X: " + r.X + ", stamped at: " + ((Int32)r.X / tileSize+1));
-                Console.WriteLine("Y: " + r.Y + ", stamped at: " + ((Int32)r.Y / tileSize+1) + "\n");
+                Console.WriteLine("X: " + r[i].X + ", stamped at: " + ((Int32)r[i].X / tileSize + 1));
+                Console.WriteLine("Y: " + r[i].Y + ", stamped at: " + ((Int32)r[i].Y / tileSize + 1) + "\n");
 #endif
-                index++;
-                logicBoard[(int)r.X / tileSize][(int)r.Y / tileSize] = currentColumn.Values[index-1];
+                logicBoard[(int)r[i].X / tileSize][(int)r[i].Y / tileSize] = currentColumn.Values[i];
             }
             //Generate new column
             NewPiece();
