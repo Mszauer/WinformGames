@@ -73,6 +73,14 @@ namespace Game {
         }
     
         public override void Update(float deltaTime) {
+#if DEBUG
+            if (KeyPressed(Keys.P)) {
+                CurrentState = GameState.Lost;
+            }
+            if (KeyPressed(Keys.L)) {
+                CurrentState = GameState.Playing;
+            }
+#endif
 
             if (CurrentState == GameState.TitleScreen) {
                 DebugStateStatus();
@@ -115,7 +123,7 @@ namespace Game {
                 if (KeyDown(Keys.Left)){
                     currentColumn.Position.X -= tileSize;
                     CheckBoundry();
-                    if (CheckCollision()) {		
+                    if (CheckStackingCollision()) {		
                        currentColumn.Position.X += tileSize;		
 #if DEBUG		
                        Console.WriteLine("Adjusted Position");		
@@ -128,7 +136,7 @@ namespace Game {
                 }
                 if (KeyDown(Keys.Right)) {
                     currentColumn.Position.X += tileSize;
-                    CheckBoundry(); if (CheckCollision()) {
+                    CheckBoundry(); if (CheckStackingCollision()) {
                         currentColumn.Position.X += tileSize;
 #if DEBUG
                         Console.WriteLine("Adjusted Position");
@@ -154,8 +162,20 @@ namespace Game {
             }
         }
 
-        bool CheckCollision() {
-            //todo check against other pieces on the field
+        bool CheckStackingCollision() {
+            //Check below
+            if (currentColumn.Position.Y + currentColumn.AABB.H > 0/*top of stack*/){
+                //return true;
+            }
+            //check left
+            if (currentColumn.Position.X < /*stack to the left*/0 ){
+                //return true;
+            }
+            //check right
+            if (currentColumn.Position.X + currentColumn.AABB.W > /*stack to the right*/0){
+                //return true;
+            }
+            
             return false;
         }
 
@@ -176,6 +196,10 @@ namespace Game {
             int index = 0;
             //copy values ontop logic board
             foreach (Rect r in currentColumn.ReturnRects()) {
+#if DEBUG
+                Console.WriteLine("X: " + r.X + ", stamped at: " + ((Int32)r.X / tileSize+1));
+                Console.WriteLine("Y: " + r.Y + ", stamped at: " + ((Int32)r.Y / tileSize+1) + "\n");
+#endif
                 index++;
                 logicBoard[(int)r.X / tileSize][(int)r.Y / tileSize] = currentColumn.Values[index-1];
             }
