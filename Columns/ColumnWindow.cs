@@ -218,7 +218,7 @@ namespace Game {
                 for (int row = 0 ; row < logicBoard[col].Length ; row++){
                     if (logicBoard[col][row] > 0) {
                         Rect fill = new Rect(col * tileSize + xOffset, row * tileSize + yOffset, tileSize, tileSize);
-                        g.FillRectangle(gemColors[logicBoard[col][row] - 1], fill.Rectangle);
+                        g.FillRectangle(gemColors[logicBoard[col][row]], fill.Rectangle);
                     }
                 }
             }
