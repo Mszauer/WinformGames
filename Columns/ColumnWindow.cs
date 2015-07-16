@@ -136,7 +136,7 @@ namespace Game {
                     currentColumn.Position.X += tileSize;
                     CheckBoundry(); 
                     if (CheckStackingCollision()) {
-                        currentColumn.Position.X += tileSize;
+                        currentColumn.Position.X -= tileSize;
 #if DEBUG
                         Console.WriteLine("Adjusted Position");
 #endif
@@ -157,6 +157,10 @@ namespace Game {
             if (moveAccum > 1.0f) {
                 currentColumn.Position.Y += tileSize;
                 CheckBoundry();
+                if (CheckStackingCollision()) {
+                    currentColumn.Position.Y -= tileSize;
+                    StampStack();
+                }
                 moveAccum -= 1.0f / (float)currentSpeed;
             }
         }
@@ -195,6 +199,140 @@ namespace Game {
             }
             //Generate new column
             NewPiece();
+        }
+
+        List<Point> CheckStreak(int row, int col) {
+            /*  +-           +-              +-          +-
+             * [][][][]  [][][][]       [][][][]    [][][][]
+             * [][x][][] [][][][]       [][][][x]   [x][][][]
+             * [][x][][] [][x][x][x]    [][][x][]   [][x][][]
+             * [][x][][] [][][][]       [][x][][]   [][][x][]
+             */
+            //if out of bounds return empty list
+            if (row < 0 || col < 0) {
+                return new List<Point>();
+            }
+
+            //HORIZONTAL
+            List<Point> horizontalStreak = new List<Point>();
+            //check to the left
+            int logicalX = col - 1; //temporary indexer
+            if (logicalX >= 0) {
+                while (logicBoard[logicalX][row] == logicBoard[col][row]) {
+                    //while the cells are equal, keep moving left until they become unequal or boundry is reached
+                    horizontalStreak.Add(new Point(logicalX, row));
+                    logicalX -= 1;
+                    if (logicalX < 0) {
+                        break;
+                    }
+                }//endwhile
+            }//endif
+            //check right
+            logicalX = col + 1;
+            if (logicalX < boardW) {
+                //while the cells are equal, keep moving left until they become unequal or boundry is reached
+                while (logicBoard[logicalX][row] == logicBoard[col][row]) {
+                    horizontalStreak.Add(new Point(logicalX, row));
+                    logicalX++;
+                    if (logicalX > boardW) {
+                        break;
+                    }
+                }//endwhile
+            }//end if
+            //return list if there is horizontal streak
+            if (horizontalStreak.Count >= 3) {
+                return horizontalStreak;
+            }
+
+            //VERTICAL
+            List<Point> verticalStreak = new List<Point>();
+            //UPWARDS
+            int logicalY = row - 1;
+            if (logicalY >= 0) {
+                while (logicBoard[col][logicalY] == logicBoard[col][row]) {
+                    //same as horizontal but why Y variables
+                    verticalStreak.Add(new Point(col, logicalY));
+                    logicalY -= 1;
+                    if (logicalY < 0) {
+                        break;
+                    }
+                }
+            }
+            //DOWNWARDS
+            logicalY = row + 1;
+            if (logicalY < boardH) {
+                while (logicBoard[col][logicalY] == logicBoard[col][row]) {
+                    verticalStreak.Add(new Point(col, logicalY));
+                    logicalY++;
+                    if (logicalY > boardH) {
+                        break;
+                    }
+                }
+            }
+            if (verticalStreak.Count >= 3) {
+                return verticalStreak;
+            }
+
+            //DIAGONAL
+            List<Point> Diag = new List<Point>();
+            //LEFT UP
+            logicalX = col - 1;
+            logicalY = row - 1;
+            if (logicalX >= 0 && logicalY >= 0) {
+                while (logicBoard[logicalX][logicalY] == logicBoard[col][row]) {
+                    Diag.Add(new Point(logicalX, logicalY));
+                    logicalX -= 1;
+                    logicalY -= 1;
+                    if (logicalX < 0 || logicalY < 0) {
+                        break;
+                    }
+                }
+            }
+            //RIGHT UP
+            logicalX = col + 1;
+            logicalY = row - 1;
+            if (logicalY >= 0 && logicalX < boardW) {
+                while (logicBoard[logicalX][logicalY] == logicBoard[col][row]) {
+                    Diag.Add(new Point(logicalX, logicalY));
+                    logicalX++;
+                    logicalY -= 1;
+                    if (logicalY < 0 || logicalX > boardW) {
+                        break;
+                    }
+                }
+            }
+            //LEFT DOWN
+            logicalX = col - 1;
+            logicalY = row + 1;
+            if (logicalX >= 0 && logicalY < boardH) {
+                while (logicBoard[logicalX][logicalY] == logicBoard[col][row]) {
+                    Diag.Add(new Point(logicalX, logicalY));
+                    logicalX -= 1;
+                    logicalY++;
+                    if (logicalX < 0 || logicalY > boardH) {
+                        break;
+                    }
+                }
+            }
+            //RIGHT DOWN
+            logicalX = col + 1;
+            logicalY = row + 1;
+            if (logicalX < boardW && logicalY < boardH) {
+                while (logicBoard[logicalX][logicalY] == logicBoard[col][row]) {
+                    Diag.Add(new Point(logicalX, logicalY));
+                    logicalX++;
+                    logicalY++;
+                    if (logicalX > boardW || logicalY > boardH) {
+                        break;
+                    }
+                }
+            }
+
+            if (Diag.Count >= 3) {
+                return Diag;
+            }
+
+            return new List<Point>();
         }
 
         void NewPiece() {
