@@ -11,7 +11,13 @@ namespace Game {
     class Column {
         float tileSize = 0; //set from ColumnWindow tileSize
         List<Rect> position = null;
-        public Point Position = default(Point); 
+        public Point Position = default(Point);
+        List<int> values = null;
+        public List<int> Values {
+            get {
+                return values;
+            }
+        }
         //gets set in ColumnWindow and accounts for offset
         //checks to see what order the column is in, and can set or return it
 
@@ -48,6 +54,7 @@ namespace Game {
         public Column(int size) {
             tileSize = size;
             position = new List<Rect>();
+            values = new List<int>();
 
         }
 
@@ -69,10 +76,16 @@ namespace Game {
             position.Add(ichi);
             position.Add(ni);
             position.Add(san);
+            values.Add(one);
+            values.Add(two);
+            values.Add(three);
         }
         public void Switch() {
             //create a loop for switching rects in a column
-            
+            int temp = values[0];
+            values[0] = values[1];
+            values[1] = values[2];
+            values[2] = temp;
         }
         public void Render(Graphics g, List<Brush> color) {
 #if DEBUG
@@ -83,8 +96,9 @@ namespace Game {
 #endif
             //Draw each rectangle in currentState while accounted for offset
 
-            foreach (Rect r in position) {
-                g.FillRectangle(color[0], (int)r.X+Position.X, (int)r.Y+Position.Y, (int)r.W, (int)r.H);
+            for (int i = 0 ; i < position.Count ; i++){
+                Rect r = position[i];
+                g.FillRectangle(color[values[i]], (int)r.X+Position.X, (int)r.Y+Position.Y, (int)r.W, (int)r.H);
             }
 
         }

@@ -10,7 +10,7 @@ using System.Windows.Forms;
 namespace Game {
     class ColumnWindow : GameBase{
         Column currentColumn = null;
-        List<Brush> gems = null;
+        List<Brush> gemColors = null;
         List<Rect> currentJewels = null;
         int[][] logicBoard = null;
         enum GameState { TitleScreen, Playing, Lost, Destroy, Fall}
@@ -42,7 +42,7 @@ namespace Game {
             boardH = h;
             this.xOffset = xOffset;
             this.yOffset = yOffset;
-            gems = new List<Brush>() { Brushes.Red, Brushes.Blue, Brushes.Green, Brushes.Black, Brushes.Orange };
+            gemColors = new List<Brush>() { Brushes.Red, Brushes.Blue, Brushes.Green, Brushes.Black, Brushes.Orange };
             currentJewels = new List<Rect>();
         }
         public void Reset() {
@@ -59,14 +59,7 @@ namespace Game {
             this.height = height / tileSize * tileSize;
             Reset();
             //Generate 3 random jewels
-            int jewel1 = r.Next(1, 5);
-            int jewel2 = r.Next(1, 5);
-            int jewel3 = r.Next(1, 5);
-            Column jewelStack = new Column(tileSize);
-
-            jewelStack.CreateColumn(jewel1,jewel2,jewel3);
-            jewelStack.Position = new Point((boardW-1) / 2 * tileSize + xOffset,yOffset);
-            currentColumn = jewelStack;
+            NewPiece();
         }
         public void DebugStateStatus(){
             //Doesnt work, wont display anything  past title screen
@@ -180,7 +173,25 @@ namespace Game {
         }
 
         void StampStack() {
+            int index = 0;
+            //copy values ontop logic board
+            foreach (Rect r in currentColumn.ReturnRects()) {
+                index++;
+                logicBoard[(int)r.X / tileSize][(int)r.Y / tileSize] = currentColumn.Values[index-1];
+            }
+            //Generate new column
+            NewPiece();
+        }
 
+        void NewPiece() {
+            int jewel1 = r.Next(1, 5);
+            int jewel2 = r.Next(1, 5);
+            int jewel3 = r.Next(1, 5);
+            Column jewelStack = new Column(tileSize);
+
+            jewelStack.CreateColumn(jewel1, jewel2, jewel3);
+            jewelStack.Position = new Point((boardW - 1) / 2 * tileSize + xOffset, yOffset);
+            currentColumn = jewelStack;
         }
 
         public override void Render(Graphics g) {
@@ -200,17 +211,17 @@ namespace Game {
                 g.DrawLine(p, new Point(xOffset + boardW * tileSize, yOffset), new Point(xOffset + boardW * tileSize, boardH * tileSize+yOffset));
             }//end using pen p
 
-            currentColumn.Render(g, gems);
+            currentColumn.Render(g, gemColors);
 
-            /*color stamped values
+           // color stamped values
             for(int col = 0 ; col < logicBoard.Length ; col++){
                 for (int row = 0 ; row < logicBoard[col].Length ; row++){
                     if (logicBoard[col][row] > 0) {
-                        Rect fill = new Rect(col * tileSize, row * tileSize, tileSize, tileSize);
-                        g.FillRectangle(gems[logicBoard[col][row] - 1], fill.Rectangle);
+                        Rect fill = new Rect(col * tileSize + xOffset, row * tileSize + yOffset, tileSize, tileSize);
+                        g.FillRectangle(gemColors[logicBoard[col][row] - 1], fill.Rectangle);
                     }
                 }
-            }*/
+            }
         }
         
     }
