@@ -11,7 +11,6 @@ namespace Game {
     class ColumnWindow : GameBase{
         Column currentColumn = null;
         List<Brush> gemColors = null;
-        List<Rect> currentJewels = null;
         int[][] logicBoard = null;
         enum GameState { TitleScreen, Playing, Lost, Destroy, Fall}
         GameState CurrentState = GameState.TitleScreen;
@@ -25,7 +24,6 @@ namespace Game {
         int currentSpeed = 1;
         Random r = null;
         bool isGameOver = false;
-        int nextShape = 0;
         float dTime = 0f;
         float moveAccum = 0f;
         float sideAccum = 0f;
@@ -43,7 +41,6 @@ namespace Game {
             this.xOffset = xOffset;
             this.yOffset = yOffset;
             gemColors = new List<Brush>() { Brushes.Red, Brushes.Blue, Brushes.Green, Brushes.Black, Brushes.Orange };
-            currentJewels = new List<Rect>();
         }
         public void Reset() {
             //set up logic board size and set values to default(0);
@@ -110,6 +107,7 @@ namespace Game {
                 isGameOver = true;
                 if (KeyPressed(Keys.Space) || LeftMousePressed) {
                     Reset();
+                    NewPiece();
                     isGameOver = false;
                     CurrentState = GameState.Playing;
                 }
@@ -136,7 +134,8 @@ namespace Game {
                 }
                 if (KeyDown(Keys.Right)) {
                     currentColumn.Position.X += tileSize;
-                    CheckBoundry(); if (CheckStackingCollision()) {
+                    CheckBoundry(); 
+                    if (CheckStackingCollision()) {
                         currentColumn.Position.X += tileSize;
 #if DEBUG
                         Console.WriteLine("Adjusted Position");
@@ -163,10 +162,8 @@ namespace Game {
         }
 
         bool CheckStackingCollision() {
-            //foreach?
             foreach (Rect r in currentColumn.ReturnRects()) {
-                //check right
-                if (logicBoard[(int)r.X / tileSize][(int)r.Y / tileSize] > 0) {
+                if (logicBoard[(int)(r.X - xOffset)/ tileSize][(int)(r.Y-yOffset) / tileSize] > 0) {
                     return true;
                 }
             }
@@ -194,7 +191,7 @@ namespace Game {
                 Console.WriteLine("X: " + r[i].X + ", stamped at: " + ((Int32)r[i].X / tileSize + 1));
                 Console.WriteLine("Y: " + r[i].Y + ", stamped at: " + ((Int32)r[i].Y / tileSize + 1) + "\n");
 #endif
-                logicBoard[(int)r[i].X / tileSize][(int)r[i].Y / tileSize] = currentColumn.Values[i];
+                logicBoard[(int)(r[i].X - xOffset)/ tileSize][(int)(r[i].Y-yOffset) / tileSize] = currentColumn.Values[i];
             }
             //Generate new column
             NewPiece();

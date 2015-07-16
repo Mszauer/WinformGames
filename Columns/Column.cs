@@ -18,11 +18,6 @@ namespace Game {
                 return values;
             }
         }
-        //gets set in ColumnWindow and accounts for offset
-        //checks to see what order the column is in, and can set or return it
-
-
-        //FIX THIS TO GET CHECKBOUNDRY TO WORK
         public Rect AABB { //Axis Aligned Boundry Blocks AKA visualization of boundry
             get {
                 //set min and max X/Y according to first rect in currentState
