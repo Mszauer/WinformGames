@@ -200,10 +200,71 @@ namespace Game {
                 logicBoard[(int)(r[i].X - xOffset)/ tileSize][(int)(r[i].Y-yOffset) / tileSize] = currentColumn.Values[i];
                 CheckStreak((int)r[i].X / tileSize, (int)r[i].Y / tileSize);
                 DestroyStreak(CheckStreak((int)r[i].X / tileSize, (int)r[i].Y / tileSize));
+                RowFall();
             }
             //Generate new column
             //TODO : DESTROY ROW, ROW FALL/ANIMATION (ENUM STATE), COSMETICS
             NewPiece();
+        }
+
+        void RowFall() {
+            /*
+             * this moves it down only one row at a time
+            for (int col = boardW - 1; col >= 0; col--) {
+                for (int row = boardH - 1; row > 0; row--) {
+                    if (logicBoard[col][row] == -1) {
+                        logicBoard[col][row] = logicBoard[col][row - 1];
+                        logicBoard[col][row - 1] = -1;
+#if DEBUG
+                        Console.WriteLine("Cell X: "+col + "Y: "+(row - 1) + " moved down");
+#endif
+                    }
+                }
+            }
+             */
+            Dictionary<Point, int> result = new Dictionary<Point, int>();
+            //Loop through col backwards
+            for (int col = boardW - 1; col >= 0; col--) {
+                //create empty cell counter
+                int emptyY = 0;
+                //loop through rows backwards
+                for (int row = boardH - 1; row >= 0; row--) {
+                    if (logicBoard[col][row] == -1) {
+                        //if cell value is -1, add one to counter
+                        emptyY++;
+                    }
+                }
+                //if counter is above 0
+                if (emptyY > 0) {
+                    for (int row = 0; row < boardH; row++) {
+                        if (logicBoard[col][row] == -1) {
+                            //loop through rows until it finds an empty cell
+                            break;
+                        }
+                        //position of empty cells and counter to dictionary
+                        result.Add(new Point(col, row), emptyY);
+                    }
+                }
+            }// end dictionary setup
+            //Sink values down:
+
+            //create buffer dictionary to store things
+            Dictionary<Point, int> changeStorage = new Dictionary<Point, int>();
+            foreach (KeyValuePair<Point, int> kvp in result) {
+                //kvp.Value is how much a cell sinks, so you add it to kvp.Key.Y to get the new cell position
+                //and then assign it to the corresponding logicboard cell
+                changeStorage.Add(new Point(kvp.Key.X, kvp.Key.Y + kvp.Value), logicBoard[kvp.Key.X][kvp.Key.Y]);
+            }
+            //Transfer the new cell positions and values to logicboard
+            foreach (KeyValuePair<Point, int> kvp in changeStorage) {
+                logicBoard[kvp.Key.X][kvp.Key.Y] = kvp.Value;
+            }
+            //sets the cells above newly sunken cells to 0
+            foreach (KeyValuePair<Point, int> kvp in result) {
+                for (int row = 0 ; row < kvp.Value ; row++){
+                    logicBoard[kvp.Key.X][row] = 0;
+                }
+            }
         }
 
         void DestroyStreak(List<Point> locations) {
