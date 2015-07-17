@@ -199,10 +199,20 @@ namespace Game {
 #endif
                 logicBoard[(int)(r[i].X - xOffset)/ tileSize][(int)(r[i].Y-yOffset) / tileSize] = currentColumn.Values[i];
                 CheckStreak((int)r[i].X / tileSize, (int)r[i].Y / tileSize);
+                DestroyStreak(CheckStreak((int)r[i].X / tileSize, (int)r[i].Y / tileSize));
             }
             //Generate new column
             //TODO : DESTROY ROW, ROW FALL/ANIMATION (ENUM STATE), COSMETICS
             NewPiece();
+        }
+
+        void DestroyStreak(List<Point> locations) {
+            foreach (Point p in locations) {
+                logicBoard[p.X][p.Y] = -1;
+#if DEBUG
+                Console.WriteLine("Cell Removed at X: " + p.X + " Y: " + p.Y);
+#endif
+            }
         }
 
         List<Point> CheckStreak(int col, int row) {
