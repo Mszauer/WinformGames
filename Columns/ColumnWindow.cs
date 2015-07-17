@@ -160,9 +160,7 @@ namespace Game {
                 if (CheckStackingCollision()) {
                     currentColumn.Position.Y -= tileSize;
                     StampStack();
-                    foreach (Rect r in currentColumn.ReturnRects()) {
-                        CheckStreak((int)r.X / tileSize, (int)r.Y / tileSize);
-                    }
+                    
                 }
                 moveAccum -= 1.0f / (float)currentSpeed;
             }
@@ -187,9 +185,7 @@ namespace Game {
             if (currentColumn.Position.Y + currentColumn.AABB.H > (boardH) * tileSize + yOffset) {
                 currentColumn.Position.Y = (boardH) * tileSize + yOffset - (int)currentColumn.AABB.H;
                 StampStack();
-                foreach (Rect r in currentColumn.ReturnRects()) {
-                    CheckStreak((int)r.X / tileSize,(int) r.Y / tileSize);
-                }
+                
             }
         }
 
@@ -202,8 +198,10 @@ namespace Game {
                 Console.WriteLine("Y: " + r[i].Y + ", stamped at: " + ((Int32)r[i].Y / tileSize + 1) + "\n");
 #endif
                 logicBoard[(int)(r[i].X - xOffset)/ tileSize][(int)(r[i].Y-yOffset) / tileSize] = currentColumn.Values[i];
+                CheckStreak((int)r[i].X / tileSize, (int)r[i].Y / tileSize);
             }
             //Generate new column
+            //TODO : DESTROY ROW, ROW FALL/ANIMATION (ENUM STATE), COSMETICS
             NewPiece();
         }
 
