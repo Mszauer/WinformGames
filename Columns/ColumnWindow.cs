@@ -159,8 +159,10 @@ namespace Game {
                 CheckBoundry();
                 if (CheckStackingCollision()) {
                     currentColumn.Position.Y -= tileSize;
-                    CheckStreak(currentColumn.Position.X/tileSize, currentColumn.Position.Y/tileSize);
                     StampStack();
+                    foreach (Rect r in currentColumn.ReturnRects()) {
+                        CheckStreak((int)r.X / tileSize, (int)r.Y / tileSize);
+                    }
                 }
                 moveAccum -= 1.0f / (float)currentSpeed;
             }
@@ -185,8 +187,9 @@ namespace Game {
             if (currentColumn.Position.Y + currentColumn.AABB.H > (boardH) * tileSize + yOffset) {
                 currentColumn.Position.Y = (boardH) * tileSize + yOffset - (int)currentColumn.AABB.H;
                 StampStack();
-                CheckStreak(currentColumn.Position.X/tileSize, currentColumn.Position.Y/tileSize);
-
+                foreach (Rect r in currentColumn.ReturnRects()) {
+                    CheckStreak((int)r.X / tileSize,(int) r.Y / tileSize);
+                }
             }
         }
 
@@ -210,7 +213,7 @@ namespace Game {
             List<Point> horizontalStreak = new List<Point>();
             horizontalStreak.Add(new Point(col, row));
             //LEFT
-            int logicalX = col; //temporary indexer
+            int logicalX = col -1; //temporary indexer
             if (logicalX >= 0) {
                 while (logicBoard[logicalX][row] > 0 && logicBoard[logicalX][row] == logicBoard[col][row]) {
                     //while the cells are equal, keep moving left until they become unequal or boundry is reached
