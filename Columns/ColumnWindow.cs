@@ -87,7 +87,7 @@ namespace Game {
             }
             if (CurrentState == GameState.Playing) {
                 DebugStateStatus();
-                if (KeyPressed(Keys.Up)) {
+                if (KeyPressed(Keys.Up) || KeyPressed(Keys.W)) {
                     currentColumn.Switch();
                 }
                 MoveDown(deltaTime);
@@ -118,7 +118,7 @@ namespace Game {
             moveAccum += dTime;
             sideAccum += dTime;
             if (sideAccum > 0.1f) {
-                if (KeyDown(Keys.Left)){
+                if (KeyDown(Keys.Left) || KeyPressed(Keys.A)) {
                     currentColumn.Position.X -= tileSize;
                     CheckBoundry();
                     if (CheckStackingCollision()) {		
@@ -132,7 +132,7 @@ namespace Game {
 #endif
 
                 }
-                if (KeyDown(Keys.Right)) {
+                if (KeyDown(Keys.Right) || KeyPressed(Keys.D)) {
                     currentColumn.Position.X += tileSize;
                     CheckBoundry(); 
                     if (CheckStackingCollision()) {
@@ -147,7 +147,7 @@ namespace Game {
                 }
                 sideAccum -= 0.1f;
             }
-            if (KeyDown(Keys.Down)) {
+            if (KeyDown(Keys.Down) || KeyPressed(Keys.S)) {
                 currentSpeed = fastFall;
             }
             else {
