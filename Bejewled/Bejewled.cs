@@ -169,7 +169,7 @@ namespace Game {
             horizontalStreak.Add(new Point(col,row));
             //Check blocks to the left
             int logicalX = col - 1;
-            if (logicalX >= 0) {
+            if (logicalX >= 0) { 
                 while (logicBoard[logicalX][row] == logicBoard[col][row]) {
                     horizontalStreak.Add(new Point(logicalX, row));
                     logicalX -= 1;

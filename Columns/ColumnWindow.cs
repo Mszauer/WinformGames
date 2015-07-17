@@ -159,6 +159,7 @@ namespace Game {
                 CheckBoundry();
                 if (CheckStackingCollision()) {
                     currentColumn.Position.Y -= tileSize;
+                    CheckStreak(currentColumn.Position.X/tileSize, currentColumn.Position.Y/tileSize);
                     StampStack();
                 }
                 moveAccum -= 1.0f / (float)currentSpeed;
@@ -184,6 +185,8 @@ namespace Game {
             if (currentColumn.Position.Y + currentColumn.AABB.H > (boardH) * tileSize + yOffset) {
                 currentColumn.Position.Y = (boardH) * tileSize + yOffset - (int)currentColumn.AABB.H;
                 StampStack();
+                CheckStreak(currentColumn.Position.X/tileSize, currentColumn.Position.Y/tileSize);
+
             }
         }
 
@@ -201,22 +204,12 @@ namespace Game {
             NewPiece();
         }
 
-        List<Point> CheckStreak(int row, int col) {
-            /*  +-           +-              +-          +-
-             * [][][][]  [][][][]       [][][][]    [][][][]
-             * [][x][][] [][][][]       [][][][x]   [x][][][]
-             * [][x][][] [][x][x][x]    [][][x][]   [][x][][]
-             * [][x][][] [][][][]       [][x][][]   [][][x][]
-             */
-            //if out of bounds return empty list
-            if (row < 0 || col < 0) {
-                return new List<Point>();
-            }
+        List<Point> CheckStreak(int col, int row) {
 
             //HORIZONTAL
             List<Point> horizontalStreak = new List<Point>();
-            //check to the left
-            int logicalX = col - 1; //temporary indexer
+            //LEFT
+            int logicalX = col; //temporary indexer
             if (logicalX >= 0) {
                 while (logicBoard[logicalX][row] == logicBoard[col][row]) {
                     //while the cells are equal, keep moving left until they become unequal or boundry is reached
@@ -227,20 +220,23 @@ namespace Game {
                     }
                 }//endwhile
             }//endif
-            //check right
+            //RIGHT
             logicalX = col + 1;
             if (logicalX < boardW) {
                 //while the cells are equal, keep moving left until they become unequal or boundry is reached
                 while (logicBoard[logicalX][row] == logicBoard[col][row]) {
                     horizontalStreak.Add(new Point(logicalX, row));
                     logicalX++;
-                    if (logicalX > boardW) {
+                    if (logicalX > boardW-1) {
                         break;
                     }
                 }//endwhile
             }//end if
             //return list if there is horizontal streak
             if (horizontalStreak.Count >= 3) {
+#if DEBUG
+                Console.WriteLine("Horizontal Streak found, Length: " + horizontalStreak.Count);
+#endif
                 return horizontalStreak;
             }
 
@@ -264,12 +260,15 @@ namespace Game {
                 while (logicBoard[col][logicalY] == logicBoard[col][row]) {
                     verticalStreak.Add(new Point(col, logicalY));
                     logicalY++;
-                    if (logicalY > boardH) {
+                    if (logicalY > boardH-1) {
                         break;
                     }
                 }
             }
             if (verticalStreak.Count >= 3) {
+#if DEBUG
+                Console.WriteLine("Vertical Streak found, Length: " + verticalStreak.Count);
+#endif
                 return verticalStreak;
             }
 
@@ -296,7 +295,7 @@ namespace Game {
                     Diag.Add(new Point(logicalX, logicalY));
                     logicalX++;
                     logicalY -= 1;
-                    if (logicalY < 0 || logicalX > boardW) {
+                    if (logicalY < 0 || logicalX > boardW-1) {
                         break;
                     }
                 }
@@ -309,7 +308,7 @@ namespace Game {
                     Diag.Add(new Point(logicalX, logicalY));
                     logicalX -= 1;
                     logicalY++;
-                    if (logicalX < 0 || logicalY > boardH) {
+                    if (logicalX < 0 || logicalY > boardH-1) {
                         break;
                     }
                 }
@@ -322,13 +321,16 @@ namespace Game {
                     Diag.Add(new Point(logicalX, logicalY));
                     logicalX++;
                     logicalY++;
-                    if (logicalX > boardW || logicalY > boardH) {
+                    if (logicalX > boardW-1 || logicalY > boardH-1) {
                         break;
                     }
                 }
             }
 
             if (Diag.Count >= 3) {
+#if DEBUG
+                Console.WriteLine("Diagonal Streak found, Length: " + Diag.Count);
+#endif
                 return Diag;
             }
 
