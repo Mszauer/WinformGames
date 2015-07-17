@@ -208,10 +208,11 @@ namespace Game {
 
             //HORIZONTAL
             List<Point> horizontalStreak = new List<Point>();
+            horizontalStreak.Add(new Point(col, row));
             //LEFT
             int logicalX = col; //temporary indexer
             if (logicalX >= 0) {
-                while (logicBoard[logicalX][row] == logicBoard[col][row]) {
+                while (logicBoard[logicalX][row] > 0 && logicBoard[logicalX][row] == logicBoard[col][row]) {
                     //while the cells are equal, keep moving left until they become unequal or boundry is reached
                     horizontalStreak.Add(new Point(logicalX, row));
                     logicalX -= 1;
@@ -224,7 +225,7 @@ namespace Game {
             logicalX = col + 1;
             if (logicalX < boardW) {
                 //while the cells are equal, keep moving left until they become unequal or boundry is reached
-                while (logicBoard[logicalX][row] == logicBoard[col][row]) {
+                while (logicBoard[logicalX][row] > 0 && logicBoard[logicalX][row] == logicBoard[col][row]) {
                     horizontalStreak.Add(new Point(logicalX, row));
                     logicalX++;
                     if (logicalX > boardW-1) {
@@ -242,10 +243,11 @@ namespace Game {
 
             //VERTICAL
             List<Point> verticalStreak = new List<Point>();
+            verticalStreak.Add(new Point(col, row));
             //UPWARDS
             int logicalY = row - 1;
             if (logicalY >= 0) {
-                while (logicBoard[col][logicalY] == logicBoard[col][row]) {
+                while (logicBoard[col][logicalY] > 0 && logicBoard[col][logicalY] == logicBoard[col][row]) {
                     //same as horizontal but why Y variables
                     verticalStreak.Add(new Point(col, logicalY));
                     logicalY -= 1;
@@ -257,7 +259,7 @@ namespace Game {
             //DOWNWARDS
             logicalY = row + 1;
             if (logicalY < boardH) {
-                while (logicBoard[col][logicalY] == logicBoard[col][row]) {
+                while (logicBoard[col][logicalY] > 0 && logicBoard[col][logicalY] == logicBoard[col][row]) {
                     verticalStreak.Add(new Point(col, logicalY));
                     logicalY++;
                     if (logicalY > boardH-1) {
@@ -274,11 +276,12 @@ namespace Game {
 
             //DIAGONAL
             List<Point> Diag = new List<Point>();
+            Diag.Add(new Point(col, row));
             //LEFT UP
             logicalX = col - 1;
             logicalY = row - 1;
             if (logicalX >= 0 && logicalY >= 0) {
-                while (logicBoard[logicalX][logicalY] == logicBoard[col][row]) {
+                while (logicBoard[logicalX][logicalY] > 0 && logicBoard[logicalX][logicalY] == logicBoard[col][row]) {
                     Diag.Add(new Point(logicalX, logicalY));
                     logicalX -= 1;
                     logicalY -= 1;
@@ -291,7 +294,7 @@ namespace Game {
             logicalX = col + 1;
             logicalY = row - 1;
             if (logicalY >= 0 && logicalX < boardW) {
-                while (logicBoard[logicalX][logicalY] == logicBoard[col][row]) {
+                while (logicBoard[logicalX][logicalY] > 0 && logicBoard[logicalX][logicalY] == logicBoard[col][row]) {
                     Diag.Add(new Point(logicalX, logicalY));
                     logicalX++;
                     logicalY -= 1;
@@ -304,7 +307,7 @@ namespace Game {
             logicalX = col - 1;
             logicalY = row + 1;
             if (logicalX >= 0 && logicalY < boardH) {
-                while (logicBoard[logicalX][logicalY] == logicBoard[col][row]) {
+                while (logicBoard[logicalX][logicalY] > 0 && logicBoard[logicalX][logicalY] == logicBoard[col][row]) {
                     Diag.Add(new Point(logicalX, logicalY));
                     logicalX -= 1;
                     logicalY++;
@@ -317,7 +320,7 @@ namespace Game {
             logicalX = col + 1;
             logicalY = row + 1;
             if (logicalX < boardW && logicalY < boardH) {
-                while (logicBoard[logicalX][logicalY] == logicBoard[col][row]) {
+                while (logicBoard[logicalX][logicalY] > 0 && logicBoard[logicalX][logicalY] == logicBoard[col][row]) {
                     Diag.Add(new Point(logicalX, logicalY));
                     logicalX++;
                     logicalY++;
