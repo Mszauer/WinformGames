@@ -87,20 +87,12 @@ namespace Game {
             }
             if (CurrentState == GameState.Playing) {
                 DebugStateStatus();
+            
+
                 if (KeyPressed(Keys.Up) || KeyPressed(Keys.W)) {
                     currentColumn.Switch();
                 }
                 MoveDown(deltaTime);
-            }
-            if (CurrentState == GameState.Destroy) {
-                DebugStateStatus();
-                //DestroyColumn();
-                CurrentState = GameState.Fall;
-            }
-            if (CurrentState == GameState.Fall) {
-                DebugStateStatus();
-                //ColumnFall();
-                CurrentState = GameState.Playing;
             }
             if (CurrentState == GameState.Lost) {
                 DebugStateStatus();
@@ -208,6 +200,7 @@ namespace Game {
         }
 
         void RowFall() {
+            CurrentState = GameState.Fall;
             /*
              * this moves it down only one row at a time
             for (int col = boardW - 1; col >= 0; col--) {
@@ -265,9 +258,11 @@ namespace Game {
                     logicBoard[kvp.Key.X][row] = 0;
                 }
             }
+            CurrentState = GameState.Playing;
         }
 
         void DestroyStreak(List<Point> locations) {
+            CurrentState = GameState.Destroy;
             foreach (Point p in locations) {
                 logicBoard[p.X][p.Y] = -1;
 #if DEBUG
