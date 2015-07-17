@@ -10,7 +10,7 @@ using System.Windows.Forms;
 namespace Game {
     class Program {
         static void Main(string[] args) {
-            Application.Run(new GameWindow(new ColumnWindow()));
+            Application.Run(new GameWindow(new ColumnTestWindow()));
         }
     }
 }

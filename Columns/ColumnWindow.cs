@@ -8,11 +8,11 @@ using System.Drawing;
 using System.Windows.Forms;
 
 namespace Game {
-    class ColumnWindow : GameBase{
+    class ColumnWindow {
         Column currentColumn = null;
         List<Brush> gemColors = null;
         int[][] logicBoard = null;
-        enum GameState { TitleScreen, Playing, Lost, Destroy, Fall}
+        enum GameState { TitleScreen, Playing, Lost, Destroy, Fall, Pause}
         GameState CurrentState = GameState.TitleScreen;
         int boardW = 0; // board width, set inside constructor
         int boardH = 0; // board Height , set inside constructor
@@ -25,6 +25,7 @@ namespace Game {
         Random r = null;
         bool isGameOver = false;
         float dTime = 0f;
+        int score = 0;
         float moveAccum = 0f;
         float sideAccum = 0f;
 #if DEBUG
@@ -33,9 +34,7 @@ namespace Game {
 
 
         public ColumnWindow(int w=8,int h=10, int xOffset = 20, int yOffset = 20) {
-            width = 400;
-            height = 600;
-            title = "Columns";
+            
             boardW = w;
             boardH = h;
             this.xOffset = xOffset;
@@ -51,9 +50,7 @@ namespace Game {
             r = new Random();
             
         }
-        public override void Initialize() {
-            this.width = width / tileSize * tileSize;
-            this.height = height / tileSize * tileSize;
+        public void Initialize() {
             Reset();
             //Generate 3 random jewels
             NewPiece();
@@ -69,35 +66,42 @@ namespace Game {
 #endif
         }
     
-        public override void Update(float deltaTime) {
+        public void Update(float deltaTime, bool pPressed, bool lPressed, bool spacePressed, bool lmPressed,bool upPressed, bool wPressed,bool leftPressed,bool aPressed,bool rightPressed, bool dPressed, bool downPressed, bool sPressed) {
 #if DEBUG
-            if (KeyPressed(Keys.P)) {
-                CurrentState = GameState.Lost;
+            if (pPressed) {
+                CurrentState = GameState.Pause;
             }
-            if (KeyPressed(Keys.L)) {
+            if (lPressed) {
                 CurrentState = GameState.Playing;
             }
 #endif
 
             if (CurrentState == GameState.TitleScreen) {
                 DebugStateStatus();
-                if (KeyPressed(Keys.Space) || LeftMousePressed) {
+                if (spacePressed || lmPressed) {
                     CurrentState = GameState.Playing;
                 }
             }
             if (CurrentState == GameState.Playing) {
                 DebugStateStatus();
-            
-
-                if (KeyPressed(Keys.Up) || KeyPressed(Keys.W)) {
-                    currentColumn.Switch();
+                //Checks to see if anything fell into a streak
+                for (int x = boardW - 1; x >= 0; x--) {
+                    for (int y = boardH-1 ; y >= 0 ; y--){
+                        CheckStreak(x, y);
+                        DestroyStreak(CheckStreak(x, y));
+                        RowFall();
+                    }
                 }
-                MoveDown(deltaTime);
+
+                    if (upPressed || wPressed) {
+                        currentColumn.Switch();
+                    }
+                MoveDown(deltaTime, leftPressed, aPressed,rightPressed,dPressed,downPressed,sPressed);
             }
             if (CurrentState == GameState.Lost) {
                 DebugStateStatus();
                 isGameOver = true;
-                if (KeyPressed(Keys.Space) || LeftMousePressed) {
+                if (spacePressed || lmPressed) {
                     Reset();
                     NewPiece();
                     isGameOver = false;
@@ -106,11 +110,11 @@ namespace Game {
             }
         }
 
-        void MoveDown(float dTime) {
+        void MoveDown(float dTime, bool leftPressed, bool aPressed, bool rightPressed, bool dPressed, bool downPressed, bool sPressed) {
             moveAccum += dTime;
             sideAccum += dTime;
             if (sideAccum > 0.1f) {
-                if (KeyDown(Keys.Left) || KeyPressed(Keys.A)) {
+                if (leftPressed || aPressed) {
                     currentColumn.Position.X -= tileSize;
                     CheckBoundry();
                     if (CheckStackingCollision()) {		
@@ -124,7 +128,7 @@ namespace Game {
 #endif
 
                 }
-                if (KeyDown(Keys.Right) || KeyPressed(Keys.D)) {
+                if (rightPressed || dPressed) {
                     currentColumn.Position.X += tileSize;
                     CheckBoundry(); 
                     if (CheckStackingCollision()) {
@@ -139,7 +143,7 @@ namespace Game {
                 }
                 sideAccum -= 0.1f;
             }
-            if (KeyDown(Keys.Down) || KeyPressed(Keys.S)) {
+            if (downPressed || sPressed) {
                 currentSpeed = fastFall;
             }
             else {
@@ -195,26 +199,11 @@ namespace Game {
                 RowFall();
             }
             //Generate new column
-            //TODO : DESTROY ROW, ROW FALL/ANIMATION (ENUM STATE), COSMETICS
             NewPiece();
         }
 
         void RowFall() {
             CurrentState = GameState.Fall;
-            /*
-             * this moves it down only one row at a time
-            for (int col = boardW - 1; col >= 0; col--) {
-                for (int row = boardH - 1; row > 0; row--) {
-                    if (logicBoard[col][row] == -1) {
-                        logicBoard[col][row] = logicBoard[col][row - 1];
-                        logicBoard[col][row - 1] = -1;
-#if DEBUG
-                        Console.WriteLine("Cell X: "+col + "Y: "+(row - 1) + " moved down");
-#endif
-                    }
-                }
-            }
-             */
             Dictionary<Point, int> result = new Dictionary<Point, int>();
             //Loop through col backwards
             for (int col = boardW - 1; col >= 0; col--) {
@@ -268,6 +257,16 @@ namespace Game {
 #if DEBUG
                 Console.WriteLine("Cell Removed at X: " + p.X + " Y: " + p.Y);
 #endif
+            }
+            float multiplier = locations.Count / 1.5f;
+            PointTracker(multiplier);
+            
+        }
+
+        void PointTracker(float multiplier) {
+            score += (int)(40 * (fallSpeed) * (float)multiplier);
+            if (score%500 == 1){
+                fallSpeed++;
             }
         }
 
@@ -418,7 +417,7 @@ namespace Game {
             currentColumn = jewelStack;
         }
 
-        public override void Render(Graphics g) {
+        public void Render(Graphics g) {
             //draw logic board
             using (Pen p = new Pen(Brushes.Black, 1f)) {
                 for (int col = 0; col < logicBoard.Length; col++) {
@@ -446,6 +445,11 @@ namespace Game {
                     }
                 }
             }
+
+            //Display Score to the left of playing board
+            g.DrawString("Score: " + System.Convert.ToString(score), new Font("Purisia", 30), Brushes.Black, new Point(boardW * (3 / 2) * tileSize,0));
+            g.DrawString("Level: " + System.Convert.ToString(fallSpeed), new Font("Purisia", 30), Brushes.Black, new Point(boardW * (3 / 2) * tileSize,60));
+
         }
         
     }

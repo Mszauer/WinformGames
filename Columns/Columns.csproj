@@ -57,6 +57,7 @@
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Column.cs" />
+    <Compile Include="ColumnTestWindow.cs" />
     <Compile Include="ColumnWindow.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
