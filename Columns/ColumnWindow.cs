@@ -204,7 +204,7 @@ namespace Game {
 #endif
                 logicBoard[(int)(r[i].X - xOffset)/ tileSize][(int)(r[i].Y-yOffset) / tileSize] = currentColumn.Values[i];
                 CheckStreak((int)r[i].X / tileSize, (int)r[i].Y / tileSize);
-                DestroyStreak(CheckStreak((int)r[i].X / tileSize, (int)r[i].Y / tileSize));
+                //DestroyStreak(CheckStreak((int)r[i].X / tileSize, (int)r[i].Y / tileSize));
             }
             //Generate new column
             NewPiece();
@@ -284,7 +284,7 @@ namespace Game {
                     }
                 }
                 if (!hasStreak) {
-                    CurrentState = GameState.Playing;
+                    //CurrentState = GameState.Playing;
                 }
             }
         }
