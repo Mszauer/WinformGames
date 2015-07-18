@@ -25,7 +25,6 @@ namespace Game {
         float timeAccum = 0f;
         Random r = null;
         bool isGameOver = false;
-        float dTime = 0f;
         int score = 0;
         float moveAccum = 0f;
         float sideAccum = 0f;
@@ -70,7 +69,8 @@ namespace Game {
         public void Update(float deltaTime, bool pPressed, bool lPressed, bool spacePressed, bool lmPressed,bool upPressed, bool wPressed,bool leftPressed,bool aPressed,bool rightPressed, bool dPressed, bool downPressed, bool sPressed) {
 #if DEBUG
             if (pPressed) {
-                CurrentState = GameState.Pause;
+                Console.WriteLine(CurrentState);
+                //CurrentState = GameState.Pause;
             }
             if (lPressed) {
                 CurrentState = GameState.Playing;
@@ -113,7 +113,9 @@ namespace Game {
                 }
             }
             if (CurrentState == GameState.Fall) {
-                RowFall(dTime);
+                RowFall(deltaTime);
+                Console.WriteLine("dTime: "+deltaTime);
+                Console.WriteLine("MoveAccum: " + moveAccum);
             }
         }
 
@@ -208,53 +210,6 @@ namespace Game {
         }
 
         void RowFall(float dTime) {
-            /*
-            CurrentState = GameState.Fall;
-            Dictionary<Point, int> result = new Dictionary<Point, int>();
-            //Loop through col backwards
-            for (int col = boardW - 1; col >= 0; col--) {
-                //create empty cell counter
-                int emptyY = 0;
-                //loop through rows backwards
-                for (int row = boardH - 1; row >= 0; row--) {
-                    if (logicBoard[col][row] == -1) {
-                        //if cell value is -1, add one to counter
-                        emptyY++;
-                    }
-                }
-                //if counter is above 0
-                if (emptyY > 0) {
-                    for (int row = 0; row < boardH; row++) {
-                        if (logicBoard[col][row] == -1) {
-                            //loop through rows until it finds an empty cell
-                            break;
-                        }
-                        //position of empty cells and counter to dictionary
-                        result.Add(new Point(col, row), emptyY);
-                    }
-                }
-            }// end dictionary setup
-            //Sink values down:
-
-            //create buffer dictionary to store things
-            Dictionary<Point, int> changeStorage = new Dictionary<Point, int>();
-            foreach (KeyValuePair<Point, int> kvp in result) {
-                //kvp.Value is how much a cell sinks, so you add it to kvp.Key.Y to get the new cell position
-                //and then assign it to the corresponding logicboard cell
-                changeStorage.Add(new Point(kvp.Key.X, kvp.Key.Y + kvp.Value), logicBoard[kvp.Key.X][kvp.Key.Y]);
-            }
-            //Transfer the new cell positions and values to logicboard
-            foreach (KeyValuePair<Point, int> kvp in changeStorage) {
-                logicBoard[kvp.Key.X][kvp.Key.Y] = kvp.Value;
-            }
-            //sets the cells above newly sunken cells to 0
-            foreach (KeyValuePair<Point, int> kvp in result) {
-                for (int row = 0 ; row < kvp.Value ; row++){
-                    logicBoard[kvp.Key.X][row] = 0;
-                }
-            }
-            CurrentState = GameState.Playing;
-             */
             timeAccum += dTime;
             if (timeAccum > 0.5f) {
                 for (int col =0; col < boardW; col++) {
@@ -272,16 +227,16 @@ namespace Game {
                     }//end row
                 }//end col
                 timeAccum -= 0.5f;
-                bool hasStreak = false; // No, you don't have a streak by default
+                bool blankCell = false; // No, you don't have a streak by default
                 for (int col = 0; col < boardW; col++) {
                     for (int row = boardH - 1; row >= 0; row--) {
                         if (logicBoard[col][row] == -1) {
-                            hasStreak = true; // If the streak count is >= 3, then you have a streak
+                            blankCell = true; // If the streak count is >= 3, then you have a streak
                         }
                     }
                 }
-                if (!hasStreak) {
-                    //CurrentState = GameState.Playing;
+                if (!blankCell) {
+                    CurrentState = GameState.Playing;
                 }
             }
         }
