@@ -12,7 +12,7 @@ namespace Game {
         Column currentColumn = null;
         List<Brush> gemColors = null;
         int[][] logicBoard = null;
-        enum GameState { TitleScreen, Playing, Lost, Destroy, Fall, Pause}
+        enum GameState { TitleScreen, Playing, Lost, Fall, Pause}
         GameState CurrentState = GameState.TitleScreen;
         int boardW = 0; // board width, set inside constructor
         int boardH = 0; // board Height , set inside constructor
@@ -96,8 +96,9 @@ namespace Game {
 #if DEBUG
                         CheckStreak(x, y);
 #endif
-                        DestroyStreak(CheckStreak(x, y));
-                        CurrentState = GameState.Fall;
+                        if (DestroyStreak(CheckStreak(x, y))) {
+                            CurrentState = GameState.Fall;
+                        }
                     }
                 }
 
@@ -288,17 +289,18 @@ namespace Game {
             }
         }
 
-        void DestroyStreak(List<Point> locations) {
-            CurrentState = GameState.Destroy;
+        bool DestroyStreak(List<Point> locations) {
+            bool destroyed = false;
             foreach (Point p in locations) {
                 logicBoard[p.X][p.Y] = -1;
+                destroyed = true;
 #if DEBUG
                 Console.WriteLine("Cell Removed at X: " + p.X + " Y: " + p.Y);
 #endif
             }
             float multiplier = locations.Count / 1.5f;
             PointTracker(multiplier);
-            
+            return destroyed;
         }
 
         void PointTracker(float multiplier) {
