@@ -93,10 +93,8 @@ namespace Game {
                 //Checks to see if anything fell into a streak
                 for (int x = boardW - 1; x >= 0; x--) {
                     for (int y = boardH-1 ; y >= 0 ; y--){
-#if DEBUG
-                        CheckStreak(x, y);
-#endif
-                        if (DestroyStreak(CheckStreak(x, y))) {
+                        List<Point> streak = CheckStreak(x, y);
+                        if (streak.Count >= 3 && DestroyStreak(streak)) {
                             CurrentState = GameState.Fall;
                         }
                     }
@@ -204,7 +202,6 @@ namespace Game {
 #endif
                 logicBoard[(int)(r[i].X - xOffset)/ tileSize][(int)(r[i].Y-yOffset) / tileSize] = currentColumn.Values[i];
                 CheckStreak((int)r[i].X / tileSize, (int)r[i].Y / tileSize);
-                //DestroyStreak(CheckStreak((int)r[i].X / tileSize, (int)r[i].Y / tileSize));
             }
             //Generate new column
             NewPiece();
