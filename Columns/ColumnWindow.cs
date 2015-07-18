@@ -84,6 +84,7 @@ namespace Game {
                 }
             }
             if (CurrentState == GameState.Playing) {
+                //hardcode spot so you lose if it spawns and is filled?
                 DebugStateStatus();
                 //Checks to see if anything fell into a streak
                 for (int x = boardW - 1; x >= 0; x--) {
@@ -268,7 +269,7 @@ namespace Game {
                     }//end row
                 }//end col
                 timeAccum -= 0.5f;
-                if (/*no streak detected*/){
+                if (CheckStreak(/*what x,y?*/).Count < 3) {
                     CurrentState = GameState.Playing;
                 }
             }
