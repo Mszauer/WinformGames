@@ -22,6 +22,7 @@ namespace Game {
         int fallSpeed = 1;
         int fastFall = 15;
         int currentSpeed = 1;
+        float timeAccum = 0f;
         Random r = null;
         bool isGameOver = false;
         float dTime = 0f;
@@ -89,7 +90,7 @@ namespace Game {
                     for (int y = boardH-1 ; y >= 0 ; y--){
                         CheckStreak(x, y);
                         DestroyStreak(CheckStreak(x, y));
-                        RowFall();
+                        RowFall(dTime);
                     }
                 }
 
@@ -116,7 +117,7 @@ namespace Game {
             if (sideAccum > 0.1f) {
                 if (leftPressed || aPressed) {
                     currentColumn.Position.X -= tileSize;
-                    CheckBoundry();
+                    CheckBoundry(dTime);
                     if (CheckStackingCollision()) {		
                        currentColumn.Position.X += tileSize;		
 #if DEBUG		
@@ -130,7 +131,7 @@ namespace Game {
                 }
                 if (rightPressed || dPressed) {
                     currentColumn.Position.X += tileSize;
-                    CheckBoundry(); 
+                    CheckBoundry(dTime); 
                     if (CheckStackingCollision()) {
                         currentColumn.Position.X -= tileSize;
 #if DEBUG
@@ -152,10 +153,10 @@ namespace Game {
 
             if (moveAccum > 1.0f) {
                 currentColumn.Position.Y += tileSize;
-                CheckBoundry();
+                CheckBoundry(dTime);
                 if (CheckStackingCollision()) {
                     currentColumn.Position.Y -= tileSize;
-                    StampStack();
+                    StampStack(dTime);
                     
                 }
                 moveAccum -= 1.0f / (float)currentSpeed;
@@ -171,7 +172,7 @@ namespace Game {
             return false;
         }
 
-        void CheckBoundry() {
+        void CheckBoundry(float dTime) {
             if (currentColumn.Position.X < xOffset) {
                 currentColumn.Position.X = xOffset;
             }
@@ -180,12 +181,12 @@ namespace Game {
             }
             if (currentColumn.Position.Y + currentColumn.AABB.H > (boardH) * tileSize + yOffset) {
                 currentColumn.Position.Y = (boardH) * tileSize + yOffset - (int)currentColumn.AABB.H;
-                StampStack();
+                StampStack(dTime);
                 
             }
         }
 
-        void StampStack() {
+        void StampStack(float dTime) {
             //copy values ontop logic board
             List<Rect> r = currentColumn.ReturnRects();
             for (int i = 0 ; i < r.Count ; i++) {
@@ -196,13 +197,14 @@ namespace Game {
                 logicBoard[(int)(r[i].X - xOffset)/ tileSize][(int)(r[i].Y-yOffset) / tileSize] = currentColumn.Values[i];
                 CheckStreak((int)r[i].X / tileSize, (int)r[i].Y / tileSize);
                 DestroyStreak(CheckStreak((int)r[i].X / tileSize, (int)r[i].Y / tileSize));
-                RowFall();
+                RowFall(dTime);
             }
             //Generate new column
             NewPiece();
         }
 
-        void RowFall() {
+        void RowFall(float dTime) {
+            /*
             CurrentState = GameState.Fall;
             Dictionary<Point, int> result = new Dictionary<Point, int>();
             //Loop through col backwards
@@ -248,6 +250,28 @@ namespace Game {
                 }
             }
             CurrentState = GameState.Playing;
+             */
+            timeAccum += dTime;
+            if (timeAccum > 0.5f) {
+                for (int col =0; col < boardW; col++) {
+                    for (int row = boardH - 1; row >= 0; row--) {
+                        if (logicBoard[col][row] == -1) {
+                            for (int move = row; move >= 0; move--) {
+                                if (move == 0) {
+                                    logicBoard[col][move] = 0;
+                                }
+                                else {
+                                    logicBoard[col][move] = logicBoard[col][move - 1];
+                                }
+                            }//end move
+                        }
+                    }//end row
+                }//end col
+                timeAccum -= 0.5f;
+                if (/*no streak detected*/){
+                    CurrentState = GameState.Playing;
+                }
+            }
         }
 
         void DestroyStreak(List<Point> locations) {
