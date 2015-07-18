@@ -86,20 +86,23 @@ namespace Game {
             if (CurrentState == GameState.Playing) {
                 //hardcode spot so you lose if it spawns and is filled?
                 DebugStateStatus();
+                if (upPressed || wPressed) {
+                    currentColumn.Switch();
+                }
+                MoveDown(deltaTime, leftPressed, aPressed, rightPressed, dPressed, downPressed, sPressed);
                 //Checks to see if anything fell into a streak
                 for (int x = boardW - 1; x >= 0; x--) {
                     for (int y = boardH-1 ; y >= 0 ; y--){
+#if DEBUG
                         CheckStreak(x, y);
+#endif
                         DestroyStreak(CheckStreak(x, y));
                         CurrentState = GameState.Fall;
                     }
                 }
 
-                    if (upPressed || wPressed) {
-                        currentColumn.Switch();
-                    }
-                MoveDown(deltaTime, leftPressed, aPressed,rightPressed,dPressed,downPressed,sPressed);
             }
+
             if (CurrentState == GameState.Lost) {
                 DebugStateStatus();
                 isGameOver = true;
@@ -111,7 +114,7 @@ namespace Game {
                 }
             }
             if (CurrentState == GameState.Fall) {
-                RowFall();
+                RowFall(dTime);
             }
         }
 
@@ -206,7 +209,7 @@ namespace Game {
             NewPiece();
         }
 
-        void RowFall() {
+        void RowFall(float dTime) {
             /*
             CurrentState = GameState.Fall;
             Dictionary<Point, int> result = new Dictionary<Point, int>();
