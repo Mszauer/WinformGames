@@ -278,7 +278,7 @@ namespace Game {
                 bool hasStreak = false; // No, you don't have a streak by default
                 for (int col = 0; col < boardW; col++) {
                     for (int row = boardH - 1; row >= 0; row--) {
-                        if (CheckStreak(col, row).Count >= 3) {
+                        if (logicBoard[col][row] == -1) {
                             hasStreak = true; // If the streak count is >= 3, then you have a streak
                         }
                     }
