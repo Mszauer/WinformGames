@@ -91,7 +91,7 @@ namespace Game {
                     for (int y = boardH-1 ; y >= 0 ; y--){
                         CheckStreak(x, y);
                         DestroyStreak(CheckStreak(x, y));
-                        RowFall(dTime);
+                        CurrentState = GameState.Fall;
                     }
                 }
 
@@ -110,6 +110,9 @@ namespace Game {
                     CurrentState = GameState.Playing;
                 }
             }
+            if (CurrentState == GameState.Fall) {
+                RowFall();
+            }
         }
 
         void MoveDown(float dTime, bool leftPressed, bool aPressed, bool rightPressed, bool dPressed, bool downPressed, bool sPressed) {
@@ -118,7 +121,7 @@ namespace Game {
             if (sideAccum > 0.1f) {
                 if (leftPressed || aPressed) {
                     currentColumn.Position.X -= tileSize;
-                    CheckBoundry(dTime);
+                    CheckBoundry();
                     if (CheckStackingCollision()) {		
                        currentColumn.Position.X += tileSize;		
 #if DEBUG		
@@ -132,7 +135,7 @@ namespace Game {
                 }
                 if (rightPressed || dPressed) {
                     currentColumn.Position.X += tileSize;
-                    CheckBoundry(dTime); 
+                    CheckBoundry(); 
                     if (CheckStackingCollision()) {
                         currentColumn.Position.X -= tileSize;
 #if DEBUG
@@ -154,10 +157,10 @@ namespace Game {
 
             if (moveAccum > 1.0f) {
                 currentColumn.Position.Y += tileSize;
-                CheckBoundry(dTime);
+                CheckBoundry();
                 if (CheckStackingCollision()) {
                     currentColumn.Position.Y -= tileSize;
-                    StampStack(dTime);
+                    StampStack();
                     
                 }
                 moveAccum -= 1.0f / (float)currentSpeed;
@@ -173,7 +176,7 @@ namespace Game {
             return false;
         }
 
-        void CheckBoundry(float dTime) {
+        void CheckBoundry() {
             if (currentColumn.Position.X < xOffset) {
                 currentColumn.Position.X = xOffset;
             }
@@ -182,12 +185,12 @@ namespace Game {
             }
             if (currentColumn.Position.Y + currentColumn.AABB.H > (boardH) * tileSize + yOffset) {
                 currentColumn.Position.Y = (boardH) * tileSize + yOffset - (int)currentColumn.AABB.H;
-                StampStack(dTime);
+                StampStack();
                 
             }
         }
 
-        void StampStack(float dTime) {
+        void StampStack() {
             //copy values ontop logic board
             List<Rect> r = currentColumn.ReturnRects();
             for (int i = 0 ; i < r.Count ; i++) {
@@ -198,13 +201,12 @@ namespace Game {
                 logicBoard[(int)(r[i].X - xOffset)/ tileSize][(int)(r[i].Y-yOffset) / tileSize] = currentColumn.Values[i];
                 CheckStreak((int)r[i].X / tileSize, (int)r[i].Y / tileSize);
                 DestroyStreak(CheckStreak((int)r[i].X / tileSize, (int)r[i].Y / tileSize));
-                RowFall(dTime);
             }
             //Generate new column
             NewPiece();
         }
 
-        void RowFall(float dTime) {
+        void RowFall() {
             /*
             CurrentState = GameState.Fall;
             Dictionary<Point, int> result = new Dictionary<Point, int>();
@@ -269,7 +271,15 @@ namespace Game {
                     }//end row
                 }//end col
                 timeAccum -= 0.5f;
-                if (CheckStreak(/*what x,y?*/).Count < 3) {
+                bool hasStreak = false; // No, you don't have a streak by default
+                for (int col = 0; col < boardW; col++) {
+                    for (int row = boardH - 1; row >= 0; row--) {
+                        if (CheckStreak(col, row).Count >= 3) {
+                            hasStreak = true; // If the streak count is >= 3, then you have a streak
+                        }
+                    }
+                }
+                if (!hasStreak) {
                     CurrentState = GameState.Playing;
                 }
             }
