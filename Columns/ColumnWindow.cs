@@ -24,13 +24,9 @@ namespace Game {
         int currentSpeed = 1;
         float timeAccum = 0f;
         Random r = null;
-        bool isGameOver = false;
         int score = 0;
         float moveAccum = 0f;
         float sideAccum = 0f;
-#if DEBUG
-        bool StateDisplayed = true;
-#endif
 
 
         public ColumnWindow(int w=8,int h=10, int xOffset = 20, int yOffset = 20) {
@@ -55,22 +51,12 @@ namespace Game {
             //Generate 3 random jewels
             NewPiece();
         }
-        public void DebugStateStatus(){
-            //Doesnt work, wont display anything  past title screen
-            //Update calls it to much to set true need help
-#if DEBUG
-            if (StateDisplayed) {
-                Console.WriteLine(CurrentState);
-                StateDisplayed = false;
-            }
-#endif
-        }
+
     
         public void Update(float deltaTime, bool pPressed, bool lPressed, bool spacePressed, bool lmPressed,bool upPressed, bool wPressed,bool leftPressed,bool aPressed,bool rightPressed, bool dPressed, bool downPressed, bool sPressed) {
 #if DEBUG
             if (pPressed) {
-                Console.WriteLine(CurrentState);
-                //CurrentState = GameState.Pause;
+                CurrentState = GameState.Pause;
             }
             if (lPressed) {
                 CurrentState = GameState.Playing;
@@ -78,14 +64,14 @@ namespace Game {
 #endif
 
             if (CurrentState == GameState.TitleScreen) {
-                DebugStateStatus();
                 if (spacePressed || lmPressed) {
                     CurrentState = GameState.Playing;
                 }
             }
             if (CurrentState == GameState.Playing) {
-                //hardcode spot so you lose if it spawns and is filled?
-                DebugStateStatus();
+                if (logicBoard[(boardW - 1) / 2][2] > 0) {
+                    CurrentState = GameState.Lost;
+                }
                 if (upPressed || wPressed) {
                     currentColumn.Switch();
                 }
@@ -103,12 +89,9 @@ namespace Game {
             }
 
             if (CurrentState == GameState.Lost) {
-                DebugStateStatus();
-                isGameOver = true;
                 if (spacePressed || lmPressed) {
                     Reset();
                     NewPiece();
-                    isGameOver = false;
                     CurrentState = GameState.Playing;
                 }
             }
@@ -257,7 +240,7 @@ namespace Game {
 
         void PointTracker(float multiplier) {
             score += (int)(40 * (fallSpeed) * (float)multiplier);
-            if (score%500 == 1){
+            if (score%500 > 0){
                 fallSpeed++;
             }
         }
@@ -333,14 +316,16 @@ namespace Game {
             }
 
             //DIAGONAL
-            List<Point> Diag = new List<Point>();
-            Diag.Add(new Point(col, row));
+            List<Point> leftDiag = new List<Point>();
+            leftDiag.Add(new Point(col, row));
+            List<Point> rightDiag = new List<Point>();
+            rightDiag.Add(new Point(col, row));
             //LEFT UP
             logicalX = col - 1;
             logicalY = row - 1;
             if (logicalX >= 0 && logicalY >= 0) {
                 while (logicBoard[logicalX][logicalY] > 0 && logicBoard[logicalX][logicalY] == logicBoard[col][row]) {
-                    Diag.Add(new Point(logicalX, logicalY));
+                    leftDiag.Add(new Point(logicalX, logicalY));
                     logicalX -= 1;
                     logicalY -= 1;
                     if (logicalX < 0 || logicalY < 0) {
@@ -353,7 +338,7 @@ namespace Game {
             logicalY = row - 1;
             if (logicalY >= 0 && logicalX < boardW) {
                 while (logicBoard[logicalX][logicalY] > 0 && logicBoard[logicalX][logicalY] == logicBoard[col][row]) {
-                    Diag.Add(new Point(logicalX, logicalY));
+                    rightDiag.Add(new Point(logicalX, logicalY));
                     logicalX++;
                     logicalY -= 1;
                     if (logicalY < 0 || logicalX > boardW-1) {
@@ -366,7 +351,7 @@ namespace Game {
             logicalY = row + 1;
             if (logicalX >= 0 && logicalY < boardH) {
                 while (logicBoard[logicalX][logicalY] > 0 && logicBoard[logicalX][logicalY] == logicBoard[col][row]) {
-                    Diag.Add(new Point(logicalX, logicalY));
+                    leftDiag.Add(new Point(logicalX, logicalY));
                     logicalX -= 1;
                     logicalY++;
                     if (logicalX < 0 || logicalY > boardH-1) {
@@ -379,7 +364,7 @@ namespace Game {
             logicalY = row + 1;
             if (logicalX < boardW && logicalY < boardH) {
                 while (logicBoard[logicalX][logicalY] > 0 && logicBoard[logicalX][logicalY] == logicBoard[col][row]) {
-                    Diag.Add(new Point(logicalX, logicalY));
+                    rightDiag.Add(new Point(logicalX, logicalY));
                     logicalX++;
                     logicalY++;
                     if (logicalX > boardW-1 || logicalY > boardH-1) {
@@ -388,11 +373,17 @@ namespace Game {
                 }
             }
 
-            if (Diag.Count >= 3) {
+            if (leftDiag.Count >= 3) {
 #if DEBUG
-                Console.WriteLine("Diagonal Streak found, Length: " + Diag.Count);
+                Console.WriteLine("Left Diagonal Streak found, Length: " + leftDiag.Count);
 #endif
-                return Diag;
+                return leftDiag;
+            }
+            if (rightDiag.Count >= 3) {
+#if DEBUG
+                Console.WriteLine("Right Diagonal Streak found, Length: " + rightDiag.Count);
+#endif
+                return rightDiag;
             }
 
             return new List<Point>();
@@ -440,8 +431,16 @@ namespace Game {
 
             //Display Score to the left of playing board
             g.DrawString("Score: " + System.Convert.ToString(score), new Font("Purisia", 30), Brushes.Black, new Point(boardW * (3 / 2) * tileSize,0));
-            g.DrawString("Level: " + System.Convert.ToString(fallSpeed), new Font("Purisia", 30), Brushes.Black, new Point(boardW * (3 / 2) * tileSize,60));
+            g.DrawString("Level: " + System.Convert.ToString(fallSpeed), new Font("Purisia", 30), Brushes.Black, new Point(boardW * (3 / 2) * tileSize, 60));
 
+            if (CurrentState == GameState.Lost) {
+                g.DrawString("You have lost", new Font("Purisia", 15), Brushes.Black, new Point(boardW * (3 / 2) * tileSize, 120));
+                g.DrawString("Left Click or press Space to start again", new Font("Purisia", 15), Brushes.Black, new Point(boardW * (3 / 2) * tileSize, 180));
+            }
+            if (CurrentState == GameState.TitleScreen) {
+                g.DrawString("Left Click or press Space to start", new Font("Purisia", 15), Brushes.Black, new Point(boardW * (3 / 2) * tileSize, 180));
+
+            }
         }
         
     }
