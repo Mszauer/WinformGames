@@ -13,8 +13,8 @@ namespace Game {
         ColumnWindow game = null;
 
         public ColumnTestWindow() {
-            width = 800;
-            height = 600;
+            width = 7*2*40;//Widht+1 *2 * tileSize
+            height = 12*40; // Height of columnwindow * tileSize
             title = "Columns";
             game = new ColumnWindow(6, 12, 0, 0); //W,H,xOffset,yOffset
         }
