@@ -14,7 +14,7 @@ namespace Game {
         public BobbleWindow() {
             width = 400;
             height = 600;
-            bobble = new PuzzleBobble(new Point(0,0),new Size(6,7));//Offset,Board Size (x*y), hexagonal radius
+            bobble = new PuzzleBobble(new Point(0,0),new Size(8,11));//Offset,Board Size (x*y), hexagonal radius
         }
         public override void Initialize() {
             bobble.Initialize();

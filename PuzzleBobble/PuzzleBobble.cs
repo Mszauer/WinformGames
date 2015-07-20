@@ -24,7 +24,7 @@ namespace Game {
         }
         Rect BoardArea {
             get {
-                return new Rect(boardOffset.X, boardOffset.Y, BoardDimensions.Width * BallDiameter, BoardDimensions.Height * BallRadius + 150);
+                return new Rect(boardOffset.X, boardOffset.Y, BoardDimensions.Width * BallDiameter, BoardDimensions.Height * BallDiameter+BallDiameter*2);
             }
         }
         Point BoardCenter{
@@ -41,7 +41,7 @@ namespace Game {
             Board = new Hexagon[BoardDimensions.Width][];
             for (int x = 0; x < Board.Length; x++) {
                 Board[x] = new Hexagon[BoardDimensions.Height];
-                for (int y = 0; y < Board.Length; y++) {
+                for (int y = 0; y < Board[x].Length; y++) {
                     Board[x][y] = new Hexagon(rad, pos.X, pos.Y);
                     Board[x][y].Radius = rad;
                     Board[x][y].xIndexer = x;
@@ -92,7 +92,7 @@ namespace Game {
             g.DrawRectangle(Pens.Green,BoardArea.Rectangle);
             int _x = (int)(Board[0][0].W*0.5f);
             int _y = (int)(Board[0][0].H*0.5f);
-            RectangleF debug = new RectangleF(_x - BallRadius, _y - BallRadius, BallDiameter, BallDiameter);
+            RectangleF debug = new RectangleF(_x - BallRadius + boardOffset.X, _y - BallRadius+boardOffset.Y, BallDiameter, BallDiameter);
             g.DrawEllipse(Pens.Yellow, debug);
         }
     }
