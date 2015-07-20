@@ -20,7 +20,7 @@ namespace Game {
             bobble.Initialize();
         }
         public override void Update(float dTime) {
-            bobble.Update(dTime);
+            bobble.Update(dTime,RightMouseDown, KeyDown(Keys.D),LeftMouseDown,KeyDown(Keys.A),KeyPressed(Keys.Space));
         }
         public override void Render(Graphics g) {
             bobble.Render(g);
