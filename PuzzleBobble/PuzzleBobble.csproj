@@ -63,6 +63,7 @@
       <Link>Sprite.cs</Link>
     </Compile>
     <Compile Include="BobbleWindow.cs" />
+    <Compile Include="PuzzleBobble.cs" />
     <Compile Include="Hexagon.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
