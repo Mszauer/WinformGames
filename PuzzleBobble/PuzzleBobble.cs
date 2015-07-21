@@ -17,6 +17,7 @@ namespace Game {
         public float RotationSpeed = 30f;
         public PointF ShootingPosition = default(PointF);
         public PointF ShootingVelocity = default(PointF);
+        Brush[] b = new Brush[] { Brushes.Yellow, Brushes.Green, Brushes.Red };
         public float BallRadius {
             get {
                 return Board[0][0].HalfW;
@@ -116,8 +117,13 @@ namespace Game {
                     ShootingVelocity.X *= -1.0f;
                 }
                 if (ShootingRect.Top < BoardArea.Top) {
-                    ShootingPosition.Y = BoardArea.Top + BallRadius;
-                    ShootingVelocity.Y *= -1.0f;
+                    Point p = Hexagon.TileAt(new Point((int)ShootingPosition.X,(int)ShootingPosition.Y), BallRadius, (float)boardOffset.X, (float)boardOffset.Y);
+                    if (p.X >= Board.Length) {
+                        p.X = Board.Length-1;
+                    }
+                    Board[p.X][p.Y].Value = 0;
+                    ShootingVelocity.X = 0;
+                    ShootingVelocity.Y = 0;
                 }
                 if (ShootingRect.Bottom > BoardArea.Bottom) {
                     ShootingPosition.Y = BoardArea.Bottom - BallRadius;
@@ -139,15 +145,15 @@ namespace Game {
                     // If neightbor is valid
                     if (p.X >= 0 && p.Y >= 0 && p.X < BoardDimensions.Width && p.Y < BoardDimensions.Height) {
                         // Draw neighbor
-                        board[p.X][p.Y].Draw(g, Pens.Green);
+                        board[p.X][p.Y].Draw(g, Pens.Green,b);
 
                         Point nw = board[mouseIndex.X][mouseIndex.Y].GetNeighborIndex(Hexagon.Directions.NorthWest);
                         if (p == nw) {
-                            board[nw.X][nw.Y].Draw(g, Pens.Yellow);
+                            board[nw.X][nw.Y].Draw(g, Pens.Yellow,b);
                         }
                     }
                 }
-                board[mouseIndex.X][mouseIndex.Y].Draw(g, Pens.Red);
+                board[mouseIndex.X][mouseIndex.Y].Draw(g, Pens.Red,b);
             }
         }
 
@@ -155,7 +161,7 @@ namespace Game {
             //Draw Board
             for (int x = 0; x < Board.Length; x++) {
                 for (int y = 0; y < Board[x].Length; y++) {
-                    Board[x][y].Draw(g, Pens.Blue);
+                    Board[x][y].Draw(g, Pens.Blue,b);
                 }
             }
             //Draw Playing Area

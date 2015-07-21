@@ -178,7 +178,7 @@ namespace Game {
             return new Point(X, Y);
         }
 
-        public void Draw(Graphics g, Pen p, Brushes[] b) {
+        public void Draw(Graphics g, Pen p, Brush[] b) {
             int centerHeight = (int)(RowH - (H - RowH));
 
             Point p1 = new Point(Center.X, Origin.Y);
@@ -207,7 +207,7 @@ namespace Game {
 
             //Draw bubbles
             if (Value >= 0){
-                g.FillEllipse(,new Rect(new Point((int)(Center.X-HalfW), (int)(Center.Y-HalfW)), new Size((int)HalfW*2,(int)HalfW*2)).Rectangle);
+                g.FillEllipse(b[Value],new Rect(new Point((int)(Center.X-HalfW), (int)(Center.Y-HalfW)), new Size((int)HalfW*2,(int)HalfW*2)).Rectangle);
             }
         }
     }
