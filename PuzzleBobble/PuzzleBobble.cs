@@ -29,7 +29,7 @@ namespace Game {
         }
         public Rect BoardArea {
             get {
-                return new Rect(boardOffset.X, boardOffset.Y, BoardDimensions.Width * BallDiameter, BoardDimensions.Height * BallDiameter+BallDiameter*2);
+                return new Rect(boardOffset.X, boardOffset.Y, BoardDimensions.Width * BallDiameter+BallRadius, BoardDimensions.Height * BallDiameter+BallDiameter*2);
             }
         }
         public Point BoardCenter{ //returns center in world space / pixel space

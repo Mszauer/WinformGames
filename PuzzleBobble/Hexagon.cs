@@ -18,6 +18,8 @@ namespace Game {
         private float radius = 0f;
         float xOffset = 0f;
         float yOffset = 0f;
+        public int Value = -1;
+        //start getters
         public float W {
             get {
                 return w;
@@ -50,7 +52,7 @@ namespace Game {
                 w = 2f * halfW;
             }
         }
-        Point Origin {
+        public Point Origin {
             get {
                 //sets x to 0 or halfW(an offset) based on if Y is divisble by 2
                 int x = (int)(xIndexer * w + xOffset) + (int)((yIndexer % 2 == 1) ? halfW : 0);
@@ -58,10 +60,10 @@ namespace Game {
                 return new Point(x, y);
             }
         }
-        Point Center {
+        public Point Center {
             get {
                 int x = (int)(xIndexer * W + halfW + xOffset) + (int)((yIndexer % 2 == 1) ? halfW : 0);
-                int y = (int)(yIndexer * rowH + rowH / 2 + yOffset);
+                int y = (int)(yIndexer * rowH + H / 2 + yOffset);
                 return new Point(x, y);
             }
         }
@@ -176,7 +178,7 @@ namespace Game {
             return new Point(X, Y);
         }
 
-        public void Draw(Graphics g, Pen p) {
+        public void Draw(Graphics g, Pen p, Brushes[] b) {
             int centerHeight = (int)(RowH - (H - RowH));
 
             Point p1 = new Point(Center.X, Origin.Y);
@@ -202,6 +204,11 @@ namespace Game {
             p1 = new Point(Origin.X + (int)W, Origin.Y + (int)(H - RowH) + centerHeight);
             p2 = new Point(Center.X, Origin.Y + (int)H);
             g.DrawLine(p, p1, p2);
+
+            //Draw bubbles
+            if (Value >= 0){
+                g.FillEllipse(,new Rect(new Point((int)(Center.X-HalfW), (int)(Center.Y-HalfW)), new Size((int)HalfW*2,(int)HalfW*2)).Rectangle);
+            }
         }
     }
 }
