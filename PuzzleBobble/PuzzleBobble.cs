@@ -169,6 +169,7 @@ namespace Game {
                                 Point _p = Hexagon.TileAt(new Point((int)ShootingPosition.X, (int)ShootingPosition.Y), Board[x][y].Radius, boardOffset.X, boardOffset.Y);
                                 if (_p.Y < BoardDimensions.Height && _p.X < BoardDimensions.Width) {
                                     StampBoard(_p.X, _p.Y);
+                                    return;
                                 }
                             }
                         }//end board value
@@ -179,16 +180,16 @@ namespace Game {
         }
 
         void StampBoard(int x, int y) {
-            Board[x][x].Value = ShootingColor;
+            Board[x][y].Value = ShootingColor;
             ShootingVelocity.X = 0;
             ShootingVelocity.Y = 0;
             ShootingColor = GetNextShootingColor();
-            List<Point> result = new List<Point>(GetStreak(x, y));
+            /*List<Point> result = GetStreak(x, y);
             if (result.Count >= 3) {
                 foreach (Point p in result) {
                     Board[p.X][p.Y].Value = -1;
                 }
-            }
+            }*/
         }
 
         public List<Point> GetStreak(int x, int y) {
