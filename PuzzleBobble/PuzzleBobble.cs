@@ -117,7 +117,7 @@ namespace Game {
                     ShootingVelocity.X *= -1.0f;
                 }
                 if (ShootingRect.Top < BoardArea.Top) {
-                    Point p = Hexagon.TileAt(new Point((int)ShootingPosition.X,(int)ShootingPosition.Y), BallRadius, (float)boardOffset.X, (float)boardOffset.Y);
+                    Point p = Hexagon.TileAt(new Point((int)ShootingPosition.X,(int)ShootingPosition.Y), Board[0][0].Radius, (float)boardOffset.X, (float)boardOffset.Y);
                     if (p.X >= Board.Length) {
                         p.X = Board.Length-1;
                     }
@@ -129,10 +129,31 @@ namespace Game {
                     ShootingPosition.Y = BoardArea.Bottom - BallRadius;
                     ShootingVelocity.Y *= -1.0f;
                 }
+                //Collision
+                for (int x = 0; x < BoardDimensions.Width - 1; x++) {
+                    for (int y = 0; y < BoardDimensions.Height - 1; y++) {
+                        if (Board[x][y].Value != -1) {
+                            float distanceX = Board[x][y].Center.X - ShootingPosition.X;
+                            float distanceY = Board[x][y].Center.Y - ShootingPosition.Y;
+                            if (distanceX < BallDiameter || distanceY < BallDiameter) {
+                                Point _p = Hexagon.TileAt(new Point((int)ShootingVelocity.X, (int)ShootingVelocity.Y), BallRadius, boardOffset.X, boardOffset.Y);
+                                Board[_p.X][_p.Y].Value = 0;
+                                ShootingVelocity.X = 0;
+                                ShootingVelocity.Y = 0;
+                            }
+                        }
+                    }
+                }
+                
             }
         }
 
-        public void HighlightNeighbors(Graphics g,float xOffset, float yOffset, Hexagon[][] board,Point mouse) {
+        float Distance(Point p1, Point p2) {
+            Point v = new Point(p1.X - p2.X, p1.Y - p2.Y);
+            return (float)Math.Sqrt(v.X * v.X + v.Y * v.Y);
+        }
+        
+        public void HighlightNeighbors(Graphics g, float xOffset, float yOffset, Hexagon[][] board, Point mouse) {
             Point MousePosition = new Point(mouse.X, mouse.Y);
             // Get the X, Y (board indices) of the mouse position
             Point mouseIndex = Hexagon.TileAt(new Point(MousePosition.X,MousePosition.Y), BallRadius,xOffset,yOffset);
