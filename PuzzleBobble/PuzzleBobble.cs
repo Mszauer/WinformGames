@@ -15,9 +15,11 @@ namespace Game {
         Point boardOffset = default(Point);
         public float ShootAngle = 90f;
         public float RotationSpeed = 30f;
+        public int ShootingColor = 0;
+        Random r = null;
         public PointF ShootingPosition = default(PointF);
         public PointF ShootingVelocity = default(PointF);
-        Brush[] b = new Brush[] { Brushes.Yellow, Brushes.Green, Brushes.Red };
+        Brush[] b = new Brush[] { Brushes.Yellow, Brushes.Green, Brushes.Red,Brushes.Blue, Brushes.Purple,Brushes.Silver,Brushes.Orange,Brushes.Black };
         public float BallRadius {
             get {
                 return Board[0][0].HalfW;
@@ -58,14 +60,16 @@ namespace Game {
         }
 
         public PuzzleBobble(Point pos, Size siz, float rad = 20f) {
-            
+            r = new Random();
             //set up board
             boardOffset = new Point(pos.X, pos.Y);
             BoardDimensions = new Size(siz.Width, siz.Height);
             Board = new Hexagon[BoardDimensions.Width][];
             for (int x = 0; x < Board.Length; x++) {
+                //Create actual hexagons
                 Board[x] = new Hexagon[BoardDimensions.Height];
                 for (int y = 0; y < Board[x].Length; y++) {
+                    //create hexagons then assign values
                     Board[x][y] = new Hexagon(rad, pos.X, pos.Y);
                     Board[x][y].Radius = rad;
                     Board[x][y].xIndexer = x;
@@ -77,6 +81,32 @@ namespace Game {
         public void Initialize() {
 
         }
+        public int GetNextShootingColor() {
+            int newColor = r.Next(0, b.Length);
+            //set up list of current colors on board
+            List<int> currentColors = new List<int>();
+            for (int col = 0; col < Board.Length; col++) {
+                for (int row = 0; row < Board[col].Length; row++) {
+                    if (Board[col][row].Value != -1) {
+                        for (int i = 0; i < currentColors.Count; i++) {
+                            if (currentColors[i] != Board[col][row].Value) {
+                                currentColors.Add(Board[col][row].Value);
+                            }
+                        }//end i
+                    }//end value check
+                }//end row
+            }//end col
+            //check if new color is in current colors
+            for (int j = 0; j < currentColors.Count; j++) {
+                do {
+                    //if not, generate new color
+                    newColor = r.Next(0, b.Length);
+                }
+                while (newColor != currentColors[j]);   
+            }
+            return newColor;
+        }
+
         public void Update(float deltaTime, bool rightDown,bool dDown, bool leftDown, bool aDown, bool spacePressed) {
             if (GameState == State.Aiming) {
                 //Rotate Aim Left or Right
@@ -142,9 +172,9 @@ namespace Game {
                                     ShootingVelocity.Y = 0;
                                 }
                             }
-                        }
-                    }
-                }
+                        }//end board value
+                    }//end y
+                }//end x
                 
             }
         }
