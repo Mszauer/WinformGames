@@ -155,9 +155,7 @@ namespace Game {
                     if (p.X >= Board.Length) {
                         p.X = Board.Length-1;
                     }
-                    Board[p.X][p.Y].Value = ShootingColor;
-                    ShootingVelocity.X = 0;
-                    ShootingVelocity.Y = 0;
+                    StampBoard(p.X, p.Y);
                 }
                 if (ShootingRect.Bottom > BoardArea.Bottom) {
                     ShootingPosition.Y = BoardArea.Bottom - BallRadius;
@@ -170,16 +168,26 @@ namespace Game {
                             if (Distance(Board[x][y].Center,new Point((int)ShootingPosition.X, (int)ShootingPosition.Y)) < BallDiameter) {
                                 Point _p = Hexagon.TileAt(new Point((int)ShootingPosition.X, (int)ShootingPosition.Y), Board[x][y].Radius, boardOffset.X, boardOffset.Y);
                                 if (_p.Y < BoardDimensions.Height && _p.X < BoardDimensions.Width) {
-
-                                    Board[_p.X][_p.Y].Value = ShootingColor;
-                                    ShootingVelocity.X = 0;
-                                    ShootingVelocity.Y = 0;
+                                    StampBoard(_p.X, _p.Y);
                                 }
                             }
                         }//end board value
                     }//end y
                 }//end x
                 
+            }
+        }
+
+        void StampBoard(int x, int y) {
+            Board[x][x].Value = ShootingColor;
+            ShootingVelocity.X = 0;
+            ShootingVelocity.Y = 0;
+            ShootingColor = GetNextShootingColor();
+            List<Point> result = new List<Point>(GetStreak(x, y));
+            if (result.Count >= 3) {
+                foreach (Point p in result) {
+                    Board[p.X][p.Y].Value = -1;
+                }
             }
         }
 
