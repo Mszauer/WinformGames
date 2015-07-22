@@ -84,31 +84,38 @@ namespace Game {
 
         }
         public int GetNextShootingColor() {
-            //set up list of current colors on board
-            List<int> currentColors = new List<int>();
-            for (int col = 0; col < Board.Length; col++) {
-                for (int row = 0; row < Board[col].Length; row++) {
-                    if (Board[col][row].Value != -1) {
-                        for (int i = 0; i < currentColors.Count; i++) {
-                            if (currentColors[i] != Board[col][row].Value) {
-                                currentColors.Add(Board[col][row].Value);
-                            }
-                        }//end i
-                    }//end value check
-                }//end row
-            }//end col
-            int newColor = r.Next(0, b.Length);
-            //checks to see if there are colors on the board
-            if (currentColors.Count >= 1) {
-                //check if new color is in current colors
-                for (int j = 0; j < currentColors.Count; j++) {
-                    while (newColor != currentColors[j]) {
-                        //if not, generate new color
-                        newColor = r.Next(0, b.Length);
+            // Create a list of integers for all the colors on the board
+            List<int> colors = new List<int>();
+
+            // Collect that list
+            for (int x = 0; x < BoardDimensions.Width; ++x) {
+                for (int y = 0; y < BoardDimensions.Height; ++y) {
+                    // Only if the cell being checked is not empty
+                    if (Board[x][y].Value != -1) {
+                        // Only if the colors list doesnt already have this color
+                        if (!colors.Contains(Board[x][y].Value)) {
+                            // Add the color to our (unique) list
+                            colors.Add(Board[x][y].Value);
+                        }
                     }
                 }
             }
-            return newColor;
+
+            // If there where colors on the board, they are now in the colors list
+            // Next, if that list is empty, return default
+            if (colors.Count == 0) {
+                return r.Next(0, b.Length);
+            }
+
+            // Now generate a random color
+            int randomColor = 0;
+            do { // Generate a new random number
+                randomColor = r.Next(0, b.Length);
+                // until we get one that colors contains
+            } while (!colors.Contains(randomColor));
+
+            // Return our random color
+            return randomColor;
         }
 
         public void Update(float deltaTime, bool rightDown,bool dDown, bool leftDown, bool aDown, bool spacePressed) {
@@ -156,6 +163,7 @@ namespace Game {
                         p.X = Board.Length-1;
                     }
                     StampBoard(p.X, p.Y);
+                    return;
                 }
                 if (ShootingRect.Bottom > BoardArea.Bottom) {
                     ShootingPosition.Y = BoardArea.Bottom - BallRadius;
@@ -184,36 +192,52 @@ namespace Game {
             ShootingVelocity.X = 0;
             ShootingVelocity.Y = 0;
             ShootingColor = GetNextShootingColor();
-            /*List<Point> result = GetStreak(x, y);
+            List<Point> result = GetStreak(x, y);
             if (result.Count >= 3) {
                 foreach (Point p in result) {
                     Board[p.X][p.Y].Value = -1;
                 }
-            }*/
+            }
         }
 
         public List<Point> GetStreak(int x, int y) {
             List<Point> result = new List<Point>();
+
+            // Add the first point
             result.Add(new Point(x, y));
-            //check upwards
-            if (Board[x][y].Value != 0) {
-                for (int i = y; i >= 0; i--) {
-                    if (Board[x][i].Value == Board[x][y].Value) {
-                        result.Add(new Point(x, i));
+
+            // This loop works becuase the condition (i < result.Count) is
+            // evaluated on each iteration. So if the first iteration (Count = 1)
+            // adds 3 items to the list, Count will be 4. We loop forwards 
+            // because the list grows, not shrinks.
+            for (int i = 0; i < result.Count; ++i) {
+                // Get the current point and hexagon being processed
+                Point current = result[i];
+                Hexagon hex = Board[current.X][current.Y];
+
+                // Get all neighbors
+                List<Point> neighbors = hex.GetNeighborIndixes();
+                foreach (Point neighbor in neighbors) {
+                    // Dont process out of bounds neighbors
+                    if (neighbor.X < 0 || neighbor.Y < 0) {
+                        continue;
                     }
-                    //Check Left Diag
-                    for (int j = x; j >= 0; j--) {
-                        if (Board[j][i].Value == Board[x][y].Value) {
-                            result.Add(new Point(j, i));
-                        }
+                    // Dont process out of bounds neighbors
+                    if (neighbor.X >= BoardDimensions.Width || neighbor.Y >= BoardDimensions.Height) {
+                        continue;
                     }
-                    for (int j = x; j < Board.Length; j++) {
-                        if (Board[j][i].Value == Board[x][y].Value) {
-                            result.Add(new Point(j, i));
+
+                    // If neighbor is same as the hex we are looking at
+                    if (Board[neighbor.X][neighbor.Y].Value == hex.Value) {
+                        // If neighbor is not yet in the result chain
+                        if (!result.Contains(neighbor)) {
+                            // Record neighbor as part of result
+                            result.Add(neighbor);
                         }
                     }
                 }
             }
+
             return result;
         }
 
