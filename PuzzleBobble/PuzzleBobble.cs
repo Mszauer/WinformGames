@@ -82,7 +82,6 @@ namespace Game {
 
         }
         public int GetNextShootingColor() {
-            int newColor = r.Next(0, b.Length);
             //set up list of current colors on board
             List<int> currentColors = new List<int>();
             for (int col = 0; col < Board.Length; col++) {
@@ -96,13 +95,13 @@ namespace Game {
                     }//end value check
                 }//end row
             }//end col
+            int newColor = r.Next(0, b.Length);
             //check if new color is in current colors
             for (int j = 0; j < currentColors.Count; j++) {
-                do {
+                while (newColor != currentColors[j]) {
                     //if not, generate new color
                     newColor = r.Next(0, b.Length);
                 }
-                while (newColor != currentColors[j]);   
             }
             return newColor;
         }
