@@ -15,7 +15,7 @@ namespace Game {
         Point boardOffset = default(Point);
         public float ShootAngle = 90f;
         public float RotationSpeed = 30f;
-        public int ShootingColor = 0;
+        public int ShootingColor = 0; // set in constructor and on collision
         Random r = null;
         public PointF ShootingPosition = default(PointF);
         public PointF ShootingVelocity = default(PointF);
@@ -61,6 +61,7 @@ namespace Game {
 
         public PuzzleBobble(Point pos, Size siz, float rad = 20f) {
             r = new Random();
+            
             //set up board
             boardOffset = new Point(pos.X, pos.Y);
             BoardDimensions = new Size(siz.Width, siz.Height);
@@ -76,6 +77,7 @@ namespace Game {
                     Board[x][y].yIndexer = y;
                 }
             }
+            ShootingColor = GetNextShootingColor();
 
         }
         public void Initialize() {
@@ -96,11 +98,14 @@ namespace Game {
                 }//end row
             }//end col
             int newColor = r.Next(0, b.Length);
-            //check if new color is in current colors
-            for (int j = 0; j < currentColors.Count; j++) {
-                while (newColor != currentColors[j]) {
-                    //if not, generate new color
-                    newColor = r.Next(0, b.Length);
+            //checks to see if there are colors on the board
+            if (currentColors.Count >= 1) {
+                //check if new color is in current colors
+                for (int j = 0; j < currentColors.Count; j++) {
+                    while (newColor != currentColors[j]) {
+                        //if not, generate new color
+                        newColor = r.Next(0, b.Length);
+                    }
                 }
             }
             return newColor;
@@ -150,7 +155,7 @@ namespace Game {
                     if (p.X >= Board.Length) {
                         p.X = Board.Length-1;
                     }
-                    Board[p.X][p.Y].Value = 0;
+                    Board[p.X][p.Y].Value = ShootingColor;
                     ShootingVelocity.X = 0;
                     ShootingVelocity.Y = 0;
                 }
@@ -166,7 +171,7 @@ namespace Game {
                                 Point _p = Hexagon.TileAt(new Point((int)ShootingPosition.X, (int)ShootingPosition.Y), Board[x][y].Radius, boardOffset.X, boardOffset.Y);
                                 if (_p.Y < BoardDimensions.Height && _p.X < BoardDimensions.Width) {
 
-                                    Board[_p.X][_p.Y].Value = 0;
+                                    Board[_p.X][_p.Y].Value = ShootingColor;
                                     ShootingVelocity.X = 0;
                                     ShootingVelocity.Y = 0;
                                 }
@@ -176,6 +181,31 @@ namespace Game {
                 }//end x
                 
             }
+        }
+
+        public List<Point> GetStreak(int x, int y) {
+            List<Point> result = new List<Point>();
+            result.Add(new Point(x, y));
+            //check upwards
+            if (Board[x][y].Value != 0) {
+                for (int i = y; i >= 0; i--) {
+                    if (Board[x][i].Value == Board[x][y].Value) {
+                        result.Add(new Point(x, i));
+                    }
+                    //Check Left Diag
+                    for (int j = x; j >= 0; j--) {
+                        if (Board[j][i].Value == Board[x][y].Value) {
+                            result.Add(new Point(j, i));
+                        }
+                    }
+                    for (int j = x; j < Board.Length; j++) {
+                        if (Board[j][i].Value == Board[x][y].Value) {
+                            result.Add(new Point(j, i));
+                        }
+                    }
+                }
+            }
+            return result;
         }
 
         float Distance(Point p1, Point p2) {
