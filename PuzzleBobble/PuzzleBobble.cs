@@ -130,14 +130,17 @@ namespace Game {
                     ShootingVelocity.Y *= -1.0f;
                 }
                 //Collision
-                for (int x = 0; x < BoardDimensions.Width - 1; x++) {
-                    for (int y = 0; y < BoardDimensions.Height - 1; y++) {
+                for (int x = 0; x < BoardDimensions.Width; x++) {
+                    for (int y = 0; y < BoardDimensions.Height; y++) {
                         if (Board[x][y].Value != -1) {
                             if (Distance(Board[x][y].Center,new Point((int)ShootingPosition.X, (int)ShootingPosition.Y)) < BallDiameter) {
                                 Point _p = Hexagon.TileAt(new Point((int)ShootingPosition.X, (int)ShootingPosition.Y), Board[x][y].Radius, boardOffset.X, boardOffset.Y);
-                                Board[_p.X][_p.Y].Value = 0;
-                                ShootingVelocity.X = 0;
-                                ShootingVelocity.Y = 0;
+                                if (_p.Y < BoardDimensions.Height && _p.X < BoardDimensions.Width) {
+
+                                    Board[_p.X][_p.Y].Value = 0;
+                                    ShootingVelocity.X = 0;
+                                    ShootingVelocity.Y = 0;
+                                }
                             }
                         }
                     }
