@@ -133,10 +133,8 @@ namespace Game {
                 for (int x = 0; x < BoardDimensions.Width - 1; x++) {
                     for (int y = 0; y < BoardDimensions.Height - 1; y++) {
                         if (Board[x][y].Value != -1) {
-                            float distanceX = Board[x][y].Center.X - ShootingPosition.X;
-                            float distanceY = Board[x][y].Center.Y - ShootingPosition.Y;
-                            if (distanceX < BallDiameter || distanceY < BallDiameter) {
-                                Point _p = Hexagon.TileAt(new Point((int)ShootingVelocity.X, (int)ShootingVelocity.Y), BallRadius, boardOffset.X, boardOffset.Y);
+                            if (Distance(Board[x][y].Center,new Point((int)ShootingPosition.X, (int)ShootingPosition.Y)) < BallDiameter) {
+                                Point _p = Hexagon.TileAt(new Point((int)ShootingVelocity.X, (int)ShootingVelocity.Y), Board[x][y].Radius, boardOffset.X, boardOffset.Y);
                                 Board[_p.X][_p.Y].Value = 0;
                                 ShootingVelocity.X = 0;
                                 ShootingVelocity.Y = 0;
