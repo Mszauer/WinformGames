@@ -15,11 +15,20 @@ namespace Game {
         Point boardOffset = default(Point);
         public float ShootAngle = 90f;
         public float RotationSpeed = 30f;
-        public int ShootingColor = 0; // set in constructor and on collision
+        int _ShootingColor = 0; // set in constructor and on collision
         Random r = null;
         public PointF ShootingPosition = default(PointF);
         public PointF ShootingVelocity = default(PointF);
         Brush[] b = new Brush[] { Brushes.Yellow, Brushes.Green, Brushes.Red,Brushes.Blue, Brushes.Purple,Brushes.Silver,Brushes.Orange,Brushes.Black };
+        public int ShootingColor {
+            get {
+                return _ShootingColor;
+            }
+            set {
+                Console.WriteLine("Color set to: " + value + "from" + _ShootingColor);
+                _ShootingColor = value;
+            }
+        }
         public float BallRadius {
             get {
                 return Board[0][0].HalfW;
@@ -77,6 +86,28 @@ namespace Game {
                     Board[x][y].yIndexer = y;
                 }
             }
+#if DEBUG
+            Board[0][0].Value = 1;
+            Board[0][1].Value = 2;
+            Board[0][2].Value = 0;
+            Board[0][3].Value = 3;
+            Board[1][1].Value = 1;
+            Board[1][3].Value = 0;
+            Board[2][1].Value = 3;
+            Board[2][3].Value = 2;
+            Board[3][1].Value = 0;
+            Board[3][3].Value = 1;
+            Board[3][4].Value = 2;
+            Board[4][1].Value = 3;
+            Board[4][3].Value = 3;
+            Board[4][4].Value = 3;
+            Board[5][1].Value = 1;
+            Board[5][3].Value = 0;
+            Board[6][1].Value = 2;
+            Board[6][3].Value = 2;
+            Board[7][0].Value = 1;
+            Board[7][2].Value = 0;
+#endif
             ShootingColor = GetNextShootingColor();
 
         }
@@ -145,6 +176,7 @@ namespace Game {
                     ShootingVelocity.X = (float)Math.Cos(AimRadians) * 250.0f;
                     ShootingVelocity.Y = -(float)Math.Sin(AimRadians) * 250.0f;
                 }
+
             }
             else if (GameState == State.Firing) {
                 ShootingPosition.X += ShootingVelocity.X * deltaTime;
@@ -188,16 +220,69 @@ namespace Game {
         }
 
         void StampBoard(int x, int y) {
-            Board[x][y].Value = ShootingColor;
+            //changing values before moving back into firing mode
             ShootingVelocity.X = 0;
             ShootingVelocity.Y = 0;
-            ShootingColor = GetNextShootingColor();
+            Board[x][y].Value = ShootingColor;           
             List<Point> result = GetStreak(x, y);
             if (result.Count >= 3) {
                 foreach (Point p in result) {
                     Board[p.X][p.Y].Value = -1;
                 }
             }
+            ShootingColor = GetNextShootingColor();
+            for (int col = 0; col < Board.Length; col++) {
+                for (int row = 0; row < Board[x].Length; row++) {
+                    if (!IsAnchored(col,row)) {
+                        Board[col][row].Value = -1;
+                    }
+                }
+            }
+        }
+
+        public bool IsAnchored(int x, int y) {
+            // Make list of connections
+            List<Point> connections = new List<Point>();
+            connections.Add(new Point(x, y));
+
+            // Loop trough all connections
+            for (int i = 0; i < connections.Count; i++) {
+                // Get current hexagon
+                Point current = connections[i];
+                Hexagon hex = Board[current.X][current.Y];
+
+                // If edge connection, return true
+                if (current.Y == 0 || current.X == 0 || current.X == BoardDimensions.Width - 1) {
+                    return true;
+                }
+
+                // Loop trough neighbors
+                List<Point> neighbors = hex.GetNeighborIndixes();
+                foreach (Point neighbor in neighbors) {
+                    // Out of bounds
+                    if (neighbor.X < 0 || neighbor.Y < 0) {
+                        //exit loop
+                        continue;
+                    }
+                    // Out of bounds
+                    if (neighbor.X >= BoardDimensions.Width || neighbor.Y >= BoardDimensions.Height) {
+                        //exit loop
+                        continue;
+                    }
+                    // Empty neighbor
+                    if (Board[neighbor.X][neighbor.Y].Value == -1) {
+                        //exit loop
+                        continue;
+                    }
+
+                    // Increase connection list if neighbor is not already in it
+                    if (!connections.Contains(neighbor)) {
+                        connections.Add(neighbor);
+                    }
+                }
+            }
+
+            return false;
         }
 
         public List<Point> GetStreak(int x, int y) {
@@ -210,7 +295,7 @@ namespace Game {
             // evaluated on each iteration. So if the first iteration (Count = 1)
             // adds 3 items to the list, Count will be 4. We loop forwards 
             // because the list grows, not shrinks.
-            for (int i = 0; i < result.Count; ++i) {
+            for (int i = 0; i < result.Count; i++) {
                 // Get the current point and hexagon being processed
                 Point current = result[i];
                 Hexagon hex = Board[current.X][current.Y];
@@ -286,6 +371,7 @@ namespace Game {
             end.Y = (int)(50.0f * (float)Math.Sin(AimRadians));
             g.DrawLine(Pens.Red, new Point((int)BoardCenter.X+boardOffset.X, (int)BoardArea.Bottom), new Point((int)(BoardCenter.X + end.X+boardOffset.X), (int)(BoardArea.Bottom - end.Y)));
             g.DrawEllipse(Pens.Red, ShootingRect.Rectangle);
+            g.FillEllipse(b[ShootingColor], ShootingRect.Rectangle);
             
             int _x = (int)(Board[0][0].W*0.5f);
             int _y = (int)(Board[0][0].H*0.5f);
