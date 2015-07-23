@@ -223,7 +223,9 @@ namespace Game {
             //changing values before moving back into firing mode
             ShootingVelocity.X = 0;
             ShootingVelocity.Y = 0;
-            Board[x][y].Value = ShootingColor;           
+            Board[x][y].Value = ShootingColor;
+            ShootingPosition.X = -Board[x][y].Radius * 2;
+            ShootingPosition.Y = -Board[x][y].Radius * 2;
             List<Point> result = GetStreak(x, y);
             if (result.Count >= 3) {
                 foreach (Point p in result) {
