@@ -9,12 +9,14 @@ using System.Windows.Forms;
 
 namespace Game {
     class PuzzleBobble {
+        Easing lerp = null;
         public Hexagon[][] Board = null;
         public Size BoardDimensions = default(Size);
         public enum State { Aiming, Firing,Falling };
         Point boardOffset = default(Point);
         public float ShootAngle = 90f;
-        public List<PointF> FallingAnimation = null;
+        //public List<PointF> FallingAnimation = null;
+        Dictionary<PointF, float> FallingAnimation = null;
         public List<int> FallingColors = null;
         public float RotationSpeed = 30f;
         int ShootingColor = 0; // set in constructor and on collision
@@ -67,7 +69,7 @@ namespace Game {
 
         public PuzzleBobble(Point pos, Size siz, float rad = 20f) {
             r = new Random();
-            
+            lerp = new Easing();
             //set up board
             boardOffset = new Point(pos.X, pos.Y);
             BoardDimensions = new Size(siz.Width, siz.Height);
@@ -106,7 +108,8 @@ namespace Game {
             Board[7][2].Value = 0;
 #endif
             ShootingColor = GetNextShootingColor();
-            FallingAnimation = new List<PointF>();
+            //FallingAnimation = new List<PointF>();
+            FallingAnimation = new Dictionary<PointF, float>();
             FallingColors = new List<int>();
         }
         public void Initialize() {
@@ -149,16 +152,32 @@ namespace Game {
 
         public void Update(float deltaTime, bool rightDown,bool dDown, bool leftDown, bool aDown, bool spacePressed) {
             if (GameState == State.Falling) {
-                for (int i = FallingAnimation.Count-1; i >= 0; i-- ) {
-                    PointF point = FallingAnimation[i];
-                    point.Y += fallSpeed * deltaTime;
-                    FallingAnimation[i] = point;
-                    if (FallingAnimation[i].Y - BallRadius > BoardArea.Bottom) {
-                        FallingAnimation.RemoveAt(i);
-                        FallingColors.RemoveAt(i);
+                //
+                foreach (KeyValuePair<PointF, float> kvp in FallingAnimation) {
+                    FallingAnimation[kvp.Key] += deltaTime;
+                    
+                    if (FallingAnimation[kvp.Key] > 1) {
+
                     }
 
                 }
+                    /*
+                for (int i = FallingAnimation.Count-1; i >= 0; i-- ) {
+                    //Create temporary point and move that, then assign fallingAnimation point to it
+                    PointF point = FallingAnimation[i];
+                    point.Y += fallSpeed * deltaTime;
+                    FallingAnimation[i] = point;
+                    //If bottom of area, remove : lerp- if .Value > 1
+                    if (FallingAnimation.Values[i] > 1) {
+                        //remove
+                    }
+                     */
+                /*if (FallingAnimation[i].Y - BallDiameter > BoardArea.Bottom) {
+                    FallingAnimation.RemoveAt(i);
+                    FallingColors.RemoveAt(i);
+                }
+
+            }*/
             }
             if (GameState == State.Aiming) {
                 //Rotate Aim Left or Right
@@ -239,7 +258,8 @@ namespace Game {
             List<Point> result = GetStreak(x, y);
             if (result.Count >= 3) {
                 foreach (Point p in result) {
-                    FallingAnimation.Add(Board[p.X][p.Y].Center);
+                    FallingAnimation.Add(Board[p.X][p.Y].Center, 0);
+                    //FallingAnimation.Add(Board[p.X][p.Y].Center);
                     FallingColors.Add(Board[p.X][p.Y].Value);
                     Board[p.X][p.Y].Value = -1;
                 }
@@ -248,7 +268,8 @@ namespace Game {
             for (int col = 0; col < Board.Length; col++) {
                 for (int row = 0; row < Board[x].Length; row++) {
                     if (Board[col][row].Value > -1 && !IsAnchored(col, row)) {
-                        FallingAnimation.Add(Board[col][row].Center);
+                        FallingAnimation.Add(Board[col][row].Center,0);
+                        //FallingAnimation.Add(Board[col][row].Center);
                         FallingColors.Add(Board[col][row].Value);
                         Board[col][row].Value = -1;
                     }
@@ -389,12 +410,19 @@ namespace Game {
             g.DrawEllipse(Pens.Red, ShootingRect.Rectangle);
             g.FillEllipse(b[ShootingColor], ShootingRect.Rectangle);
             //Draw Falling bobbles
-            if (FallingAnimation.Count > 0) {
-                for (int i = 0; i < FallingAnimation.Count; i++) {
-                    RectangleF r = new RectangleF(new PointF(FallingAnimation[i].X - BallRadius,FallingAnimation[i].Y - BallRadius),new SizeF(BallDiameter,BallDiameter));
-                    g.FillEllipse(b[FallingColors[i]], r);
-                }
+            foreach (KeyValuePair<PointF, float> kvp in FallingAnimation) {
+
             }
+            /*if (FallingAnimation.Count > 0) {
+                int i = 0;
+                foreach (KeyValuePair<PointF,float> kvp in FallingAnimation){
+                //for (int i = 0; i < FallingAnimation.Count; i++) {
+                    RectangleF r = new RectangleF(new PointF(kvp.Key.X - BallRadius, kvp.Key.Y - BallRadius), new SizeF(BallDiameter, BallDiameter));
+                    //RectangleF r = new RectangleF(new PointF(FallingAnimation[i].X - BallRadius, FallingAnimation[i].Y - BallRadius), new SizeF(BallDiameter, BallDiameter));
+                    g.FillEllipse(b[FallingColors[i]], r);
+                    i++;
+                }
+            }*/
             int _x = (int)(Board[0][0].W*0.5f);
             int _y = (int)(Board[0][0].H*0.5f);
             RectangleF debug = new RectangleF(_x - BallRadius + boardOffset.X, _y - BallRadius+boardOffset.Y, BallDiameter, BallDiameter);
