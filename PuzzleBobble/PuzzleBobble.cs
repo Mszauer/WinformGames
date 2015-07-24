@@ -411,7 +411,7 @@ namespace Game {
             g.FillEllipse(b[ShootingColor], ShootingRect.Rectangle);
             //Draw Falling bobbles
             foreach (KeyValuePair<PointF, float> kvp in FallingAnimation) {
-
+                Point currentPosition = lerp.ExpoEaseOut();
             }
             /*if (FallingAnimation.Count > 0) {
                 int i = 0;
