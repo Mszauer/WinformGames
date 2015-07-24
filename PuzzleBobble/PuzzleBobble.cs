@@ -9,7 +9,6 @@ using System.Windows.Forms;
 
 namespace Game {
     class PuzzleBobble {
-        Easing lerp = null;
         public Hexagon[][] Board = null;
         public Size BoardDimensions = default(Size);
         public enum State { Aiming, Firing,Falling };
@@ -69,7 +68,6 @@ namespace Game {
 
         public PuzzleBobble(Point pos, Size siz, float rad = 20f) {
             r = new Random();
-            lerp = new Easing();
             //set up board
             boardOffset = new Point(pos.X, pos.Y);
             BoardDimensions = new Size(siz.Width, siz.Height);
@@ -152,14 +150,23 @@ namespace Game {
 
         public void Update(float deltaTime, bool rightDown,bool dDown, bool leftDown, bool aDown, bool spacePressed) {
             if (GameState == State.Falling) {
-                //
+                // Make a list of PointF objects to remove
+                // Basically you want to keep a list of keys that are no longer needed
+                List<PointF> gone = new List<PointF>();
+
                 foreach (KeyValuePair<PointF, float> kvp in FallingAnimation) {
                     FallingAnimation[kvp.Key] += deltaTime;
-                    
+
                     if (FallingAnimation[kvp.Key] > 1) {
-
+                        // Add kvp.Key to the remove list
+                        gone.Add(kvp.Key);
                     }
+                }
 
+                // Loop trough the remove list, and remove every key from the 
+                // FallingAnimation dictionary
+                foreach (PointF p in gone) {
+                    FallingAnimation.Remove(p);
                 }
                     /*
                 for (int i = FallingAnimation.Count-1; i >= 0; i-- ) {
@@ -412,8 +419,31 @@ namespace Game {
             //Draw Falling bobbles
             foreach (KeyValuePair<PointF, float> kvp in FallingAnimation) {
                 float time = kvp.Value;
-                Point p = new Point((int)kvp.Key.X,(int)kvp.Key.Y);
-                Point currentPosition = lerp.BounceEaseIn(time,Board[p.X][p.Y].Center.Y - BallRadius,BoardDimensions.Height*1);
+                //Point p = new Point((int)kvp.Key.X,(int)kvp.Key.Y);
+                //Point currentPosition = lerp.BounceEaseIn(time,Board[p.X][p.Y].Center.Y - BallRadius,BoardDimensions.Height*1);
+
+                // The lerp starts at the original bubble center
+                PointF startPosition = new PointF(kvp.Key.X, kvp.Key.Y);
+                // The lerp is going to end below the playing field, at the X of the original
+                // posiiton (change this to random x later to make it look more interesting)
+                PointF endPosition = new PointF(kvp.Key.X, BoardArea.Y + BoardArea.H + BallDiameter);
+
+                // Now that we know the start and end points, we can use LERP and TIME to find the
+                // current position of the object on the animation curve.
+                // EASING is a STATIC class. You DO NOT NEED AN INSTANCE OF A CLASS TO CALL A STATIC METHOD
+                // DOING SO IS A BIG COMPILER ERROR!!!
+                PointF currentPosition = new PointF();
+                currentPosition.Y = Easing.BounceEaseIn(time, startPosition.Y, endPosition.Y);
+                currentPosition.X = Easing.BounceEaseIn(time, startPosition.X, endPosition.X);
+
+                // Now that we know where on the animation curve we are, lets construct a rectangle that
+                // can be used to render our ellipse.
+                RectangleF r = new RectangleF(new PointF(currentPosition.X - BallRadius, currentPosition.Y - BallRadius),
+                                              new SizeF(BallDiameter, BallDiameter));
+
+                // And finally, render that bubble. For now, we're just going to render all bubbles the same color
+                g.FillEllipse(b[FallingColors[0]], r);
+
             }
             /*if (FallingAnimation.Count > 0) {
                 int i = 0;
