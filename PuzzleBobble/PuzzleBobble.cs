@@ -247,7 +247,7 @@ namespace Game {
             ShootingColor = GetNextShootingColor();
             for (int col = 0; col < Board.Length; col++) {
                 for (int row = 0; row < Board[x].Length; row++) {
-                    if (!IsAnchored(col,row)) {
+                    if (Board[col][row].Value > -1 && !IsAnchored(col, row)) {
                         FallingAnimation.Add(Board[col][row].Center);
                         FallingColors.Add(Board[col][row].Value);
                         Board[col][row].Value = -1;
@@ -391,7 +391,7 @@ namespace Game {
             //Draw Falling bobbles
             if (FallingAnimation.Count > 0) {
                 for (int i = 0; i < FallingAnimation.Count; i++) {
-                    RectangleF r = new RectangleF(FallingAnimation[i],new SizeF(BallRadius,BallRadius));
+                    RectangleF r = new RectangleF(FallingAnimation[i],new SizeF(BallDiameter,BallDiameter));
                     g.FillEllipse(b[FallingColors[i]], r);
                 }
             }
