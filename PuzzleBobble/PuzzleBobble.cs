@@ -149,11 +149,15 @@ namespace Game {
 
         public void Update(float deltaTime, bool rightDown,bool dDown, bool leftDown, bool aDown, bool spacePressed) {
             if (GameState == State.Falling) {
-                for (int i = 0; i < FallingAnimation.Count; i++ ) {
-                    FallingAnimation[i].Y += 100.0f * deltaTime;
-                }
-                foreach (PointF p in FallingAnimation) {
-                    p.Y = p.Y + 100.0f * deltaTime;
+                for (int i = FallingAnimation.Count-1; i >= 0; i-- ) {
+                    PointF point = FallingAnimation[i];
+                    point.Y += fallSpeed * deltaTime;
+                    FallingAnimation[i] = point;
+                    if (FallingAnimation[i].Y - BallRadius > BoardArea.Bottom) {
+                        FallingAnimation.RemoveAt(i);
+                        FallingColors.RemoveAt(i);
+                    }
+
                 }
             }
             if (GameState == State.Aiming) {
@@ -384,7 +388,13 @@ namespace Game {
             g.DrawLine(Pens.Red, new Point((int)BoardCenter.X+boardOffset.X, (int)BoardArea.Bottom), new Point((int)(BoardCenter.X + end.X+boardOffset.X), (int)(BoardArea.Bottom - end.Y)));
             g.DrawEllipse(Pens.Red, ShootingRect.Rectangle);
             g.FillEllipse(b[ShootingColor], ShootingRect.Rectangle);
-            
+            //Draw Falling bobbles
+            if (FallingAnimation.Count > 0) {
+                for (int i = 0; i < FallingAnimation.Count; i++) {
+                    RectangleF r = new RectangleF(FallingAnimation[i],new SizeF(BallRadius,BallRadius));
+                    g.FillEllipse(b[FallingColors[i]], r);
+                }
+            }
             int _x = (int)(Board[0][0].W*0.5f);
             int _y = (int)(Board[0][0].H*0.5f);
             RectangleF debug = new RectangleF(_x - BallRadius + boardOffset.X, _y - BallRadius+boardOffset.Y, BallDiameter, BallDiameter);
