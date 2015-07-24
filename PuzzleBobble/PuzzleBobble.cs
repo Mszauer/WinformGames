@@ -11,24 +11,18 @@ namespace Game {
     class PuzzleBobble {
         public Hexagon[][] Board = null;
         public Size BoardDimensions = default(Size);
-        public enum State { Aiming, Firing };
+        public enum State { Aiming, Firing,Falling };
         Point boardOffset = default(Point);
         public float ShootAngle = 90f;
+        public List<PointF> FallingAnimation = null;
+        public List<int> FallingColors = null;
         public float RotationSpeed = 30f;
-        int _ShootingColor = 0; // set in constructor and on collision
+        int ShootingColor = 0; // set in constructor and on collision
         Random r = null;
+        float fallSpeed = 100f;
         public PointF ShootingPosition = default(PointF);
         public PointF ShootingVelocity = default(PointF);
         Brush[] b = new Brush[] { Brushes.Yellow, Brushes.Green, Brushes.Red,Brushes.Blue, Brushes.Purple,Brushes.Silver,Brushes.Orange,Brushes.Black };
-        public int ShootingColor {
-            get {
-                return _ShootingColor;
-            }
-            set {
-                Console.WriteLine("Color set to: " + value + "from" + _ShootingColor);
-                _ShootingColor = value;
-            }
-        }
         public float BallRadius {
             get {
                 return Board[0][0].HalfW;
@@ -58,6 +52,9 @@ namespace Game {
             get {
                 if (ShootingVelocity.X == 0 && ShootingVelocity.Y == 0) {
                     return State.Aiming;
+                }
+                if (FallingAnimation.Count > 0) {
+                    return State.Falling;
                 }
                 return State.Firing;
             }
@@ -109,7 +106,8 @@ namespace Game {
             Board[7][2].Value = 0;
 #endif
             ShootingColor = GetNextShootingColor();
-
+            FallingAnimation = new List<PointF>();
+            FallingColors = new List<int>();
         }
         public void Initialize() {
 
@@ -150,6 +148,14 @@ namespace Game {
         }
 
         public void Update(float deltaTime, bool rightDown,bool dDown, bool leftDown, bool aDown, bool spacePressed) {
+            if (GameState == State.Falling) {
+                for (int i = 0; i < FallingAnimation.Count; i++ ) {
+                    FallingAnimation[i].Y += 100.0f * deltaTime;
+                }
+                foreach (PointF p in FallingAnimation) {
+                    p.Y = p.Y + 100.0f * deltaTime;
+                }
+            }
             if (GameState == State.Aiming) {
                 //Rotate Aim Left or Right
                 if (rightDown || dDown) {
@@ -229,6 +235,8 @@ namespace Game {
             List<Point> result = GetStreak(x, y);
             if (result.Count >= 3) {
                 foreach (Point p in result) {
+                    FallingAnimation.Add(Board[p.X][p.Y].Center);
+                    FallingColors.Add(Board[p.X][p.Y].Value);
                     Board[p.X][p.Y].Value = -1;
                 }
             }
@@ -236,6 +244,8 @@ namespace Game {
             for (int col = 0; col < Board.Length; col++) {
                 for (int row = 0; row < Board[x].Length; row++) {
                     if (!IsAnchored(col,row)) {
+                        FallingAnimation.Add(Board[col][row].Center);
+                        FallingColors.Add(Board[col][row].Value);
                         Board[col][row].Value = -1;
                     }
                 }
