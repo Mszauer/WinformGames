@@ -50,11 +50,11 @@ namespace Game {
         }
         public State GameState {
             get {
-                if (ShootingVelocity.X == 0 && ShootingVelocity.Y == 0) {
-                    return State.Aiming;
-                }
                 if (FallingAnimation.Count > 0) {
                     return State.Falling;
+                } 
+                else if (ShootingVelocity.X == 0 && ShootingVelocity.Y == 0) {
+                    return State.Aiming;
                 }
                 return State.Firing;
             }
@@ -391,7 +391,7 @@ namespace Game {
             //Draw Falling bobbles
             if (FallingAnimation.Count > 0) {
                 for (int i = 0; i < FallingAnimation.Count; i++) {
-                    RectangleF r = new RectangleF(FallingAnimation[i],new SizeF(BallDiameter,BallDiameter));
+                    RectangleF r = new RectangleF(new PointF(FallingAnimation[i].X - BallRadius,FallingAnimation[i].Y - BallRadius),new SizeF(BallDiameter,BallDiameter));
                     g.FillEllipse(b[FallingColors[i]], r);
                 }
             }
