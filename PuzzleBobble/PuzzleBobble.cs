@@ -14,12 +14,12 @@ namespace Game {
         public enum State { Aiming, Firing,Falling };
         Point boardOffset = default(Point);
         public float ShootAngle = 90f;
-        public List<PointF> FallingAnimation = null;
-        public List<int> FallingColors = null;
+        public Dictionary<PointF,int> FallingColors = null;
+        public Dictionary<PointF, float> FallingAnimation = null;
+        public Dictionary<PointF, PointF> FallingDestinations = null;
         public float RotationSpeed = 30f;
         int ShootingColor = 0; // set in constructor and on collision
         Random r = null;
-        float fallSpeed = 100f;
         public PointF ShootingPosition = default(PointF);
         public PointF ShootingVelocity = default(PointF);
         Brush[] b = new Brush[] { Brushes.Yellow, Brushes.Green, Brushes.Red,Brushes.Blue, Brushes.Purple,Brushes.Silver,Brushes.Orange,Brushes.Black };
@@ -52,6 +52,7 @@ namespace Game {
             get {
                 if (FallingAnimation.Count > 0) {
                     return State.Falling;
+                    //.Count is 3 evena fter they fell
                 } 
                 else if (ShootingVelocity.X == 0 && ShootingVelocity.Y == 0) {
                     return State.Aiming;
@@ -106,8 +107,9 @@ namespace Game {
             Board[7][2].Value = 0;
 #endif
             ShootingColor = GetNextShootingColor();
-            FallingAnimation = new List<PointF>();
-            FallingColors = new List<int>();
+            FallingAnimation = new Dictionary<PointF,float>();
+            FallingColors = new Dictionary<PointF,int>();
+            FallingDestinations = new Dictionary<PointF, PointF>();
         }
         public void Initialize() {
 
@@ -149,15 +151,20 @@ namespace Game {
 
         public void Update(float deltaTime, bool rightDown,bool dDown, bool leftDown, bool aDown, bool spacePressed) {
             if (GameState == State.Falling) {
-                for (int i = FallingAnimation.Count-1; i >= 0; i-- ) {
-                    PointF point = FallingAnimation[i];
-                    point.Y += fallSpeed * deltaTime;
-                    FallingAnimation[i] = point;
-                    if (FallingAnimation[i].Y - BallRadius > BoardArea.Bottom) {
-                        FallingAnimation.RemoveAt(i);
-                        FallingColors.RemoveAt(i);
-                    }
+                //use the .Keys property of the dictionary to make a list of all keys
+                List<PointF> animationKeys = new List<PointF>(FallingAnimation.Keys);
 
+                //Loop through all keys
+                foreach (PointF key in animationKeys) {
+                    //update value of each key
+                    FallingAnimation[key] += deltaTime;
+                    //check if ball is below playing field
+                    if (FallingAnimation[key] - BallRadius > BoardArea.Bottom) {
+                        //remove from dictionary using key
+                        FallingAnimation.Remove(key);
+                        FallingColors.Remove(key);
+                        FallingDestinations.Remove(key);
+                    }
                 }
             }
             if (GameState == State.Aiming) {
@@ -239,8 +246,9 @@ namespace Game {
             List<Point> result = GetStreak(x, y);
             if (result.Count >= 3) {
                 foreach (Point p in result) {
-                    FallingAnimation.Add(Board[p.X][p.Y].Center);
-                    FallingColors.Add(Board[p.X][p.Y].Value);
+                    FallingAnimation.Add(Board[p.X][p.Y].Center,0.0f);
+                    FallingColors.Add(Board[p.X][p.Y].Center,Board[p.X][p.Y].Value);
+                    FallingDestinations.Add(Board[p.X][p.Y].Center, new PointF(r.Next(0, (int)BoardArea.W), BoardArea.H + BallDiameter));
                     Board[p.X][p.Y].Value = -1;
                 }
             }
@@ -248,8 +256,9 @@ namespace Game {
             for (int col = 0; col < Board.Length; col++) {
                 for (int row = 0; row < Board[x].Length; row++) {
                     if (Board[col][row].Value > -1 && !IsAnchored(col, row)) {
-                        FallingAnimation.Add(Board[col][row].Center);
-                        FallingColors.Add(Board[col][row].Value);
+                        FallingAnimation.Add(Board[col][row].Center,0.0f);
+                        FallingColors.Add(Board[col][row].Center,Board[col][row].Value);
+                        FallingDestinations.Add(Board[col][row].Center, new PointF(r.Next(0, (int)BoardArea.W), BoardArea.H + BallDiameter));
                         Board[col][row].Value = -1;
                     }
                 }
@@ -390,9 +399,22 @@ namespace Game {
             g.FillEllipse(b[ShootingColor], ShootingRect.Rectangle);
             //Draw Falling bobbles
             if (FallingAnimation.Count > 0) {
-                for (int i = 0; i < FallingAnimation.Count; i++) {
-                    RectangleF r = new RectangleF(new PointF(FallingAnimation[i].X - BallRadius,FallingAnimation[i].Y - BallRadius),new SizeF(BallDiameter,BallDiameter));
-                    g.FillEllipse(b[FallingColors[i]], r);
+                foreach (KeyValuePair<PointF, float> kvp in FallingAnimation) {
+                    //Get the start, end and time of the easing
+                    PointF animStart = kvp.Key;
+                    PointF animEnd = FallingDestinations[kvp.Key];
+                    float animTime = kvp.Value;
+                    //Figure out the current point in our easing animation
+                    PointF animPosition = new PointF();
+                    animPosition.X = Easing.Linear(animTime, animStart.X, animEnd.X);
+                    animPosition.Y = Easing.BackEaseIn(animTime, animStart.Y, animEnd.Y);
+                    //Create bubble around the point
+                    RectangleF bubble = new RectangleF(0, 0, BallDiameter, BallDiameter);
+                    bubble.X = animPosition.X - BallRadius;
+                    bubble.Y = animPosition.Y - BallRadius;
+                    //Finally Render the bubble
+                    int brushIndex = FallingColors[kvp.Key];
+                    g.FillEllipse(b[brushIndex], bubble);
                 }
             }
             int _x = (int)(Board[0][0].W*0.5f);
