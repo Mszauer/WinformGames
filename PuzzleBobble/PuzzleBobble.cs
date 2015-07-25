@@ -52,7 +52,6 @@ namespace Game {
             get {
                 if (FallingAnimation.Count > 0) {
                     return State.Falling;
-                    //.Count is 3 evena fter they fell
                 } 
                 else if (ShootingVelocity.X == 0 && ShootingVelocity.Y == 0) {
                     return State.Aiming;
@@ -159,7 +158,7 @@ namespace Game {
                     //update value of each key
                     FallingAnimation[key] += deltaTime;
                     //check if ball is below playing field
-                    if (FallingAnimation[key] - BallRadius > BoardArea.Bottom) {
+                    if (FallingAnimation[key] > 1) {
                         //remove from dictionary using key
                         FallingAnimation.Remove(key);
                         FallingColors.Remove(key);
