@@ -11,7 +11,7 @@ namespace Game {
     class PuzzleBobble {
         public Hexagon[][] Board = null;
         public Size BoardDimensions = default(Size);
-        public enum State { Aiming, Firing,Falling };
+        public enum State { Aiming, Firing, Falling, Won, Lost};
         Point boardOffset = default(Point);
         public float ShootAngle = 90f;
         public Dictionary<PointF,int> FallingColors = null;
@@ -20,6 +20,7 @@ namespace Game {
         public float RotationSpeed = 30f;
         int ShootingColor = 0; // set in constructor and on collision
         Random r = null;
+        bool hasLost = false;
         public PointF ShootingPosition = default(PointF);
         public PointF ShootingVelocity = default(PointF);
         Brush[] b = new Brush[] { Brushes.Yellow, Brushes.Green, Brushes.Red,Brushes.Blue, Brushes.Purple,Brushes.Silver,Brushes.Orange,Brushes.Black };
@@ -50,14 +51,30 @@ namespace Game {
         }
         public State GameState {
             get {
+                //Check if things are falling
                 if (FallingAnimation.Count > 0) {
                     return State.Falling;
-                } 
+                }
+                //check if board is empty
+                bool emptyBoard = true;
+                for (int x = 0; x < Board.Length; x++) {
+                    for (int y = 0; y < Board[x].Length; y++) {
+                        if (Board[x][y].Value > -1) {
+                            emptyBoard = false;
+                        }
+                    }
+                }
+                if (emptyBoard) {
+                    return State.Won;
+                }
+                //Check if shooting ball is moving
                 else if (ShootingVelocity.X == 0 && ShootingVelocity.Y == 0) {
                     return State.Aiming;
                 }
+                //else firing
                 return State.Firing;
             }
+            
         }
         public Rect ShootingRect {
             get {
@@ -83,36 +100,66 @@ namespace Game {
                     Board[x][y].yIndexer = y;
                 }
             }
-#if DEBUG
-            Board[0][0].Value = 1;
-            Board[0][1].Value = 2;
-            Board[0][2].Value = 0;
-            Board[0][3].Value = 3;
-            Board[1][1].Value = 1;
-            Board[1][3].Value = 0;
-            Board[2][1].Value = 3;
-            Board[2][3].Value = 2;
-            Board[3][1].Value = 0;
-            Board[3][3].Value = 1;
-            Board[3][4].Value = 2;
-            Board[4][1].Value = 3;
-            Board[4][3].Value = 3;
-            Board[4][4].Value = 3;
-            Board[5][1].Value = 1;
-            Board[5][3].Value = 0;
-            Board[6][1].Value = 2;
-            Board[6][3].Value = 2;
-            Board[7][0].Value = 1;
-            Board[7][2].Value = 0;
-#endif
-            ShootingColor = GetNextShootingColor();
-            FallingAnimation = new Dictionary<PointF,float>();
-            FallingColors = new Dictionary<PointF,int>();
-            FallingDestinations = new Dictionary<PointF, PointF>();
+            
         }
         public void Initialize() {
-
+            GenerateRandomBoard();
+            ShootingColor = GetNextShootingColor();
+            FallingAnimation = new Dictionary<PointF, float>();
+            FallingColors = new Dictionary<PointF, int>();
+            FallingDestinations = new Dictionary<PointF, PointF>();
         }
+
+        void GenerateRandomBoard() {
+            for (int x = 0; x < Board.Length; x++) {
+                for (int y = 0; y < Board[x].Length; y++) {
+                    Board[x][y].Value = -1;
+                }
+            }
+
+            int board = r.Next(0, 5);
+            if (board == 0) {
+                Board[0][0].Value = Board[1][1].Value = Board[3][3].Value = Board[7][0].Value = Board[5][1].Value = 1;
+                Board[0][1].Value = Board[2][3].Value = Board[6][1].Value = Board[6][3].Value = Board[3][4].Value = 2;
+                Board[0][2].Value = Board[1][3].Value = Board[3][1].Value = Board[5][3].Value = Board[7][2].Value = 0;
+                Board[0][3].Value = Board[2][1].Value = Board[4][1].Value = Board[4][3].Value = Board[4][4].Value = 3;
+            }
+            else if (board == 1) {
+                Board[0][5].Value = Board[1][6].Value = Board[4][3].Value = Board[5][2].Value = 2;
+                Board[0][6].Value = Board[0][7].Value = Board[4][1].Value = Board[4][2].Value = 5;
+                Board[1][3].Value = Board[2][4].Value = Board[5][5].Value = Board[6][4].Value = 0;
+                Board[1][4].Value = Board[1][5].Value = Board[5][3].Value = Board[5][4].Value = 6;
+                Board[2][1].Value = Board[3][2].Value = Board[6][7].Value = Board[7][6].Value = 4;
+                Board[2][2].Value = Board[2][3].Value = Board[6][5].Value = Board[6][6].Value = 1;
+                Board[3][0].Value = Board[3][1].Value = Board[4][0].Value = 7;
+                Board[7][7].Value = 4;
+            }
+            else if (board == 2) {
+                Board[1][0].Value = 7; Board[1][1].Value = 2; Board[1][2].Value = 1; Board[1][3].Value = 1;
+                Board[1][4].Value = 3; Board[1][5].Value = 1;
+                Board[1][6].Value = 3; Board[1][7].Value = 2; Board[2][0].Value = 7; Board[5][0].Value = 3;
+                Board[5][1].Value = 2; Board[5][2].Value = 4; Board[5][3].Value = 3; Board[5][4].Value = 2;
+                Board[5][5].Value = 5; Board[5][6].Value = 2; Board[5][7].Value = 5; Board[6][0].Value = 3;
+            }
+            else if (board == 3) {
+                Board[0][0].Value = 2; Board[0][1].Value = 2; Board[0][2].Value = 3; Board[0][3].Value = 3;
+                Board[1][0].Value = 2; Board[1][1].Value = 2; Board[1][2].Value = 3; Board[1][3].Value = 1;
+                Board[2][0].Value = 0; Board[2][1].Value = 0; Board[2][2].Value = 1; Board[2][3].Value = 1;
+                Board[3][0].Value = 0; Board[3][1].Value = 0; Board[3][2].Value = 1; Board[3][3].Value = 2;
+                Board[4][0].Value = 3; Board[4][1].Value = 3; Board[4][2].Value = 2; Board[4][3].Value = 2;
+                Board[5][0].Value = 3; Board[5][1].Value = 3; Board[5][2].Value = 2; Board[5][3].Value = 0;
+                Board[6][0].Value = 1; Board[6][1].Value = 1; Board[6][2].Value = 0; Board[6][3].Value = 0;
+                Board[7][0].Value = 1; Board[7][1].Value = 1; Board[7][2].Value = 0; Board[7][3].Value = 3;
+            }
+            else if (board == 4) {
+                Board[2][0].Value = 6; Board[2][1].Value = 6;
+                Board[2][3].Value = 5; Board[2][5].Value = 1; Board[3][1].Value = 5; Board[3][2].Value = 5;
+                Board[3][3].Value = 3; Board[3][4].Value = 3; Board[3][5].Value = 4; Board[3][6].Value = 4;
+                Board[3][7].Value = 1; Board[4][1].Value = 6; Board[4][2].Value = 3; Board[4][3].Value = 5;
+                Board[4][4].Value = 4; Board[4][5].Value = 1; Board[4][6].Value = 1; Board[5][0].Value = 6;
+            }
+        }
+
         public int GetNextShootingColor() {
             // Create a list of integers for all the colors on the board
             List<int> colors = new List<int>();
@@ -148,7 +195,7 @@ namespace Game {
             return randomColor;
         }
 
-        public void Update(float deltaTime, bool rightDown,bool dDown, bool leftDown, bool aDown, bool spacePressed) {
+        public void Update(float deltaTime, bool rightDown,bool dDown, bool leftDown, bool aDown, bool spacePressed,bool rPressed) {
             if (GameState == State.Falling) {
                 //use the .Keys property of the dictionary to make a list of all keys
                 List<PointF> animationKeys = new List<PointF>(FallingAnimation.Keys);
@@ -221,17 +268,25 @@ namespace Game {
                 for (int x = 0; x < BoardDimensions.Width; x++) {
                     for (int y = 0; y < BoardDimensions.Height; y++) {
                         if (Board[x][y].Value != -1) {
-                            if (Distance(Board[x][y].Center,new Point((int)ShootingPosition.X, (int)ShootingPosition.Y)) < BallDiameter) {
+                            if (Distance(Board[x][y].Center,new Point((int)ShootingPosition.X, (int)ShootingPosition.Y)) < BallDiameter *.75f) {
                                 Point _p = Hexagon.TileAt(new Point((int)ShootingPosition.X, (int)ShootingPosition.Y), Board[x][y].Radius, boardOffset.X, boardOffset.Y);
                                 if (_p.Y < BoardDimensions.Height && _p.X < BoardDimensions.Width) {
                                     StampBoard(_p.X, _p.Y);
                                     return;
+                                }
+                                else if (_p.Y >= BoardDimensions.Height) {
+                                    hasLost = true;
                                 }
                             }
                         }//end board value
                     }//end y
                 }//end x
                 
+            }//end firing state
+            if (GameState == State.Lost | GameState == State.Won) {
+                if (rPressed) {
+                    Initialize();
+                }
             }
         }
 
@@ -379,21 +434,68 @@ namespace Game {
                 board[mouseIndex.X][mouseIndex.Y].Draw(g, Pens.Red,b);
             }
         }
+        //Copied from google, do not have to know, only how to use
+        public bool LineIntersection(PointF line1Start, PointF line1End, PointF line2Start, PointF line2End, out PointF intersection) {
+            float firstLineSlopeX, firstLineSlopeY, secondLineSlopeX, secondLineSlopeY;
+            
+            firstLineSlopeX = line1End.X - line1Start.X;
+            firstLineSlopeY = line1End.Y - line1Start.Y;
 
-        public void Render(Graphics g){
+            secondLineSlopeX = line2End.X - line2Start.X;
+            secondLineSlopeY = line2End.Y - line2Start.Y;
+
+            float s, t;
+            s = (-firstLineSlopeY * (line1Start.X - line2Start.X) + firstLineSlopeX * (line1Start.Y - line2Start.Y)) / (-secondLineSlopeX * firstLineSlopeY + firstLineSlopeX * secondLineSlopeY);
+            t = (secondLineSlopeX * (line1Start.Y - line2Start.Y) - secondLineSlopeY * (line1Start.X - line2Start.X)) / (-secondLineSlopeX * firstLineSlopeY + firstLineSlopeX * secondLineSlopeY);
+
+            if (s >= 0 && s <= 1 && t >= 0 && t <= 1) {
+                float intersectionPointX = line1Start.X + (t * firstLineSlopeX);
+                float intersectionPointY = line1Start.Y + (t * firstLineSlopeY);
+
+                //Collision detected
+                intersection = new PointF(intersectionPointX, intersectionPointY);
+
+                return true;
+            }
+
+            intersection = new PointF(0, 0);
+            return false; //no collision
+        }
+
+        public void Render(Graphics g) {
+
             //Draw Board
             for (int x = 0; x < Board.Length; x++) {
                 for (int y = 0; y < Board[x].Length; y++) {
-                    Board[x][y].Draw(g, Pens.Blue,b);
+                    Board[x][y].Draw(g, b);
                 }
             }
+#if DEBUG
+
             //Draw Playing Area
             g.DrawRectangle(Pens.Green,BoardArea.Rectangle);
+#endif
             //Draw Aimer
             Point end = new Point();
-            end.X = (int)(50.0f * (float)Math.Cos(AimRadians));
-            end.Y = (int)(50.0f * (float)Math.Sin(AimRadians));
-            g.DrawLine(Pens.Red, new Point((int)BoardCenter.X+boardOffset.X, (int)BoardArea.Bottom), new Point((int)(BoardCenter.X + end.X+boardOffset.X), (int)(BoardArea.Bottom - end.Y)));
+            end.X = (int)(BoardArea.H * 0.8f * (float)Math.Cos(AimRadians));
+            end.Y = (int)(BoardArea.H * 0.8f * (float)Math.Sin(AimRadians));
+
+            Point start = new Point((int)BoardCenter.X + boardOffset.X, (int)BoardArea.Bottom);
+            end = new Point((int)(BoardCenter.X + end.X + boardOffset.X), (int)(BoardArea.Bottom - end.Y));
+
+            PointF intersection = new PointF();
+            if (LineIntersection(start, end, new PointF(BoardArea.Right, BoardArea.Top), new PointF(BoardArea.Right, BoardArea.Bottom), out intersection)) {
+                PointF angleStart = new PointF(BoardArea.Right - (end.X - BoardArea.Right), end.Y);
+                end = new Point((int)intersection.X, (int)intersection.Y);
+                g.DrawLine(Pens.Red, angleStart, end);
+            }
+            else if (LineIntersection(start, end, new PointF(BoardArea.Left, BoardArea.Top), new PointF(BoardArea.Left, BoardArea.Bottom), out intersection)) {
+                PointF angleStart = new PointF(-end.X, end.Y);
+                end = new Point((int)intersection.X, (int)intersection.Y);
+                g.DrawLine(Pens.Red, angleStart, end);
+            }
+            g.DrawLine(Pens.Red, start, end);
+            //Draw shooting bubble
             g.DrawEllipse(Pens.Red, ShootingRect.Rectangle);
             g.FillEllipse(b[ShootingColor], ShootingRect.Rectangle);
             //Draw Falling bobbles
@@ -416,10 +518,20 @@ namespace Game {
                     g.FillEllipse(b[brushIndex], bubble);
                 }
             }
+            if (GameState == State.Won) {
+                g.DrawString("You Won!", new Font("Purisa", 20), Brushes.Red, new PointF(BoardArea.Center.X - 125f,BoardArea.Center.Y - 20f));                
+                g.DrawString("Press R to try again", new Font("Purisa", 20), Brushes.Red, new PointF(BoardArea.Center.X -200f, BoardArea.Center.Y + 20f));
+            }
+            if (GameState == State.Lost) {
+                g.DrawString("You Lost!", new Font("Purisa", 20), Brushes.Red, new PointF(BoardArea.Center.X - 125f, BoardArea.Center.Y - 20f));
+                g.DrawString("Press R to try again", new Font("Purisa", 20), Brushes.Red, new PointF(BoardArea.Center.X - 200f, BoardArea.Center.Y + 20f));
+            }
+#if DEBUG
             int _x = (int)(Board[0][0].W*0.5f);
             int _y = (int)(Board[0][0].H*0.5f);
             RectangleF debug = new RectangleF(_x - BallRadius + boardOffset.X, _y - BallRadius+boardOffset.Y, BallDiameter, BallDiameter);
             g.DrawEllipse(Pens.Yellow, debug);
+#endif
         }
     }
 }

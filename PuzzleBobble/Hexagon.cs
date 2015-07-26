@@ -210,5 +210,10 @@ namespace Game {
                 g.FillEllipse(b[Value],new Rect(new Point((int)(Center.X-HalfW), (int)(Center.Y-HalfW)), new Size((int)HalfW*2,(int)HalfW*2)).Rectangle);
             }
         }
+        public void Draw(Graphics g, Brush[] b) {
+            if (Value >= 0) {
+                g.FillEllipse(b[Value], new Rect(new Point((int)(Center.X - HalfW), (int)(Center.Y - HalfW)), new Size((int)HalfW * 2, (int)HalfW * 2)).Rectangle);
+            }
+        }
     }
 }
