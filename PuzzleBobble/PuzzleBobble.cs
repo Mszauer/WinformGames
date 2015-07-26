@@ -67,6 +67,9 @@ namespace Game {
                 if (emptyBoard) {
                     return State.Won;
                 }
+                else if (hasLost) {
+                    return State.Lost;
+                }
                 //Check if shooting ball is moving
                 else if (ShootingVelocity.X == 0 && ShootingVelocity.Y == 0) {
                     return State.Aiming;
@@ -103,6 +106,7 @@ namespace Game {
             
         }
         public void Initialize() {
+            hasLost = false;
             GenerateRandomBoard();
             ShootingColor = GetNextShootingColor();
             FallingAnimation = new Dictionary<PointF, float>();
@@ -283,7 +287,7 @@ namespace Game {
                 }//end x
                 
             }//end firing state
-            if (GameState == State.Lost | GameState == State.Won) {
+            if (GameState == State.Lost || GameState == State.Won) {
                 if (rPressed) {
                     Initialize();
                 }

@@ -15,6 +15,7 @@ namespace Game {
             bobble = new PuzzleBobble(new Point(0,0),new Size(8,11));//Offset,Board Size (x*y), hexagonal radius
             width = (int)bobble.BoardArea.W;
             height = (int)bobble.BoardArea.H;
+            title = "PuzzleBobble";
         }
         public override void Initialize() {
             bobble.Initialize();
