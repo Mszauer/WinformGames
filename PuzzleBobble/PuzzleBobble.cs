@@ -523,12 +523,12 @@ namespace Game {
                 }
             }
             if (GameState == State.Won) {
-                g.DrawString("You Won!", new Font("Purisa", 20), Brushes.Red, new PointF(BoardArea.Center.X - 125f,BoardArea.Center.Y - 20f));                
-                g.DrawString("Press R to try again", new Font("Purisa", 20), Brushes.Red, new PointF(BoardArea.Center.X -200f, BoardArea.Center.Y + 20f));
+                g.DrawString("You Won!", new Font("Purisa", 20), Brushes.Red, new PointF(BoardArea.Center.X - 75f,BoardArea.Center.Y - 20f));                
+                g.DrawString("Press R to try again", new Font("Purisa", 20), Brushes.Red, new PointF(BoardArea.Center.X -125f, BoardArea.Center.Y + 20f));
             }
             if (GameState == State.Lost) {
-                g.DrawString("You Lost!", new Font("Purisa", 20), Brushes.Red, new PointF(BoardArea.Center.X - 125f, BoardArea.Center.Y - 20f));
-                g.DrawString("Press R to try again", new Font("Purisa", 20), Brushes.Red, new PointF(BoardArea.Center.X - 200f, BoardArea.Center.Y + 20f));
+                g.DrawString("You Lost!", new Font("Purisa", 20), Brushes.Red, new PointF(BoardArea.Center.X - 75f, BoardArea.Center.Y - 20f));
+                g.DrawString("Press R to try again", new Font("Purisa", 20), Brushes.Red, new PointF(BoardArea.Center.X - 125f, BoardArea.Center.Y + 20f));
             }
 #if DEBUG
             int _x = (int)(Board[0][0].W*0.5f);
