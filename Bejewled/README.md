@@ -1,5 +1,5 @@
 # Bejeweled Clone
-![alt text](https://github.com/Mszauer/Mario-World1-1/blob/master/Screenshots/Mario1.PNG "Start Screen")
+![alt text](https://github.com/Mszauer/WinformGames/blob/master/Bejewled/Screenshots/Bejewled.PNG "Start Screen")
 ##Purpose
 It has a very large board, 7x7 but the game logic can scale to any sized board. This was one of the first bigger games that I developed, and the most complicated at the time of creation. Starting off as a simple Bejeweled clone it became something similar to Puzzle and Dragons. I learned a lot of new concepts and got to use callbacks, something that was still new to me.
 
