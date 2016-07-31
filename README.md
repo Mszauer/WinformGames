@@ -9,7 +9,7 @@
 ###Columns
 ![alt text](https://github.com/Mszauer/WinformGames/blob/master/Screenshots/Columns.PNG " ")
 ###Connect Four
-![alt text](https://github.com/Mszauer/WinformGames/blob/master/Screenshots/Connect4.PNG
+![alt text](https://github.com/Mszauer/WinformGames/blob/master/Screenshots/Connect4.PNG " ")
 ###Flappy Bird
 ![alt text](https://github.com/Mszauer/WinformGames/blob/master/Screenshots/FlappyBird.PNG " ")
 ###Flood Control
@@ -17,8 +17,7 @@
 ###Puzzle Bobble
 ![alt text](https://github.com/Mszauer/WinformGames/blob/master/Screenshots/PuzzleBobble.PNG " ")
 ###Tetris
-
-
+![alt text](https://github.com/Mszauer/WinformGames/blob/master/Screenshots/Tetris.PNG " ")
 ###Snake
 ![alt text](https://github.com/Mszauer/WinformGames/blob/master/Screenshots/Snake.PNG " ")
 ###Pong
