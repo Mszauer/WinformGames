@@ -17,7 +17,7 @@
 ###Puzzle Bobble
 ![alt text](https://github.com/Mszauer/WinformGames/blob/master/Screenshots/PuzzleBobble.PNG " ")
 ###Tetris
-![alt text](https://github.com/Mszauer/WinformGames/blob/master/Screenshots/Tetris.JPG " ")
+![alt text](https://github.com/Mszauer/WinformGames/blob/master/Screenshots/Tetris.jpg " ")
 ###Snake
 ![alt text](https://github.com/Mszauer/WinformGames/blob/master/Screenshots/Snake.PNG " ")
 ###Pong
